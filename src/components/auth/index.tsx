@@ -1,42 +1,39 @@
 "use client";
 import { Phone } from "lucide-react";
 import Link from "next/link";
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 
 export default function Auth() {
+  const codeLength = 6;
   const [step, setStep] = useState<"phone" | "code">("phone");
   const [phone, setPhone] = useState("");
-  const [code, setCode] = useState("");
-  const codeLength = 6;
-  const codeInputs = Array.from({ length: codeLength });
-  const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
+  const [code, setCode] = useState<string[]>(Array(codeLength).fill(""));
+  const inputRefs = useRef<Array<HTMLInputElement | null>>([]);
   const [error, setError] = useState("");
 
   const phoneValid = /^09\d{9}$/.test(phone.replace(/\s/g, ""));
-  const codeValid = /^\d{4,6}$/.test(code);
+  const codeValid = code.every((d) => /^\d$/.test(d));
+
+  // focus first code input when entering the code step
+  useEffect(() => {
+    if (step === "code") {
+      // small timeout to ensure inputs are mounted
+      setTimeout(() => inputRefs.current[0]?.focus(), 50);
+    }
+  }, [step]);
 
   // Masked input for phone number: 0912 345 6789
   const formatPhone = (value: string) => {
-    // Keep only digits, max 11 characters
-    let digits = value.replace(/\D/g, "").slice(0, 11);
-
+    const digits = value.replace(/\D/g, "").slice(0, 11);
     let formatted = "";
-    if (digits.length > 0) {
-      formatted += digits.slice(0, 4); // 0912
-    }
-    if (digits.length > 4) {
-      formatted += " " + digits.slice(4, 7); // 345
-    }
-    if (digits.length > 7) {
-      formatted += " " + digits.slice(7, 11); // 6789
-    }
-
+    if (digits.length > 0) formatted += digits.slice(0, 4);
+    if (digits.length > 4) formatted += " " + digits.slice(4, 7);
+    if (digits.length > 7) formatted += " " + digits.slice(7, 11);
     return formatted;
   };
 
   const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    // Always format and set the value
-    setPhone(formatPhone(e.target.value));
+    setPhone(e.target.value);
   };
 
   const handleSendCode = () => {
@@ -55,7 +52,63 @@ export default function Auth() {
       return;
     }
     setError("");
-    console.log("ورود با کد:", code);
+    console.log("ورود با کد:", code.join(""));
+  };
+
+  // handle typing into a specific box
+  const handleCodeChange = (e: React.ChangeEvent<HTMLInputElement>, index: number) => {
+    const val = e.target.value.replace(/\D/g, "").slice(-1); // keep last digit only
+    const newCode = [...code];
+    newCode[index] = val || "";
+    setCode(newCode);
+
+    // move focus forward if user typed a digit
+    if (val && index < codeLength - 1) {
+      inputRefs.current[index + 1]?.focus();
+    }
+  };
+
+  // handle keyboard navigation / deletion
+  const handleCodeKeyDown = (e: React.KeyboardEvent<HTMLInputElement>, index: number) => {
+    if (e.key === "Backspace") {
+      e.preventDefault();
+      if (code[index]) {
+        // clear current box
+        const newCode = [...code];
+        newCode[index] = "";
+        setCode(newCode);
+      } else if (index > 0) {
+        // move to previous box if current is empty
+        inputRefs.current[index - 1]?.focus();
+      }
+    } else if (e.key === "Delete") {
+      e.preventDefault();
+      const newCode = [...code];
+      newCode[index] = "";
+      setCode(newCode);
+    } else if (e.key === "ArrowLeft" && index > 0) {
+      e.preventDefault();
+      inputRefs.current[index - 1]?.focus();
+    } else if (e.key === "ArrowRight" && index < codeLength - 1) {
+      e.preventDefault();
+      inputRefs.current[index + 1]?.focus();
+    }
+  };
+
+  // paste into a specific input: fill forward from that index
+  const handlePaste = (e: React.ClipboardEvent<HTMLInputElement>, index: number) => {
+    e.preventDefault();
+    const pasted = e.clipboardData.getData("text").replace(/\D/g, "").slice(0, codeLength - index);
+    if (!pasted) return;
+
+    const newCode = [...code];
+    pasted.split("").forEach((digit, i) => {
+      newCode[index + i] = digit;
+    });
+    setCode(newCode);
+
+    const nextIndex = Math.min(index + pasted.length, codeLength - 1);
+    inputRefs.current[nextIndex]?.focus();
   };
 
   return (
@@ -67,9 +120,7 @@ export default function Auth() {
 
         {step === "phone" && (
           <div className="space-y-4">
-            <label className="block text-gray-700 font-medium mb-1">
-              شماره موبایل
-            </label>
+            <label className="block text-gray-700 font-medium mb-1">شماره موبایل</label>
             <div className="flex items-center border border-gray-300 rounded-lg focus-within:ring-2 focus-within:ring-[var(--main-color)] transition">
               <Phone className="mx-3 text-[var(--main-color)]" size={20} />
               <input
@@ -86,11 +137,9 @@ export default function Auth() {
             <button
               onClick={handleSendCode}
               disabled={!phoneValid}
-              className={`w-full py-3 rounded-lg text-white font-semibold transition
-                ${phoneValid
-                  ? "bg-[var(--main-color)] hover:bg-[var(--main-color-dark)]"
-                  : "bg-gray-400 cursor-not-allowed"
-                }`}
+              className={`w-full py-3 rounded-lg text-white font-semibold transition ${
+                phoneValid ? "bg-[var(--main-color)] hover:bg-[var(--main-color-dark)]" : "bg-gray-400 cursor-not-allowed"
+              }`}
             >
               دریافت کد تایید
             </button>
@@ -99,68 +148,47 @@ export default function Auth() {
 
         {step === "code" && (
           <div className="space-y-4">
-            <label className="block text-gray-700 font-medium mb-1">
-              کد تایید
-            </label>
-            <div className="flex items-center justify-center gap-2">
-              {codeInputs.map((_, idx) => {
-                // RTL: show code from right to left
-                const rtlIdx = codeLength - 1 - idx;
-                return (
-                  <input
-                    dir="rtl"
-                    key={idx}
-                    type="text"
-                    inputMode="numeric"
-                    maxLength={1}
-                    value={code[rtlIdx] || ""}
-                    onChange={e => {
-                      const val = e.target.value.replace(/\D/g, "");
-                      if (!val) return;
-                      let newCode = code.padStart(codeLength, "").split("");
-                      newCode[rtlIdx] = val[val.length - 1];
-                      const joined = newCode.join("").slice(-codeLength);
-                      setCode(joined.trimStart());
-                      if (val && idx > 0) {
-                        inputRefs.current[idx - 1]?.focus();
-                      }
-                    }}
-                    onKeyDown={e => {
-                      if (e.key === "Backspace") {
-                        let newCode = code.padStart(codeLength, "").split("");
-                        if (newCode[rtlIdx]) {
-                          newCode[rtlIdx] = "";
-                          setCode(newCode.join("").trimStart());
-                        } else if (idx < codeLength - 1) {
-                          inputRefs.current[idx + 1]?.focus();
-                        }
-                      }
-                    }}
-                    ref={el => { inputRefs.current[idx] = el; }}
-                    className="w-12 h-12 text-center border border-gray-300 rounded-lg text-xl font-bold focus:ring-2 focus:ring-[var(--main-color)] transition bg-transparent"
-                    style={{ direction: "ltr" }}
-                  />
-                );
-              })}
+            <label className="block text-gray-700 font-medium mb-1">کد تایید</label>
+
+            {/* Force LTR for the code inputs so they render left-to-right even in an RTL page */}
+            <div dir="ltr" className="flex flex-row items-center justify-center gap-3">
+              {code.map((digit, idx) => (
+                <input
+                  key={idx}
+                  type="text"
+                  inputMode="numeric"
+                  pattern="\d*"
+                  maxLength={1}
+                  value={digit}
+                  onChange={(e) => handleCodeChange(e, idx)}
+                  onKeyDown={(e) => handleCodeKeyDown(e, idx)}
+                  onPaste={(e) => handlePaste(e, idx)}
+                  onFocus={(e) => e.currentTarget.select()}
+                  ref={(el:any) => (inputRefs.current[idx] = el)}
+                  aria-label={`کد رقم ${idx + 1}`}
+                  className="w-12 h-12 text-center border border-gray-300 rounded-lg text-xl font-bold focus:ring-2 focus:ring-[var(--main-color)] transition bg-transparent"
+                />
+              ))}
             </div>
+
             {error && <p className="text-red-500 text-sm">{error}</p>}
-            <Link href={'/dashboard'}>
+
+            <Link href="/dashboard">
               <button
                 onClick={handleVerifyCode}
                 disabled={!codeValid}
-                className={`w-full py-3 cursor-pointer rounded-lg text-white font-semibold transition
-                  ${codeValid
-                    ? "bg-[var(--main-color)] hover:bg-[var(--main-color-dark)]"
-                    : "bg-gray-400 cursor-not-allowed]"
-                  }`}
+                className={`w-full py-3 rounded-lg text-white font-semibold transition ${
+                  codeValid ? "bg-[var(--main-color)] hover:bg-[var(--main-color-dark)]" : "bg-gray-400 cursor-not-allowed"
+                }`}
               >
                 ورود به سامانه
               </button>
             </Link>
+
             <button
               onClick={() => {
                 setStep("phone");
-                setCode("");
+                setCode(Array(codeLength).fill(""));
                 setError("");
               }}
               className="mt-2 text-sm text-[var(--main-color)] hover:underline cursor-pointer"
