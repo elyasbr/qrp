@@ -2,6 +2,7 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import { ArrowRight, Menu, Square } from "lucide-react";
+import Image from "next/image";
 
 export default function Home() {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -33,7 +34,7 @@ export default function Home() {
           </div>
           {/* Logo */}
           <div className="text-[var(--main-color)] font-extrabold text-xl font-Morabba">
-            بیمه 
+            <Image alt="logo" src='/images/logo.jpg' width={100} height={100}/>
           </div>
 
           {/* Mobile Toggle Button */}
