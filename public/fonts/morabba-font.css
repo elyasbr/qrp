@@ -1,0 +1,56 @@
+/* Morabba font-face definitions */
+
+@font-face {
+  font-family: 'Morabba';
+  src: url('/fonts/woff2/Morabba-Black.woff2') format('woff2');
+  font-weight: 900;
+  font-style: normal;
+}
+@font-face {
+  font-family: 'Morabba';
+  src: url('/fonts/woff2/Morabba-Bold.woff2') format('woff2');
+  font-weight: bold;
+  font-style: normal;
+}
+@font-face {
+  font-family: 'Morabba';
+  src: url('/fonts/woff2/Morabba-ExtraBold.woff2') format('woff2');
+  font-weight: 800;
+  font-style: normal;
+}
+@font-face {
+  font-family: 'Morabba';
+  src: url('/fonts/woff2/Morabba-Heavy.woff2') format('woff2');
+  font-weight: 700;
+  font-style: normal;
+}
+@font-face {
+  font-family: 'Morabba';
+  src: url('/fonts/woff2/Morabba-Light.woff2') format('woff2');
+  font-weight: 300;
+  font-style: normal;
+}
+@font-face {
+  font-family: 'Morabba';
+  src: url('/fonts/woff2/Morabba-Medium.woff2') format('woff2');
+  font-weight: 500;
+  font-style: normal;
+}
+@font-face {
+  font-family: 'Morabba';
+  src: url('/fonts/woff2/Morabba-Regular.woff2') format('woff2');
+  font-weight: normal;
+  font-style: normal;
+}
+@font-face {
+  font-family: 'Morabba';
+  src: url('/fonts/woff2/Morabba-SemiBold.woff2') format('woff2');
+  font-weight: 600;
+  font-style: normal;
+}
+@font-face {
+  font-family: 'Morabba';
+  src: url('/fonts/woff2/Morabba-Ultralight.woff2') format('woff2');
+  font-weight: 200;
+  font-style: normal;
+}
