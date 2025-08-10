@@ -4,82 +4,113 @@ import Link from "next/link";
 import { useState, useRef, useEffect } from "react";
 
 export default function Auth() {
+  const phoneLength = 11; // 11 digits for phone number (e.g. 09123456789)
   const codeLength = 6;
+
   const [step, setStep] = useState<"phone" | "code">("phone");
-  const [phone, setPhone] = useState("");
+  const [phoneDigits, setPhoneDigits] = useState<string[]>(Array(phoneLength).fill(""));
   const [code, setCode] = useState<string[]>(Array(codeLength).fill(""));
-  const inputRefs = useRef<Array<HTMLInputElement | null>>([]);
+  const phoneInputRefs = useRef<Array<HTMLInputElement | null>>([]);
+  const codeInputRefs = useRef<Array<HTMLInputElement | null>>([]);
   const [error, setError] = useState("");
 
-  const phoneValid = /^09\d{9}$/.test(phone.replace(/\s/g, ""));
+  // Phone number validation (must be 11 digits, start with 09)
+  const phoneValid =
+    phoneDigits.length === phoneLength &&
+    phoneDigits.every((d) => /^\d$/.test(d)) &&
+    phoneDigits[0] === "0" &&
+    phoneDigits[1] === "9";
+
+  // Code validation: all digits filled
   const codeValid = code.every((d) => /^\d$/.test(d));
 
-  // focus first code input when entering the code step
+  // Focus first input on step change
   useEffect(() => {
-    if (step === "code") {
-      // small timeout to ensure inputs are mounted
-      setTimeout(() => inputRefs.current[0]?.focus(), 50);
+    if (step === "phone") {
+      setTimeout(() => phoneInputRefs.current[0]?.focus(), 50);
+    } else if (step === "code") {
+      setTimeout(() => codeInputRefs.current[0]?.focus(), 50);
     }
   }, [step]);
 
-  // Masked input for phone number: 0912 345 6789
-  const formatPhone = (value: string) => {
-    const digits = value.replace(/\D/g, "").slice(0, 11);
-    let formatted = "";
-    if (digits.length > 0) formatted += digits.slice(0, 4);
-    if (digits.length > 4) formatted += " " + digits.slice(4, 7);
-    if (digits.length > 7) formatted += " " + digits.slice(7, 11);
-    return formatted;
-  };
+  // Handle phone digit change
+  const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>, idx: number) => {
+    const val = e.target.value.replace(/\D/g, "").slice(-1); // only last digit
+    if (!val && e.target.value !== "") return; // ignore if invalid character typed
 
-  const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setPhone(e.target.value);
-  };
+    const newDigits = [...phoneDigits];
+    newDigits[idx] = val || "";
+    setPhoneDigits(newDigits);
 
-  const handleSendCode = () => {
-    if (!phoneValid) {
-      setError("لطفا شماره موبایل معتبر وارد کنید.");
-      return;
+    if (val && idx < phoneLength - 1) {
+      phoneInputRefs.current[idx + 1]?.focus();
     }
-    setError("");
-    console.log("ارسال کد برای:", phone.replace(/\s/g, ""));
-    setStep("code");
   };
 
-  const handleVerifyCode = () => {
-    if (!codeValid) {
-      setError("کد وارد شده نامعتبر است.");
-      return;
+  // Handle phone key down (navigation and deletion)
+  const handlePhoneKeyDown = (e: React.KeyboardEvent<HTMLInputElement>, idx: number) => {
+    if (e.key === "Backspace") {
+      e.preventDefault();
+      const newDigits = [...phoneDigits];
+      if (newDigits[idx]) {
+        newDigits[idx] = "";
+        setPhoneDigits(newDigits);
+      } else if (idx > 0) {
+        phoneInputRefs.current[idx - 1]?.focus();
+        const prevDigits = [...phoneDigits];
+        prevDigits[idx - 1] = "";
+        setPhoneDigits(prevDigits);
+      }
+    } else if (e.key === "Delete") {
+      e.preventDefault();
+      const newDigits = [...phoneDigits];
+      newDigits[idx] = "";
+      setPhoneDigits(newDigits);
+    } else if (e.key === "ArrowLeft" && idx > 0) {
+      e.preventDefault();
+      phoneInputRefs.current[idx - 1]?.focus();
+    } else if (e.key === "ArrowRight" && idx < phoneLength - 1) {
+      e.preventDefault();
+      phoneInputRefs.current[idx + 1]?.focus();
     }
-    setError("");
-    console.log("ورود با کد:", code.join(""));
   };
 
-  // handle typing into a specific box
+  // Paste on phone inputs: fill digits forward
+  const handlePhonePaste = (e: React.ClipboardEvent<HTMLInputElement>, idx: number) => {
+    e.preventDefault();
+    const pasted = e.clipboardData.getData("text").replace(/\D/g, "").slice(0, phoneLength - idx);
+    if (!pasted) return;
+
+    const newDigits = [...phoneDigits];
+    pasted.split("").forEach((digit, i) => {
+      newDigits[idx + i] = digit;
+    });
+    setPhoneDigits(newDigits);
+
+    const nextIndex = Math.min(idx + pasted.length, phoneLength - 1);
+    phoneInputRefs.current[nextIndex]?.focus();
+  };
+
+  // Handle code digit change, keydown, and paste are unchanged (same as before)
   const handleCodeChange = (e: React.ChangeEvent<HTMLInputElement>, index: number) => {
-    const val = e.target.value.replace(/\D/g, "").slice(-1); // keep last digit only
+    const val = e.target.value.replace(/\D/g, "").slice(-1);
     const newCode = [...code];
     newCode[index] = val || "";
     setCode(newCode);
-
-    // move focus forward if user typed a digit
     if (val && index < codeLength - 1) {
-      inputRefs.current[index + 1]?.focus();
+      codeInputRefs.current[index + 1]?.focus();
     }
   };
 
-  // handle keyboard navigation / deletion
   const handleCodeKeyDown = (e: React.KeyboardEvent<HTMLInputElement>, index: number) => {
     if (e.key === "Backspace") {
       e.preventDefault();
       if (code[index]) {
-        // clear current box
         const newCode = [...code];
         newCode[index] = "";
         setCode(newCode);
       } else if (index > 0) {
-        // move to previous box if current is empty
-        inputRefs.current[index - 1]?.focus();
+        codeInputRefs.current[index - 1]?.focus();
       }
     } else if (e.key === "Delete") {
       e.preventDefault();
@@ -88,14 +119,13 @@ export default function Auth() {
       setCode(newCode);
     } else if (e.key === "ArrowLeft" && index > 0) {
       e.preventDefault();
-      inputRefs.current[index - 1]?.focus();
+      codeInputRefs.current[index - 1]?.focus();
     } else if (e.key === "ArrowRight" && index < codeLength - 1) {
       e.preventDefault();
-      inputRefs.current[index + 1]?.focus();
+      codeInputRefs.current[index + 1]?.focus();
     }
   };
 
-  // paste into a specific input: fill forward from that index
   const handlePaste = (e: React.ClipboardEvent<HTMLInputElement>, index: number) => {
     e.preventDefault();
     const pasted = e.clipboardData.getData("text").replace(/\D/g, "").slice(0, codeLength - index);
@@ -108,7 +138,28 @@ export default function Auth() {
     setCode(newCode);
 
     const nextIndex = Math.min(index + pasted.length, codeLength - 1);
-    inputRefs.current[nextIndex]?.focus();
+    codeInputRefs.current[nextIndex]?.focus();
+  };
+
+  // Send code after phone validation
+  const handleSendCode = () => {
+    if (!phoneValid) {
+      setError("لطفا شماره موبایل معتبر وارد کنید.");
+      return;
+    }
+    setError("");
+    console.log("ارسال کد برای:", phoneDigits.join(""));
+    setStep("code");
+  };
+
+  // Verify code input
+  const handleVerifyCode = () => {
+    if (!codeValid) {
+      setError("کد وارد شده نامعتبر است.");
+      return;
+    }
+    setError("");
+    console.log("ورود با کد:", code.join(""));
   };
 
   return (
@@ -121,19 +172,26 @@ export default function Auth() {
         {step === "phone" && (
           <div className="space-y-4">
             <label className="block text-gray-700 font-medium mb-1">شماره موبایل</label>
-            <div className="flex items-center border border-gray-300 rounded-lg focus-within:ring-2 focus-within:ring-[var(--main-color)] transition">
-              <Phone className="mx-3 text-[var(--main-color)]" size={20} />
-              <input
-                type="tel"
-                value={phone}
-                onChange={handlePhoneChange}
-                placeholder="0915 123 4567"
-                className="w-full p-3 text-right placeholder-gray-400 bg-transparent focus:outline-none"
-                maxLength={13}
-              />
+            <div dir="ltr" className="flex justify-center gap-1 ">
+              {phoneDigits.map((digit, idx) => (
+                <input
+                  key={idx}
+                  type="text"
+                  inputMode="numeric"
+                  pattern="\d*"
+                  maxLength={1}
+                  value={digit}
+                  onChange={(e) => handlePhoneChange(e, idx)}
+                  onKeyDown={(e) => handlePhoneKeyDown(e, idx)}
+                  onPaste={(e) => handlePhonePaste(e, idx)}
+                  onFocus={(e) => e.currentTarget.select()}
+                  ref={(el:any) => (phoneInputRefs.current[idx] = el)}
+                  aria-label={`شماره موبایل رقم ${idx + 1}`}
+                  className="w-6 lg:w-7 h-8 text-center border border-gray-300 rounded-lg text-lg font-semibold focus:ring-2 focus:ring-[var(--main-color)] transition bg-transparent"
+                />
+              ))}
             </div>
-            {error && <p className="text-red-500 text-sm">{error}</p>}
-
+            {error && <p className="text-red-500 text-sm mt-1">{error}</p>}
             <button
               onClick={handleSendCode}
               disabled={!phoneValid}
@@ -150,7 +208,6 @@ export default function Auth() {
           <div className="space-y-4">
             <label className="block text-gray-700 font-medium mb-1">کد تایید</label>
 
-            {/* Force LTR for the code inputs so they render left-to-right even in an RTL page */}
             <div dir="ltr" className="flex flex-row items-center justify-center gap-3">
               {code.map((digit, idx) => (
                 <input
@@ -164,7 +221,7 @@ export default function Auth() {
                   onKeyDown={(e) => handleCodeKeyDown(e, idx)}
                   onPaste={(e) => handlePaste(e, idx)}
                   onFocus={(e) => e.currentTarget.select()}
-                  ref={(el:any) => (inputRefs.current[idx] = el)}
+                  ref={(el:any) => (codeInputRefs.current[idx] = el)}
                   aria-label={`کد رقم ${idx + 1}`}
                   className="w-12 h-12 text-center border border-gray-300 rounded-lg text-xl font-bold focus:ring-2 focus:ring-[var(--main-color)] transition bg-transparent"
                 />
