@@ -3,6 +3,8 @@ import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
 import { otpLoginByMobile, acceptLoginByMobile, setRole } from "@/services/api/userService";
 import { decodeJwt } from "@/services/api/auth";
+import { extractToken } from "@/services/api/utils";
+import { useAuth } from "@/hooks/useAuth";
 import { useRouter } from "next/navigation";
 
 export default function SignIn({ title = "ورود به سامانه" }: { title?: string }) {
@@ -18,6 +20,7 @@ export default function SignIn({ title = "ورود به سامانه" }: { title
   const [rolesToSelect, setRolesToSelect] = useState<any[] | null>(null);
   const [settingRole, setSettingRole] = useState(false);
   const router = useRouter();
+  const { login } = useAuth();
 
   const phoneValid =
     phoneDigits.length === phoneLength &&
@@ -159,9 +162,10 @@ export default function SignIn({ title = "ورود به سامانه" }: { title
     try {
       const mobile = formatMobile(phoneDigits);
       const res = await acceptLoginByMobile(mobile, code.join(""));
-      const token = res?.result?.token || res?.token || res?.data?.token || null;
+      const token = extractToken(res);
       if (token) {
-        if (typeof window !== "undefined") localStorage.setItem("authToken", token);
+        // Use the login function from useAuth hook
+        login(token);
         const payload: any = decodeJwt(token) || {};
         const roles = payload?.roles || payload?.role || [];
 
@@ -169,8 +173,15 @@ export default function SignIn({ title = "ورود به سامانه" }: { title
           // prefer rowId as roleId when available (backend expects rowId in roleId)
           const roleToSend = roles[0]?.rowId || roles[0]?.slug || roles[0];
           setSettingRole(true);
-          await setRole(roleToSend);
+          const roleResponse = await setRole(roleToSend);
           setSettingRole(false);
+          
+          // Check if setRole returned a new token and update it
+          const newToken = extractToken(roleResponse);
+          if (newToken) {
+            login(newToken);
+          }
+          
           router.push("/dashboard");
           return;
         }
@@ -195,8 +206,15 @@ export default function SignIn({ title = "ورود به سامانه" }: { title
     try {
       setSettingRole(true);
       const roleToSend = role?.rowId || role?.slug || role;
-      await setRole(roleToSend);
+      const roleResponse = await setRole(roleToSend);
       setSettingRole(false);
+      
+      // Check if setRole returned a new token and update it
+      const newToken = extractToken(roleResponse);
+      if (newToken) {
+        login(newToken);
+      }
+      
       router.push("/dashboard");
     } catch (err: any) {
       setSettingRole(false);
@@ -315,5 +333,3 @@ export default function SignIn({ title = "ورود به سامانه" }: { title
     </div>
   );
 }
-
-// ...existing code...

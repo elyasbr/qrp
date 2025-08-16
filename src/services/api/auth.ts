@@ -62,6 +62,20 @@ export function getToken(): string | null {
   return localStorage.getItem('authToken');
 }
 
+export function setToken(token: string): void {
+  if (typeof window === 'undefined') return;
+  localStorage.setItem('authToken', token);
+  // Dispatch custom event to notify axios interceptor about token update
+  window.dispatchEvent(new CustomEvent('tokenUpdated', { detail: { token } }));
+}
+
+export function removeToken(): void {
+  if (typeof window === 'undefined') return;
+  localStorage.removeItem('authToken');
+  // Dispatch custom event to notify axios interceptor about token removal
+  window.dispatchEvent(new CustomEvent('tokenUpdated', { detail: { token: null } }));
+}
+
 export function getAuthPayload<T = JwtPayload>(): T | null {
   const token = getToken();
   return decodeJwt<T>(token || undefined);
