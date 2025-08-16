@@ -62,9 +62,10 @@ export const preRegisterMobile = async (mobile: string, iso3Country = 'IRN'): Pr
 };
 
 // 2) Accept register (verify code and create user)
-export const acceptRegisterMobile = async (mobile: string, code: string, iso3Country = 'IRN'): Promise<any> => {
+export const acceptRegisterMobile = async (mobile: string, smsCode: string): Promise<any> => {
   try {
-    const response = await api.post(`/user/mobile/accept-register`, { iso3Country, mobile: String(mobile), code });
+    // API expects { mobile, smsCode } for accept-register
+    const response = await api.post(`/user/mobile/accept-register`, { mobile: String(mobile), smsCode });
     return response.data;
   } catch (error) {
     throw new Error((error as AxiosError)?.message || 'Failed to accept mobile registration');
@@ -83,9 +84,10 @@ export const preSignInByMobile = async (mobile: string): Promise<any> => {
 };
 
 // 4) Accept sign-in (verify OTP and return token/user)
-export const acceptSignInByMobile = async (mobile: string, code: string, iso3Country = 'IRN'): Promise<any> => {
+export const acceptSignInByMobile = async (mobile: string, smsCode: string): Promise<any> => {
   try {
-    const response = await api.post(`/user/mobile/accept-sign-in`, { iso3Country, mobile: String(mobile), code });
+    // API expects { mobile, smsCode } for accept-sign-in
+    const response = await api.post(`/user/mobile/accept-sign-in`, { mobile: String(mobile), smsCode });
     return response.data;
   } catch (error) {
     throw new Error((error as AxiosError)?.message || 'Failed to accept sign-in by mobile');
