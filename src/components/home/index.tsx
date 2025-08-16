@@ -79,7 +79,7 @@ export default function Home() {
         </p>
 
         {/* CTA Button */}
-        <Link href="/auth">
+        <Link href="/signup">
           <button className="flex cursor-pointer items-center gap-2 bg-[var(--main-color)] hover:bg-[var(--main-color-dark)] text-white px-6 py-3 rounded-xl text-base font-semibold shadow-md transition-all">
             <ArrowRight className="text-xl" />
             شروع کنید

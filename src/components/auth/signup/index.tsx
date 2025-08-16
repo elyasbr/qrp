@@ -1,10 +1,10 @@
 "use client";
-import { Phone } from "lucide-react";
-import Link from "next/link";
 import { useState, useRef, useEffect } from "react";
+import Link from "next/link";
+import { preRegisterMobile, acceptRegisterMobile } from "@/services/api/userService";
 
-export default function Auth() {
-  const phoneLength = 11; // 11 digits for phone number (e.g. 09123456789)
+export default function SignUp({ title = "ثبت نام" }: { title?: string }) {
+  const phoneLength = 11;
   const codeLength = 6;
 
   const [step, setStep] = useState<"phone" | "code">("phone");
@@ -14,40 +14,47 @@ export default function Auth() {
   const codeInputRefs = useRef<Array<HTMLInputElement | null>>([]);
   const [error, setError] = useState("");
 
-  // Phone number validation (must be 11 digits, start with 09)
   const phoneValid =
     phoneDigits.length === phoneLength &&
     phoneDigits.every((d) => /^\d$/.test(d)) &&
     phoneDigits[0] === "0" &&
     phoneDigits[1] === "9";
 
-  // Code validation: all digits filled
+  // format collected digits (e.g. 09152944074)
+  const formatMobile = (digits: string[]) => {
+    const raw = digits.join(""); // digits only
+    if (raw.startsWith("0")) {
+      // local form like 0915... -> remove leading 0
+      return `+98${raw.replace(/^0+/, "")}`;
+    }
+    if (raw.startsWith("98")) {
+      // already has country code without plus: 98915... -> +98915...
+      return `+${raw}`;
+    }
+    if (raw.startsWith("9")) {
+      // short form like 915... -> +98915...
+      return `+98${raw}`;
+    }
+    // fallback: prefix +98
+    return `+98${raw}`;
+  };
+
   const codeValid = code.every((d) => /^\d$/.test(d));
 
-  // Focus first input on step change
   useEffect(() => {
-    if (step === "phone") {
-      setTimeout(() => phoneInputRefs.current[0]?.focus(), 50);
-    } else if (step === "code") {
-      setTimeout(() => codeInputRefs.current[0]?.focus(), 50);
-    }
+    if (step === "phone") setTimeout(() => phoneInputRefs.current[0]?.focus(), 50);
+    else setTimeout(() => codeInputRefs.current[0]?.focus(), 50);
   }, [step]);
 
-  // Handle phone digit change
   const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>, idx: number) => {
-    const val = e.target.value.replace(/\D/g, "").slice(-1); // only last digit
-    if (!val && e.target.value !== "") return; // ignore if invalid character typed
-
+    const val = e.target.value.replace(/\D/g, "").slice(-1);
+    if (!val && e.target.value !== "") return;
     const newDigits = [...phoneDigits];
     newDigits[idx] = val || "";
     setPhoneDigits(newDigits);
-
-    if (val && idx < phoneLength - 1) {
-      phoneInputRefs.current[idx + 1]?.focus();
-    }
+    if (val && idx < phoneLength - 1) phoneInputRefs.current[idx + 1]?.focus();
   };
 
-  // Handle phone key down (navigation and deletion)
   const handlePhoneKeyDown = (e: React.KeyboardEvent<HTMLInputElement>, idx: number) => {
     if (e.key === "Backspace") {
       e.preventDefault();
@@ -75,31 +82,23 @@ export default function Auth() {
     }
   };
 
-  // Paste on phone inputs: fill digits forward
   const handlePhonePaste = (e: React.ClipboardEvent<HTMLInputElement>, idx: number) => {
     e.preventDefault();
     const pasted = e.clipboardData.getData("text").replace(/\D/g, "").slice(0, phoneLength - idx);
     if (!pasted) return;
-
     const newDigits = [...phoneDigits];
-    pasted.split("").forEach((digit, i) => {
-      newDigits[idx + i] = digit;
-    });
+    pasted.split("").forEach((digit, i) => (newDigits[idx + i] = digit));
     setPhoneDigits(newDigits);
-
     const nextIndex = Math.min(idx + pasted.length, phoneLength - 1);
     phoneInputRefs.current[nextIndex]?.focus();
   };
 
-  // Handle code digit change, keydown, and paste are unchanged (same as before)
   const handleCodeChange = (e: React.ChangeEvent<HTMLInputElement>, index: number) => {
     const val = e.target.value.replace(/\D/g, "").slice(-1);
     const newCode = [...code];
     newCode[index] = val || "";
     setCode(newCode);
-    if (val && index < codeLength - 1) {
-      codeInputRefs.current[index + 1]?.focus();
-    }
+    if (val && index < codeLength - 1) codeInputRefs.current[index + 1]?.focus();
   };
 
   const handleCodeKeyDown = (e: React.KeyboardEvent<HTMLInputElement>, index: number) => {
@@ -109,9 +108,7 @@ export default function Auth() {
         const newCode = [...code];
         newCode[index] = "";
         setCode(newCode);
-      } else if (index > 0) {
-        codeInputRefs.current[index - 1]?.focus();
-      }
+      } else if (index > 0) codeInputRefs.current[index - 1]?.focus();
     } else if (e.key === "Delete") {
       e.preventDefault();
       const newCode = [...code];
@@ -130,44 +127,47 @@ export default function Auth() {
     e.preventDefault();
     const pasted = e.clipboardData.getData("text").replace(/\D/g, "").slice(0, codeLength - index);
     if (!pasted) return;
-
     const newCode = [...code];
-    pasted.split("").forEach((digit, i) => {
-      newCode[index + i] = digit;
-    });
+    pasted.split("").forEach((digit, i) => (newCode[index + i] = digit));
     setCode(newCode);
-
     const nextIndex = Math.min(index + pasted.length, codeLength - 1);
     codeInputRefs.current[nextIndex]?.focus();
   };
 
-  // Send code after phone validation
-  const handleSendCode = () => {
+  const handleSendCode = async () => {
     if (!phoneValid) {
       setError("لطفا شماره موبایل معتبر وارد کنید.");
       return;
     }
     setError("");
-    console.log("ارسال کد برای:", phoneDigits.join(""));
-    setStep("code");
+    try {
+  const mobile = formatMobile(phoneDigits);
+  await preRegisterMobile(mobile);
+      setStep("code");
+    } catch (err: any) {
+      setError(err?.message || "خطا در ارسال کد");
+    }
   };
 
-  // Verify code input
-  const handleVerifyCode = () => {
+  const handleVerifyCode = async () => {
     if (!codeValid) {
       setError("کد وارد شده نامعتبر است.");
       return;
     }
     setError("");
-    console.log("ورود با کد:", code.join(""));
+    try {
+  const mobile = formatMobile(phoneDigits);
+  await acceptRegisterMobile(mobile, code.join(""));
+      // TODO: handle token + redirect after successful registration
+    } catch (err: any) {
+      setError(err?.message || "کد وارد شده اشتباه است");
+    }
   };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-[#f8f9fb] text-[var(--foreground)] p-4">
       <div className="w-full max-w-md bg-white rounded-3xl shadow-[0_8px_30px_rgba(0,0,0,0.1)] p-8 space-y-8 transition">
-        <h1 className="text-3xl font-extrabold text-center text-[var(--main-color)] mb-4">
-          ورود به سامانه
-        </h1>
+        <h1 className="text-3xl font-extrabold text-center text-[var(--main-color)] mb-4">{title}</h1>
 
         {step === "phone" && (
           <div className="space-y-4">
@@ -185,7 +185,7 @@ export default function Auth() {
                   onKeyDown={(e) => handlePhoneKeyDown(e, idx)}
                   onPaste={(e) => handlePhonePaste(e, idx)}
                   onFocus={(e) => e.currentTarget.select()}
-                  ref={(el:any) => (phoneInputRefs.current[idx] = el)}
+                  ref={(el: any) => (phoneInputRefs.current[idx] = el)}
                   aria-label={`شماره موبایل رقم ${idx + 1}`}
                   className="w-6 lg:w-7 h-8 text-center border border-gray-300 rounded-lg text-lg font-semibold focus:ring-2 focus:ring-[var(--main-color)] transition bg-transparent"
                 />
@@ -221,7 +221,7 @@ export default function Auth() {
                   onKeyDown={(e) => handleCodeKeyDown(e, idx)}
                   onPaste={(e) => handlePaste(e, idx)}
                   onFocus={(e) => e.currentTarget.select()}
-                  ref={(el:any) => (codeInputRefs.current[idx] = el)}
+                  ref={(el: any) => (codeInputRefs.current[idx] = el)}
                   aria-label={`کد رقم ${idx + 1}`}
                   className="w-12 h-12 text-center border border-gray-300 rounded-lg text-xl font-bold focus:ring-2 focus:ring-[var(--main-color)] transition bg-transparent"
                 />
@@ -238,7 +238,7 @@ export default function Auth() {
                   codeValid ? "bg-[var(--main-color)] hover:bg-[var(--main-color-dark)]" : "bg-gray-400 cursor-not-allowed"
                 }`}
               >
-                ورود به سامانه
+                ثبت نام و ورود
               </button>
             </Link>
 
