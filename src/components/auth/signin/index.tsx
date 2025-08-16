@@ -142,8 +142,8 @@ export default function SignIn({ title = "ورود به سامانه" }: { title
     }
     setError("");
     try {
-  const mobile = formatMobile(phoneDigits);
-  await otpLoginByMobile(mobile);
+      const mobile = formatMobile(phoneDigits);
+      await otpLoginByMobile(mobile);
       setStep("code");
     } catch (err: any) {
       setError(err?.message || "خطا در ارسال کد");
@@ -166,9 +166,10 @@ export default function SignIn({ title = "ورود به سامانه" }: { title
         const roles = payload?.roles || payload?.role || [];
 
         if (Array.isArray(roles) && roles.length === 1) {
-          const roleSlug = roles[0]?.slug || roles[0];
+          // prefer rowId as roleId when available (backend expects rowId in roleId)
+          const roleToSend = roles[0]?.rowId || roles[0]?.slug || roles[0];
           setSettingRole(true);
-          await setRole(roleSlug);
+          await setRole(roleToSend);
           setSettingRole(false);
           router.push("/dashboard");
           return;
@@ -193,8 +194,8 @@ export default function SignIn({ title = "ورود به سامانه" }: { title
     if (!role) return;
     try {
       setSettingRole(true);
-      const slug = role.slug || role;
-      await setRole(slug);
+      const roleToSend = role?.rowId || role?.slug || role;
+      await setRole(roleToSend);
       setSettingRole(false);
       router.push("/dashboard");
     } catch (err: any) {
@@ -234,9 +235,8 @@ export default function SignIn({ title = "ورود به سامانه" }: { title
             <button
               onClick={handleSendCode}
               disabled={!phoneValid}
-              className={`w-full py-3 rounded-lg text-white font-semibold transition ${
-                phoneValid ? "bg-[var(--main-color)] hover:bg-[var(--main-color-dark)]" : "bg-gray-400 cursor-not-allowed"
-              }`}
+              className={`w-full py-3 rounded-lg text-white font-semibold transition ${phoneValid ? "bg-[var(--main-color)] hover:bg-[var(--main-color-dark)]" : "bg-gray-400 cursor-not-allowed"
+                }`}
             >
               دریافت کد تایید
             </button>
@@ -273,9 +273,8 @@ export default function SignIn({ title = "ورود به سامانه" }: { title
               <button
                 onClick={handleVerifyCode}
                 disabled={!codeValid}
-                className={`w-full py-3 rounded-lg text-white font-semibold transition ${
-                  codeValid ? "bg-[var(--main-color)] hover:bg-[var(--main-color-dark)]" : "bg-gray-400 cursor-not-allowed"
-                }`}
+                className={`w-full py-3 rounded-lg text-white font-semibold transition ${codeValid ? "bg-[var(--main-color)] hover:bg-[var(--main-color-dark)]" : "bg-gray-400 cursor-not-allowed"
+                  }`}
               >
                 ورود به سامانه
               </button>
@@ -294,24 +293,24 @@ export default function SignIn({ title = "ورود به سامانه" }: { title
           </div>
         )}
 
-                  {rolesToSelect && (
-                    <div className="space-y-4">
-                      <h2 className="text-lg font-semibold">انتخاب نقش</h2>
-                      <div className="flex flex-col gap-2">
-                        {rolesToSelect.map((r: any) => (
-                          <button
-                            key={r.slug || r.rowId || r}
-                            onClick={() => chooseRole(r)}
-                            disabled={settingRole}
-                            className="py-2 px-3 rounded-lg bg-[var(--main-color)] text-white"
-                          >
-                            {r.slug || r}
-                          </button>
-                        ))}
-                      </div>
-                      {error && <p className="text-red-500 text-sm">{error}</p>}
-                    </div>
-                  )}
+        {rolesToSelect && (
+          <div className="space-y-4">
+            <h2 className="text-lg font-semibold">انتخاب نقش</h2>
+            <div className="flex flex-col gap-2">
+              {rolesToSelect.map((r: any) => (
+                <button
+                  key={r.slug || r.rowId || r}
+                  onClick={() => chooseRole(r)}
+                  disabled={settingRole}
+                  className="py-2 px-3 rounded-lg bg-[var(--main-color)] text-white"
+                >
+                  {r.slug || r}
+                </button>
+              ))}
+            </div>
+            {error && <p className="text-red-500 text-sm">{error}</p>}
+          </div>
+        )}
       </div>
     </div>
   );
