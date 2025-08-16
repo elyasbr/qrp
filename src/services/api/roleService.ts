@@ -4,18 +4,26 @@ import api from './api';
 export interface Role {
   id: number;
   name: string;
+  value?: string;
   description?: string;
+  isInternal?: boolean;
+  isActive?: boolean;
   companyId?: number;
+  createdBy?: string;
+  createdAt?: string; // ISO timestamp
 }
 
 export interface RoleCreateRequest {
   name: string;
+  value?: string;
   description?: string;
+  isInternal?: boolean;
+  isActive?: boolean;
   companyId?: number;
 }
 
 export interface PaginationRequest {
-  page: number;
+  pageIndex: number;
   pageSize: number;
   search?: string;
 }
@@ -23,7 +31,7 @@ export interface PaginationRequest {
 export interface PaginationResponse<T> {
   items: T[];
   total: number;
-  page: number;
+  pageIndex: number;
   pageSize: number;
 }
 
@@ -64,7 +72,8 @@ export const getRole = async (roleId: number): Promise<Role> => {
 
 export const getRoles = async (payload: PaginationRequest): Promise<PaginationResponse<Role>> => {
   try {
-    const response = await api.post<PaginationResponse<Role>>('/role/pagination', payload);
+  // API expects pageIndex/pageSize in request body per API docs
+  const response = await api.post<PaginationResponse<Role>>('/role/pagination', payload);
     return response.data;
   } catch (error) {
     throw new Error((error as AxiosError)?.message || 'Failed to fetch roles');
