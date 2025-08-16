@@ -95,9 +95,10 @@ export const acceptSignInByMobile = async (mobile: string, smsCode: string): Pro
 };
 
 // 5) Set role (set role via JWT or backend)
-export const setRole = async (role: string | number): Promise<any> => {
+export const setRole = async (roleId: string | number): Promise<any> => {
   try {
-    const response = await api.post(`/user/set-role`, { role });
+    // API expects { roleId: "..." }
+    const response = await api.post(`/user/set-role`, { roleId });
     return response.data;
   } catch (error) {
     throw new Error((error as AxiosError)?.message || 'Failed to set role');

@@ -1,7 +1,9 @@
 "use client";
 import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
-import { otpLoginByMobile, acceptLoginByMobile } from "@/services/api/userService";
+import { otpLoginByMobile, acceptLoginByMobile, setRole } from "@/services/api/userService";
+import { decodeJwt } from "@/services/api/auth";
+import { useRouter } from "next/navigation";
 
 export default function SignIn({ title = "ورود به سامانه" }: { title?: string }) {
   const phoneLength = 11;
@@ -13,6 +15,9 @@ export default function SignIn({ title = "ورود به سامانه" }: { title
   const phoneInputRefs = useRef<Array<HTMLInputElement | null>>([]);
   const codeInputRefs = useRef<Array<HTMLInputElement | null>>([]);
   const [error, setError] = useState("");
+  const [rolesToSelect, setRolesToSelect] = useState<any[] | null>(null);
+  const [settingRole, setSettingRole] = useState(false);
+  const router = useRouter();
 
   const phoneValid =
     phoneDigits.length === phoneLength &&
@@ -152,11 +157,49 @@ export default function SignIn({ title = "ورود به سامانه" }: { title
     }
     setError("");
     try {
-  const mobile = formatMobile(phoneDigits);
-  await acceptLoginByMobile(mobile, code.join(""));
-      // TODO: handle token + redirect
+      const mobile = formatMobile(phoneDigits);
+      const res = await acceptLoginByMobile(mobile, code.join(""));
+      const token = res?.result?.token || res?.token || res?.data?.token || null;
+      if (token) {
+        if (typeof window !== "undefined") localStorage.setItem("authToken", token);
+        const payload: any = decodeJwt(token) || {};
+        const roles = payload?.roles || payload?.role || [];
+
+        if (Array.isArray(roles) && roles.length === 1) {
+          const roleSlug = roles[0]?.slug || roles[0];
+          setSettingRole(true);
+          await setRole(roleSlug);
+          setSettingRole(false);
+          router.push("/dashboard");
+          return;
+        }
+
+        if (Array.isArray(roles) && roles.length > 1) {
+          setRolesToSelect(roles);
+          return;
+        }
+
+        router.push("/dashboard");
+        return;
+      }
+
+      router.push("/dashboard");
     } catch (err: any) {
       setError(err?.message || "کد وارد شده اشتباه است");
+    }
+  };
+
+  const chooseRole = async (role: any) => {
+    if (!role) return;
+    try {
+      setSettingRole(true);
+      const slug = role.slug || role;
+      await setRole(slug);
+      setSettingRole(false);
+      router.push("/dashboard");
+    } catch (err: any) {
+      setSettingRole(false);
+      setError(err?.message || "خطا در انتخاب نقش");
     }
   };
 
@@ -250,7 +293,28 @@ export default function SignIn({ title = "ورود به سامانه" }: { title
             </button>
           </div>
         )}
+
+                  {rolesToSelect && (
+                    <div className="space-y-4">
+                      <h2 className="text-lg font-semibold">انتخاب نقش</h2>
+                      <div className="flex flex-col gap-2">
+                        {rolesToSelect.map((r: any) => (
+                          <button
+                            key={r.slug || r.rowId || r}
+                            onClick={() => chooseRole(r)}
+                            disabled={settingRole}
+                            className="py-2 px-3 rounded-lg bg-[var(--main-color)] text-white"
+                          >
+                            {r.slug || r}
+                          </button>
+                        ))}
+                      </div>
+                      {error && <p className="text-red-500 text-sm">{error}</p>}
+                    </div>
+                  )}
       </div>
     </div>
   );
 }
+
+// ...existing code...
