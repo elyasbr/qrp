@@ -290,7 +290,7 @@ export default function SignIn({ title = "ورود به سامانه" }: { title
                     onFocus={(e) => e.currentTarget.select()}
                     ref={(el: any) => (phoneInputRefs.current[idx] = el)}
                     aria-label={`شماره موبایل رقم ${idx + 1}`}
-                    className="w-6 lg:w-7 h-8 text-center border border-gray-300 rounded-lg text-lg font-semibold focus:ring-2 focus:ring-[var(--main-color)] transition bg-transparent"
+                    className="w-6 lg:w-7 h-8 text-center outline-none border border-gray-300 rounded-lg text-lg font-semibold focus:ring-2 focus:ring-[var(--main-color)] transition bg-transparent"
                   />
                 ))}
               </div>

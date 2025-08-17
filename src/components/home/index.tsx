@@ -3,9 +3,11 @@ import React, { useState } from "react";
 import Link from "next/link";
 import { ArrowRight, Menu, Square } from "lucide-react";
 import Image from "next/image";
+import { useAuth } from "@/hooks/useAuth";
 
 export default function Home() {
   const [menuOpen, setMenuOpen] = useState(false);
+  const { isLoggedIn } = useAuth();
 
   const links = [
     { label: "خانه", href: "/" },
@@ -80,12 +82,21 @@ export default function Home() {
         </p>
 
         {/* CTA Button */}
+        {isLoggedIn ? (
+          <Link href="/dashboard">
+            <button className="flex cursor-pointer items-center gap-2 bg-[var(--main-color)] hover:bg-[var(--main-color-dark)] text-white px-6 py-3 rounded-xl text-base font-semibold shadow-md transition-all">
+              <ArrowRight className="text-xl" />
+              داشبورد
+            </button>
+          </Link>
+        ) : (
         <Link href="/signin">
           <button className="flex cursor-pointer items-center gap-2 bg-[var(--main-color)] hover:bg-[var(--main-color-dark)] text-white px-6 py-3 rounded-xl text-base font-semibold shadow-md transition-all">
             <ArrowRight className="text-xl" />
             شروع کنید
           </button>
         </Link>
+        )}
       </main>
     </>
   );
