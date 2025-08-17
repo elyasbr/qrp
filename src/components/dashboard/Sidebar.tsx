@@ -1,9 +1,10 @@
 "use client"
-import { AlignJustify, Info, Phone, SquareX, User } from "lucide-react";
+import { AlignJustify, Info, Phone, SquareX, User, LogOut } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 import Image from "next/image";
-
+import { useAuth } from "@/hooks/useAuth";
+import { useRouter } from "next/navigation";
 
 const navItems = [
   { href: "/dashboard/profile", label: "پروفایل", icon: <User /> },
@@ -13,13 +14,21 @@ const navItems = [
 
 export default function Sidebar() {
   const [open, setOpen] = useState(false);
+  const { logout, isLoggedIn } = useAuth();
+  const router = useRouter();
+
+  const handleLogout = () => {
+    logout();
+    setOpen(false);
+    router.push("/");
+  };
 
   return (
     <>
       {/* Toggle button for mobile */}
       <button
         onClick={() => setOpen(true)}
-        className="md:hidden fixed top-4 right-4 z-50 bg-white border-2 border-[var(--main-color)]  p-2 rounded-full shadow-lg"
+        className="md:hidden fixed top-4 right-4 z-50 bg-white border-2 border-[var(--main-color)] p-2 rounded-full shadow-lg"
       >
         <AlignJustify size={24} />
       </button>
@@ -34,10 +43,14 @@ export default function Sidebar() {
 
       {/* Sidebar */}
       <aside
-        className={`fixed top-0 right-0 h-screen bg-white min-w-60 shadow-md z-50 transition-transform duration-300
-        ${open ? "translate-x-0" : "translate-x-full"} md:translate-x-0 md:static md:block md:w-64`}
+        className={`
+          fixed top-0 right-0 h-full w-64 bg-white shadow-lg transform transition-transform duration-300 ease-in-out z-50
+          md:relative md:translate-x-0 md:z-auto md:shadow-none
+          ${open ? "translate-x-0" : "translate-x-full"}
+        `}
       >
-        <div className="flex justify-between items-center p-4 md:hidden">
+        {/* Mobile header */}
+        <div className="flex justify-between items-center p-4 md:hidden border-b border-gray-200">
           <div className="text-[var(--main-color)] font-extrabold text-xl font-Morabba">
             <Image alt="logo" src='/images/logo.jpg' width={100} height={100} />
           </div>
@@ -47,21 +60,41 @@ export default function Sidebar() {
           </button>
         </div>
 
-        <nav className="flex flex-col gap-2 p-4">
-          <div className="hidden lg:block text-[var(--main-color)] font-extrabold text-xl font-Morabba pr-10 pb-5 pt-5">
-            <Image alt="logo" src='/images/logo.jpg' width={120} height={120} />
+        {/* Desktop logo */}
+        <div className="hidden md:block text-center p-6 border-b border-gray-200">
+          <div className="text-[var(--main-color)] font-extrabold text-xl font-Morabba">
+            <Image alt="logo" src='/images/logo.jpg' width={120} height={120} className="mx-auto" />
           </div>
-          {navItems.map((item) => (
-            <Link
-              key={item.href}
-              href={item.href}
-              className="flex items-center gap-3 text-gray-700 hover:bg-gray-100 p-3 rounded-lg transition-all"
-              onClick={() => setOpen(false)} // close on mobile
-            >
-              <span className="text-md">{item.icon}</span>
-              <span className="text-sm font-semibold">{item.label}</span>
-            </Link>
-          ))}
+        </div>
+
+        {/* Navigation */}
+        <nav className="flex flex-col h-full">
+          <div className="flex-1 p-4">
+            {navItems.map((item) => (
+              <Link
+                key={item.href}
+                href={item.href}
+                className="flex items-center gap-3 text-gray-700 hover:bg-gray-100 p-3 rounded-lg transition-all mb-2"
+                onClick={() => setOpen(false)} // close on mobile
+              >
+                <span className="text-md">{item.icon}</span>
+                <span className="text-sm font-semibold">{item.label}</span>
+              </Link>
+            ))}
+          </div>
+          
+          {/* Logout Button */}
+          {isLoggedIn && (
+            <div className="p-4 border-t border-gray-200">
+              <button
+                onClick={handleLogout}
+                className="flex items-center gap-3 text-red-600 hover:bg-red-50 p-3 rounded-lg transition-all w-full"
+              >
+                <LogOut size={20} />
+                <span className="text-sm font-semibold">خروج از حساب</span>
+              </button>
+            </div>
+          )}
         </nav>
       </aside>
     </>

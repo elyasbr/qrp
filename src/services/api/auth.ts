@@ -95,7 +95,7 @@ export function hasRole(role: string): boolean {
 
 export function isTokenExpired(): boolean {
   const p = getAuthPayload();
-  if (!p?.exp) return true; // treat missing exp as expired
+  if (!p?.exp) return false; // If no expiration field, treat as valid (not expired)
   return Date.now() / 1000 >= p.exp;
 }
 

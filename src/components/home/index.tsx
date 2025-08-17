@@ -32,6 +32,7 @@ export default function Home() {
               </Link>
             ))}
           </div>
+          
           {/* Logo */}
           <div className="text-[var(--main-color)] font-extrabold text-xl font-Morabba">
             <Image alt="logo" src='/images/logo.jpg' width={100} height={100}/>
@@ -49,8 +50,8 @@ export default function Home() {
 
         {/* Mobile Menu */}
         {menuOpen && (
-          <div className="md:hidden px-4 pb-4 bg-white rounded-b-xl shadow-inner">
-            <div className="flex flex-col gap-3">
+          <div className="absolute top-full left-0 right-0 bg-white shadow-lg border-t border-gray-200 md:hidden">
+            <div className="flex flex-col gap-3 p-4">
               {links.map((link) => (
                 <Link
                   key={link.label}
@@ -79,7 +80,7 @@ export default function Home() {
         </p>
 
         {/* CTA Button */}
-        <Link href="/signup">
+        <Link href="/signin">
           <button className="flex cursor-pointer items-center gap-2 bg-[var(--main-color)] hover:bg-[var(--main-color-dark)] text-white px-6 py-3 rounded-xl text-base font-semibold shadow-md transition-all">
             <ArrowRight className="text-xl" />
             شروع کنید

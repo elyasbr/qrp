@@ -2,6 +2,9 @@
 import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
 import { preRegisterMobile, acceptRegisterMobile } from "@/services/api/userService";
+import { extractAndTranslateError } from "@/utils/errorTranslations";
+import { useSnackbar } from "@/hooks/useSnackbar";
+import Snackbar from "@/components/common/Snackbar";
 
 export default function SignUp({ title = "ثبت نام" }: { title?: string }) {
   const phoneLength = 11;
@@ -12,7 +15,7 @@ export default function SignUp({ title = "ثبت نام" }: { title?: string }) 
   const [code, setCode] = useState<string[]>(Array(codeLength).fill(""));
   const phoneInputRefs = useRef<Array<HTMLInputElement | null>>([]);
   const codeInputRefs = useRef<Array<HTMLInputElement | null>>([]);
-  const [error, setError] = useState("");
+  const { showError, snackbar, hideSnackbar } = useSnackbar();
 
   const phoneValid =
     phoneDigits.length === phoneLength &&
@@ -136,101 +139,96 @@ export default function SignUp({ title = "ثبت نام" }: { title?: string }) 
 
   const handleSendCode = async () => {
     if (!phoneValid) {
-      setError("لطفا شماره موبایل معتبر وارد کنید.");
+      showError("لطفا شماره موبایل معتبر وارد کنید.");
       return;
     }
-    setError("");
     try {
-  const mobile = formatMobile(phoneDigits);
-  await preRegisterMobile(mobile);
+      const mobile = formatMobile(phoneDigits);
+      await preRegisterMobile(mobile);
       setStep("code");
     } catch (err: any) {
-      setError(err?.message || "خطا در ارسال کد");
+      showError(extractAndTranslateError(err));
     }
   };
 
   const handleVerifyCode = async () => {
     if (!codeValid) {
-      setError("کد وارد شده نامعتبر است.");
+      showError("کد وارد شده نامعتبر است.");
       return;
     }
-    setError("");
     try {
-  const mobile = formatMobile(phoneDigits);
-  await acceptRegisterMobile(mobile, code.join(""));
+      const mobile = formatMobile(phoneDigits);
+      await acceptRegisterMobile(mobile, code.join(""));
       // TODO: handle token + redirect after successful registration
     } catch (err: any) {
-      setError(err?.message || "کد وارد شده اشتباه است");
+      showError(extractAndTranslateError(err));
     }
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-[#f8f9fb] text-[var(--foreground)] p-4">
-      <div className="w-full max-w-md bg-white rounded-3xl shadow-[0_8px_30px_rgba(0,0,0,0.1)] p-8 space-y-8 transition">
-        <h1 className="text-3xl font-extrabold text-center text-[var(--main-color)] mb-4">{title}</h1>
+    <>
+      <div className="min-h-screen flex items-center justify-center bg-[#f8f9fb] text-[var(--foreground)] p-4">
+        <div className="w-full max-w-md bg-white rounded-3xl shadow-[0_8px_30px_rgba(0,0,0,0.1)] p-8 space-y-8 transition">
+          <h1 className="text-3xl font-extrabold text-center text-[var(--main-color)] mb-4">{title}</h1>
 
-        {step === "phone" && (
-          <div className="space-y-4">
-            <label className="block text-gray-700 font-medium mb-1">شماره موبایل</label>
-            <div dir="ltr" className="flex justify-center gap-1 ">
-              {phoneDigits.map((digit, idx) => (
-                <input
-                  key={idx}
-                  type="text"
-                  inputMode="numeric"
-                  pattern="\d*"
-                  maxLength={1}
-                  value={digit}
-                  onChange={(e) => handlePhoneChange(e, idx)}
-                  onKeyDown={(e) => handlePhoneKeyDown(e, idx)}
-                  onPaste={(e) => handlePhonePaste(e, idx)}
-                  onFocus={(e) => e.currentTarget.select()}
-                  ref={(el: any) => (phoneInputRefs.current[idx] = el)}
-                  aria-label={`شماره موبایل رقم ${idx + 1}`}
-                  className="w-6 lg:w-7 h-8 text-center border border-gray-300 rounded-lg text-lg font-semibold focus:ring-2 focus:ring-[var(--main-color)] transition bg-transparent"
-                />
-              ))}
+          {step === "phone" && (
+            <div className="space-y-4">
+              <label className="block text-gray-700 font-medium mb-1">شماره موبایل</label>
+              <div dir="ltr" className="flex justify-center gap-1 ">
+                {phoneDigits.map((digit, idx) => (
+                  <input
+                    key={idx}
+                    type="text"
+                    inputMode="numeric"
+                    pattern="\d*"
+                    maxLength={1}
+                    value={digit}
+                    onChange={(e) => handlePhoneChange(e, idx)}
+                    onKeyDown={(e) => handlePhoneKeyDown(e, idx)}
+                    onPaste={(e) => handlePhonePaste(e, idx)}
+                    onFocus={(e) => e.currentTarget.select()}
+                    ref={(el: any) => (phoneInputRefs.current[idx] = el)}
+                    aria-label={`شماره موبایل رقم ${idx + 1}`}
+                    className="w-6 lg:w-7 h-8 text-center border border-gray-300 rounded-lg text-lg font-semibold focus:ring-2 focus:ring-[var(--main-color)] transition bg-transparent"
+                  />
+                ))}
+              </div>
+              <button
+                onClick={handleSendCode}
+                disabled={!phoneValid}
+                className={`w-full py-3 rounded-lg text-white font-semibold transition ${
+                  phoneValid ? "bg-[var(--main-color)] hover:bg-[var(--main-color-dark)]" : "bg-gray-400 cursor-not-allowed"
+                }`}
+              >
+                دریافت کد تایید
+              </button>
             </div>
-            {error && <p className="text-red-500 text-sm mt-1">{error}</p>}
-            <button
-              onClick={handleSendCode}
-              disabled={!phoneValid}
-              className={`w-full py-3 rounded-lg text-white font-semibold transition ${
-                phoneValid ? "bg-[var(--main-color)] hover:bg-[var(--main-color-dark)]" : "bg-gray-400 cursor-not-allowed"
-              }`}
-            >
-              دریافت کد تایید
-            </button>
-          </div>
-        )}
+          )}
 
-        {step === "code" && (
-          <div className="space-y-4">
-            <label className="block text-gray-700 font-medium mb-1">کد تایید</label>
+          {step === "code" && (
+            <div className="space-y-4">
+              <label className="block text-gray-700 font-medium mb-1">کد تایید</label>
 
-            <div dir="ltr" className="flex flex-row items-center justify-center gap-3">
-              {code.map((digit, idx) => (
-                <input
-                  key={idx}
-                  type="text"
-                  inputMode="numeric"
-                  pattern="\d*"
-                  maxLength={1}
-                  value={digit}
-                  onChange={(e) => handleCodeChange(e, idx)}
-                  onKeyDown={(e) => handleCodeKeyDown(e, idx)}
-                  onPaste={(e) => handlePaste(e, idx)}
-                  onFocus={(e) => e.currentTarget.select()}
-                  ref={(el: any) => (codeInputRefs.current[idx] = el)}
-                  aria-label={`کد رقم ${idx + 1}`}
-                  className="w-12 h-12 text-center border border-gray-300 rounded-lg text-xl font-bold focus:ring-2 focus:ring-[var(--main-color)] transition bg-transparent"
-                />
-              ))}
-            </div>
+              <div dir="ltr" className="flex flex-row items-center justify-center gap-3">
+                {code.map((digit, idx) => (
+                  <input
+                    key={idx}
+                    type="text"
+                    inputMode="numeric"
+                    pattern="\d*"
+                    maxLength={1}
+                    value={digit}
+                    onChange={(e) => handleCodeChange(e, idx)}
+                    onKeyDown={(e) => handleCodeKeyDown(e, idx)}
+                    onPaste={(e) => handlePaste(e, idx)}
+                    onFocus={(e) => e.currentTarget.select()}
+                    ref={(el: any) => (codeInputRefs.current[idx] = el)}
+                    aria-label={`کد رقم ${idx + 1}`}
+                    className="w-12 h-12 text-center border border-gray-300 rounded-lg text-xl font-bold focus:ring-2 focus:ring-[var(--main-color)] transition bg-transparent"
+                  />
+                ))}
+              </div>
 
-            {error && <p className="text-red-500 text-sm">{error}</p>}
-
-            <Link href="/dashboard">
               <button
                 onClick={handleVerifyCode}
                 disabled={!codeValid}
@@ -240,21 +238,30 @@ export default function SignUp({ title = "ثبت نام" }: { title?: string }) 
               >
                 ثبت نام و ورود
               </button>
-            </Link>
 
-            <button
-              onClick={() => {
-                setStep("phone");
-                setCode(Array(codeLength).fill(""));
-                setError("");
-              }}
-              className="mt-2 text-sm text-[var(--main-color)] hover:underline cursor-pointer"
-            >
-              بازگشت به مرحله قبل
-            </button>
-          </div>
-        )}
+              <button
+                onClick={() => {
+                  setStep("phone");
+                  setCode(Array(codeLength).fill(""));
+                }}
+                className="mt-2 text-sm text-[var(--main-color)] hover:underline cursor-pointer"
+              >
+                بازگشت به مرحله قبل
+              </button>
+            </div>
+          )}
+        </div>
       </div>
-    </div>
+
+      {/* Snackbar for errors */}
+      <Snackbar
+        message={snackbar.message}
+        type={snackbar.type}
+        duration={snackbar.duration}
+        isOpen={snackbar.isOpen}
+        onClose={hideSnackbar}
+        position="top-center"
+      />
+    </>
   );
 }
