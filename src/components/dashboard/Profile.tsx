@@ -18,8 +18,8 @@ const Profile = () => {
                     alt="User Avatar"
                     className="w-24 h-24 rounded-full mb-4 border-4 border-[var(--main-color)]"
                 />
-                <h2 className="text-xl font-bold text-[var(--foreground)]">علیرضا بهلول</h2>
-                <p className="text-sm text-gray-600 dark:text-gray-400">alireza@example.com</p>
+                <h2 className="text-xl font-bold text-[var(--foreground)]">ایران راد </h2>
+                <p className="text-sm text-gray-600 dark:text-gray-400">iranrad@example.com</p>
 
                 <div className="mt-4 flex gap-2 flex-wrap justify-center">
                     <button className="flex items-center cursor-pointer gap-2 px-4 py-2 rounded-xl bg-[var(--main-color)] text-white hover:bg-[var(--main-color-dark)] transition">
