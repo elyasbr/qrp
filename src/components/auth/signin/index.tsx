@@ -325,7 +325,7 @@ export default function SignIn({ title = "ورود به سامانه" }: { title
                     onFocus={(e) => e.currentTarget.select()}
                     ref={(el: any) => (codeInputRefs.current[idx] = el)}
                     aria-label={`کد رقم ${idx + 1}`}
-                    className="w-12 h-12 text-center border border-gray-300 rounded-lg text-xl font-bold focus:ring-2 focus:ring-[var(--main-color)] transition bg-transparent"
+                    className="w-10 h-10 lg:w-12 lg:h-12 text-center border border-gray-300 rounded-lg text-xl font-bold focus:ring-2 focus:ring-[var(--main-color)] transition bg-transparent"
                   />
                 ))}
               </div>
