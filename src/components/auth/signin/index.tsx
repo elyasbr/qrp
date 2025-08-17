@@ -160,7 +160,16 @@ export default function SignIn({ title = "ورود به سامانه" }: { title
       await otpLoginByMobile(mobile);
       setStep("code");
     } catch (err: any) {
-      showError(extractAndTranslateError(err));
+      // Handle specific error for unregistered mobile number
+      const errorData = err?.response?.data || err?.data || err;
+      const errorCode = errorData?.message?.code || errorData?.code;
+      const errorMsg = errorData?.message?.msg || errorData?.msg || errorData?.message;
+      
+      if (errorCode === 1001 || errorMsg === "MOBILE_FIELD_USER_IS_DUPLICATED") {
+        showError("این شماره موبایل ثبت نام نشده است. لطفاً ابتدا ثبت نام کنید.");
+      } else {
+        showError(extractAndTranslateError(err));
+      }
     }
   };
 
@@ -224,7 +233,16 @@ export default function SignIn({ title = "ورود به سامانه" }: { title
       setIsProcessing(false);
       
     } catch (err: any) {
-      showError(extractAndTranslateError(err));
+      // Handle specific error for unregistered mobile number
+      const errorData = err?.response?.data || err?.data || err;
+      const errorCode = errorData?.message?.code || errorData?.code;
+      const errorMsg = errorData?.message?.msg || errorData?.msg || errorData?.message;
+      
+      if (errorCode === 1001 || errorMsg === "MOBILE_FIELD_USER_IS_DUPLICATED") {
+        showError("این شماره موبایل ثبت نام نشده است. لطفاً ابتدا ثبت نام کنید.");
+      } else {
+        showError(extractAndTranslateError(err));
+      }
       setIsProcessing(false);
     }
   };
@@ -375,6 +393,17 @@ export default function SignIn({ title = "ورود به سامانه" }: { title
               <p className="text-gray-600">در حال تنظیم نقش...</p>
             </div>
           )}
+
+          {/* Navigation to signup */}
+          <div className="text-center pt-4 border-t border-gray-200">
+            <p className="text-gray-600 mb-2">حساب کاربری ندارید؟</p>
+            <Link
+              href="/signup"
+              className="inline-block px-6 py-2 text-[var(--main-color)] border border-[var(--main-color)] rounded-lg hover:bg-[var(--main-color)] hover:text-white transition-colors"
+            >
+              ثبت نام کنید
+            </Link>
+          </div>
         </div>
       </div>
 

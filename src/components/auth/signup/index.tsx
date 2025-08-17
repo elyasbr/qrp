@@ -2,9 +2,6 @@
 import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
 import { preRegisterMobile, acceptRegisterMobile } from "@/services/api/userService";
-import { decodeJwt } from "@/services/api/auth";
-import { extractToken } from "@/services/api/utils";
-import { useAuth } from "@/hooks/useAuth";
 import { useRouter } from "next/navigation";
 import { extractAndTranslateError } from "@/utils/errorTranslations";
 import { useSnackbar } from "@/hooks/useSnackbar";
@@ -21,8 +18,7 @@ export default function SignUp({ title = "ثبت نام" }: { title?: string }) 
   const codeInputRefs = useRef<Array<HTMLInputElement | null>>([]);
   const [isProcessing, setIsProcessing] = useState(false);
   const router = useRouter();
-  const { login, isLoggedIn } = useAuth();
-  const { showError, snackbar, hideSnackbar } = useSnackbar();
+  const { showError, showSuccess, snackbar, hideSnackbar } = useSnackbar();
 
   const phoneValid =
     phoneDigits.length === phoneLength &&
@@ -55,13 +51,6 @@ export default function SignUp({ title = "ثبت نام" }: { title?: string }) 
     if (step === "phone") setTimeout(() => phoneInputRefs.current[0]?.focus(), 50);
     else setTimeout(() => codeInputRefs.current[0]?.focus(), 50);
   }, [step]);
-
-  // Redirect to dashboard when authentication is successful
-  useEffect(() => {
-    if (isLoggedIn && !isProcessing) {
-      router.push("/dashboard");
-    }
-  }, [isLoggedIn, isProcessing, router]);
 
   const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>, idx: number) => {
     const val = e.target.value.replace(/\D/g, "").slice(-1);
@@ -161,7 +150,16 @@ export default function SignUp({ title = "ثبت نام" }: { title?: string }) 
       await preRegisterMobile(mobile);
       setStep("code");
     } catch (err: any) {
-      showError(extractAndTranslateError(err));
+      // Handle specific duplicate mobile error - check multiple possible error structures
+      const errorData = err?.response?.data || err?.data || err;
+      const errorCode = errorData?.message?.code || errorData?.code;
+      const errorMsg = errorData?.message?.msg || errorData?.msg || errorData?.message;
+      
+      if (errorCode === 1001 || errorMsg === "MOBILE_FIELD_USER_IS_DUPLICATED") {
+        showError("این کاربر قبلا ثبت نام کرده است.");
+      } else {
+        showError(extractAndTranslateError(err));
+      }
     }
   };
 
@@ -178,19 +176,24 @@ export default function SignUp({ title = "ثبت نام" }: { title?: string }) 
       const mobile = formatMobile(phoneDigits);
       const res = await acceptRegisterMobile(mobile, code.join(""));
       
-      const token = extractToken(res);
-      if (!token) {
-        throw new Error("توکن احراز هویت دریافت نشد");
-      }
-
-      // Login with the token after successful registration
-      login(token);
-      
-      // Set isProcessing to false so redirect can happen
-      setIsProcessing(false);
+      // Registration successful - redirect to signin
+      showSuccess("ثبت نام با موفقیت انجام شد. لطفاً وارد شوید.");
+      setTimeout(() => {
+        router.push("/signin");
+      }, 1500);
       
     } catch (err: any) {
-      showError(extractAndTranslateError(err));
+      // Handle specific duplicate mobile error - check multiple possible error structures
+      const errorData = err?.response?.data || err?.data || err;
+      const errorCode = errorData?.message?.code || errorData?.code;
+      const errorMsg = errorData?.message?.msg || errorData?.msg || errorData?.message;
+      
+      if (errorCode === 1001 || errorMsg === "MOBILE_FIELD_USER_IS_DUPLICATED") {
+        showError("این کاربر قبلا ثبت نام کرده است.");
+      } else {
+        showError(extractAndTranslateError(err));
+      }
+    } finally {
       setIsProcessing(false);
     }
   };
@@ -219,7 +222,7 @@ export default function SignUp({ title = "ثبت نام" }: { title?: string }) 
                     onFocus={(e) => e.currentTarget.select()}
                     ref={(el: any) => (phoneInputRefs.current[idx] = el)}
                     aria-label={`شماره موبایل رقم ${idx + 1}`}
-                    className="w-6 lg:w-7 h-8 text-center border border-gray-300 rounded-lg text-lg font-semibold focus:ring-2 focus:ring-[var(--main-color)] transition bg-transparent"
+                    className="w-6 lg:w-7 h-8 text-center border outline-none border-gray-300 rounded-lg text-lg font-semibold focus:ring-2 focus:ring-[var(--main-color)] transition bg-transparent"
                   />
                 ))}
               </div>
@@ -254,7 +257,7 @@ export default function SignUp({ title = "ثبت نام" }: { title?: string }) 
                     onFocus={(e) => e.currentTarget.select()}
                     ref={(el: any) => (codeInputRefs.current[idx] = el)}
                     aria-label={`کد رقم ${idx + 1}`}
-                    className="w-10 h-10 outline-none lg:w-12 lg:h-12 text-center border border-gray-300 rounded-lg text-xl font-bold focus:ring-2 focus:ring-[var(--main-color)] transition bg-transparent"
+                    className="w-10 h-10 outline-none outline-none lg:w-12 lg:h-12 text-center border border-gray-300 rounded-lg text-xl font-bold focus:ring-2 focus:ring-[var(--main-color)] transition bg-transparent"
                   />
                 ))}
               </div>
@@ -266,7 +269,7 @@ export default function SignUp({ title = "ثبت نام" }: { title?: string }) 
                   codeValid && !isProcessing ? "bg-[var(--main-color)] hover:bg-[var(--main-color-dark)]" : "bg-gray-400 cursor-not-allowed"
                 }`}
               >
-                {isProcessing ? "در حال ثبت نام..." : "ثبت نام و ورود"}
+                {isProcessing ? "در حال ثبت نام..." : "ثبت نام "}
               </button>
 
               <button
@@ -281,6 +284,17 @@ export default function SignUp({ title = "ثبت نام" }: { title?: string }) 
               </button>
             </div>
           )}
+
+          {/* Navigation to signin */}
+          <div className="text-center pt-4 border-t border-gray-200">
+            <p className="text-gray-600 mb-2">قبلاً ثبت نام کرده‌اید؟</p>
+            <Link
+              href="/signin"
+              className="inline-block px-6 py-2 text-[var(--main-color)] border border-[var(--main-color)] rounded-lg hover:bg-[var(--main-color)] hover:text-white transition-colors"
+            >
+              وارد شوید
+            </Link>
+          </div>
         </div>
       </div>
 

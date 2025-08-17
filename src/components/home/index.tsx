@@ -19,7 +19,7 @@ export default function Home() {
   return (
     <>
       {/* Navbar */}
-      <nav className="w-full bg-white shadow-sm fixed top-0 z-50">
+      <nav className="w-full bg-white  shadow-md fixed top-0 z-50">
         <div className="max-w-5xl mx-auto px-4 py-3 flex items-center justify-between">
 
           {/* Desktop Menu */}
@@ -81,7 +81,7 @@ export default function Home() {
           مدیریت درخواست‌ها، پشتیبانی و خدمات بیمه‌ای در بستری ساده، سریع و امن. هم‌اکنون وارد حساب کاربری خود شوید یا ثبت‌نام کنید.
         </p>
 
-        {/* CTA Button */}
+        {/* CTA Buttons */}
         {isLoggedIn ? (
           <Link href="/dashboard">
             <button className="flex cursor-pointer items-center gap-2 bg-[var(--main-color)] hover:bg-[var(--main-color-dark)] text-white px-6 py-3 rounded-xl text-base font-semibold shadow-md transition-all">
@@ -90,12 +90,19 @@ export default function Home() {
             </button>
           </Link>
         ) : (
-        <Link href="/signin">
-          <button className="flex cursor-pointer items-center gap-2 bg-[var(--main-color)] hover:bg-[var(--main-color-dark)] text-white px-6 py-3 rounded-xl text-base font-semibold shadow-md transition-all">
-            <ArrowRight className="text-xl" />
-            شروع کنید
-          </button>
-        </Link>
+          <div className="flex flex-col sm:flex-row gap-4 w-full max-w-md">
+            <Link href="/signin" className="flex-1">
+              <button className="w-full flex cursor-pointer items-center justify-center gap-2 bg-[var(--main-color)] hover:bg-[var(--main-color-dark)] text-white px-6 py-3 rounded-xl text-base font-semibold shadow-md transition-all">
+                <ArrowRight className="text-xl" />
+                ورود
+              </button>
+            </Link>
+            <Link href="/signup" className="flex-1">
+              <button className="w-full flex cursor-pointer items-center justify-center gap-2 bg-white hover:bg-gray-50 text-[var(--main-color)] border-2 border-[var(--main-color)] px-6 py-3 rounded-xl text-base font-semibold shadow-md transition-all">
+                ثبت نام
+              </button>
+            </Link>
+          </div>
         )}
       </main>
     </>

@@ -1,5 +1,5 @@
 "use client"
-import { AlignJustify, Info, Phone, SquareX, User, LogOut } from "lucide-react";
+import { AlignJustify, Info, Phone, SquareX, User, LogOut, FileText, ChevronDown, ChevronLeft } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 import Image from "next/image";
@@ -8,12 +8,20 @@ import { useRouter } from "next/navigation";
 
 const navItems = [
   { href: "/dashboard/profile", label: "پروفایل", icon: <User /> },
+  { 
+    label: "گزارش", 
+    icon: <FileText />, 
+    subItems: [
+      { href: "/dashboard/animals", label: "لیست حیوانات" }
+    ]
+  },
   { href: "/about", label: "درباره ما", icon: <Info /> },
   { href: "/contact", label: "تماس با ما", icon: <Phone /> },
 ];
 
 export default function Sidebar() {
   const [open, setOpen] = useState(false);
+  const [expandedItems, setExpandedItems] = useState<string[]>([]);
   const { logout, isLoggedIn } = useAuth();
   const router = useRouter();
 
@@ -22,6 +30,16 @@ export default function Sidebar() {
     setOpen(false);
     router.push("/");
   };
+
+  const toggleExpanded = (label: string) => {
+    setExpandedItems(prev => 
+      prev.includes(label) 
+        ? prev.filter(item => item !== label)
+        : [...prev, label]
+    );
+  };
+
+  const isExpanded = (label: string) => expandedItems.includes(label);
 
   return (
     <>
@@ -79,15 +97,53 @@ export default function Sidebar() {
           <nav className="flex flex-col flex-1">
             <div className="p-4 flex-1">
               {navItems.map((item) => (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  className="flex items-center gap-3 text-gray-700 hover:bg-gray-100 p-3 rounded-lg transition-all mb-2"
-                  onClick={() => setOpen(false)}
-                >
-                  <span className="text-md">{item.icon}</span>
-                  <span className="text-sm font-semibold">{item.label}</span>
-                </Link>
+                <div key={item.label}>
+                  {item.href ? (
+                    // Regular navigation item
+                    <Link
+                      href={item.href}
+                      className="flex items-center gap-3 text-gray-700 hover:bg-gray-100 p-3 rounded-lg transition-all mb-2"
+                      onClick={() => setOpen(false)}
+                    >
+                      <span className="text-md">{item.icon}</span>
+                      <span className="text-sm font-semibold">{item.label}</span>
+                    </Link>
+                  ) : (
+                    // Nested navigation item
+                    <div>
+                      <button
+                        onClick={() => toggleExpanded(item.label)}
+                        className="flex items-center justify-between w-full text-gray-700 hover:bg-gray-100 p-3 rounded-lg transition-all mb-2"
+                      >
+                        <div className="flex items-center gap-3">
+                          <span className="text-md">{item.icon}</span>
+                          <span className="text-sm font-semibold">{item.label}</span>
+                        </div>
+                        {isExpanded(item.label) ? (
+                          <ChevronDown size={16} />
+                        ) : (
+                          <ChevronLeft size={16} />
+                        )}
+                      </button>
+                      
+                      {/* Sub-items */}
+                      {isExpanded(item.label) && item.subItems && (
+                        <div className="mr-6 space-y-1">
+                          {item.subItems.map((subItem) => (
+                            <Link
+                              key={subItem.href}
+                              href={subItem.href}
+                              className="flex items-center gap-3 text-gray-800 hover:bg-gray-50 p-2 rounded-lg transition-all text-sm"
+                              onClick={() => setOpen(false)}
+                            >
+                              <span className="text-sm font-medium">{subItem.label}</span>
+                            </Link>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
               ))}
             </div>
 
