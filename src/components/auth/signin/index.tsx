@@ -21,23 +21,10 @@ export default function SignIn({ title = "ورود به سامانه" }: { title
   const codeInputRefs = useRef<Array<HTMLInputElement | null>>([]);
   const [rolesToSelect, setRolesToSelect] = useState<any[] | null>(null);
   const [settingRole, setSettingRole] = useState(false);
+  const [isProcessing, setIsProcessing] = useState(false);
   const router = useRouter();
   const { login, isLoggedIn } = useAuth();
 
-  // Helper function to wait for authentication to complete
-  const waitForAuth = async (maxAttempts = 10) => {
-    console.log('waitForAuth: Starting to wait for authentication...');
-    for (let i = 0; i < maxAttempts; i++) {
-      console.log(`waitForAuth: Attempt ${i + 1}, isLoggedIn: ${isLoggedIn}`);
-      if (isLoggedIn) {
-        console.log('waitForAuth: Authentication successful!');
-        return true;
-      }
-      await new Promise(resolve => setTimeout(resolve, 100));
-    }
-    console.log('waitForAuth: Authentication timeout, returning false');
-    return false;
-  };
   const { showError, snackbar, hideSnackbar } = useSnackbar();
 
   const phoneValid =
@@ -67,6 +54,13 @@ export default function SignIn({ title = "ورود به سامانه" }: { title
     if (step === "phone") setTimeout(() => phoneInputRefs.current[0]?.focus(), 50);
     else setTimeout(() => codeInputRefs.current[0]?.focus(), 50);
   }, [step]);
+
+  // Redirect to dashboard when authentication is successful
+  useEffect(() => {
+    if (isLoggedIn && !isProcessing) {
+      router.push("/dashboard");
+    }
+  }, [isLoggedIn, isProcessing, router]);
 
   const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>, idx: number) => {
     const val = e.target.value.replace(/\D/g, "").slice(-1);
@@ -175,72 +169,70 @@ export default function SignIn({ title = "ورود به سامانه" }: { title
       showError("کد وارد شده نامعتبر است.");
       return;
     }
+    
+    if (isProcessing) return;
+    setIsProcessing(true);
+    
     try {
       const mobile = formatMobile(phoneDigits);
       const res = await acceptLoginByMobile(mobile, code.join(""));
-      console.log('Login response:', res);
+      
       const token = extractToken(res);
-      console.log('Extracted token:', token ? token.substring(0, 20) + '...' : 'No token');
-      if (token) {
-        // Use the login function from useAuth hook
-        console.log('Calling login with token...');
-        login(token);
-        console.log('Login called, checking auth status...');
-        
-        // Debug: Check if token is stored in localStorage
-        setTimeout(() => {
-          const storedToken = localStorage.getItem('authToken');
-          console.log('Stored token in localStorage:', storedToken ? storedToken.substring(0, 20) + '...' : 'No token');
-        }, 200);
-        const payload: any = decodeJwt(token) || {};
-        const roles = payload?.roles || payload?.role || [];
+      if (!token) {
+        throw new Error("توکن احراز هویت دریافت نشد");
+      }
 
-        if (Array.isArray(roles) && roles.length === 1) {
-          // prefer rowId as roleId when available (backend expects rowId in roleId)
-          const roleToSend = roles[0]?.rowId || roles[0]?.slug || roles[0];
-          setSettingRole(true);
+      // Login with the token
+      login(token);
+      
+      const payload: any = decodeJwt(token) || {};
+      const roles = payload?.roles || payload?.role || [];
+
+      if (Array.isArray(roles) && roles.length === 1) {
+        // Single role - set it automatically
+        const roleToSend = roles[0]?.rowId || roles[0]?.slug || roles[0];
+        setSettingRole(true);
+        
+        try {
           const roleResponse = await setRole(roleToSend);
-          setSettingRole(false);
           
           // Check if setRole returned a new token and update it
           const newToken = extractToken(roleResponse);
           if (newToken) {
             login(newToken);
           }
-          
-          // Wait for authentication to complete
-          const authComplete = await waitForAuth();
-          if (authComplete) {
-            router.push("/dashboard");
-          } else {
-            showError("خطا در احراز هویت. لطفاً دوباره تلاش کنید.");
-          }
-          return;
+        } catch (roleErr: any) {
+          // Don't show error for role setting, just continue with login
+        } finally {
+          setSettingRole(false);
         }
-
-        if (Array.isArray(roles) && roles.length > 1) {
-          setRolesToSelect(roles);
-          return;
-        }
-
-        // Wait for authentication to complete
-        const authComplete = await waitForAuth();
-        if (authComplete) {
-          router.push("/dashboard");
-        } else {
-          showError("خطا در احراز هویت. لطفاً دوباره تلاش کنید.");
-        }
+        
+        // Set isProcessing to false so redirect can happen
+        setIsProcessing(false);
         return;
       }
 
-      router.push("/dashboard");
+      if (Array.isArray(roles) && roles.length > 1) {
+        // Multiple roles - let user choose
+        setRolesToSelect(roles);
+        setIsProcessing(false);
+        return;
+      }
+
+      // No roles or single role already handled
+      // Set isProcessing to false so redirect can happen
+      setIsProcessing(false);
+      
     } catch (err: any) {
       showError(extractAndTranslateError(err));
+      setIsProcessing(false);
     }
   };
 
   const chooseRole = async (role: any) => {
-    if (!role) return;
+    if (!role || isProcessing) return;
+    
+    setIsProcessing(true);
     try {
       setSettingRole(true);
       const roleToSend = role?.rowId || role?.slug || role;
@@ -253,15 +245,12 @@ export default function SignIn({ title = "ورود به سامانه" }: { title
         login(newToken);
       }
       
-      // Wait for authentication to complete
-      const authComplete = await waitForAuth();
-      if (authComplete) {
-        router.push("/dashboard");
-      } else {
-        showError("خطا در احراز هویت. لطفاً دوباره تلاش کنید.");
-      }
+      // Set isProcessing to false so redirect can happen
+      setIsProcessing(false);
+      
     } catch (err: any) {
       setSettingRole(false);
+      setIsProcessing(false);
       showError(extractAndTranslateError(err));
     }
   };
@@ -332,12 +321,12 @@ export default function SignIn({ title = "ورود به سامانه" }: { title
 
               <button
                 onClick={handleVerifyCode}
-                disabled={!codeValid}
+                disabled={!codeValid || isProcessing}
                 className={`w-full py-3 rounded-lg text-white font-semibold transition ${
-                  codeValid ? "bg-[var(--main-color)] hover:bg-[var(--main-color-dark)]" : "bg-gray-400 cursor-not-allowed"
+                  codeValid && !isProcessing ? "bg-[var(--main-color)] hover:bg-[var(--main-color-dark)]" : "bg-gray-400 cursor-not-allowed"
                 }`}
               >
-                ورود به سامانه
+                {isProcessing ? "در حال ورود..." : "ورود به سامانه"}
               </button>
 
               <button
@@ -345,7 +334,8 @@ export default function SignIn({ title = "ورود به سامانه" }: { title
                   setStep("phone");
                   setCode(Array(codeLength).fill(""));
                 }}
-                className="mt-2 text-sm text-[var(--main-color)] hover:underline cursor-pointer"
+                disabled={isProcessing}
+                className="mt-2 text-sm text-[var(--main-color)] hover:underline cursor-pointer disabled:opacity-50"
               >
                 بازگشت به مرحله قبل
               </button>
@@ -360,9 +350,9 @@ export default function SignIn({ title = "ورود به سامانه" }: { title
                   <button
                     key={idx}
                     onClick={() => chooseRole(role)}
-                    disabled={settingRole}
+                    disabled={settingRole || isProcessing}
                     className={`w-full p-3 text-right rounded-lg border transition-all ${
-                      settingRole
+                      settingRole || isProcessing
                         ? "bg-gray-100 cursor-not-allowed"
                         : "bg-white hover:bg-gray-50 border-gray-300 hover:border-[var(--main-color)]"
                     }`}
