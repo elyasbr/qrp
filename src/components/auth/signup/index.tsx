@@ -2,6 +2,10 @@
 import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
 import { preRegisterMobile, acceptRegisterMobile } from "@/services/api/userService";
+import { decodeJwt } from "@/services/api/auth";
+import { extractToken } from "@/services/api/utils";
+import { useAuth } from "@/hooks/useAuth";
+import { useRouter } from "next/navigation";
 import { extractAndTranslateError } from "@/utils/errorTranslations";
 import { useSnackbar } from "@/hooks/useSnackbar";
 import Snackbar from "@/components/common/Snackbar";
@@ -15,6 +19,9 @@ export default function SignUp({ title = "ثبت نام" }: { title?: string }) 
   const [code, setCode] = useState<string[]>(Array(codeLength).fill(""));
   const phoneInputRefs = useRef<Array<HTMLInputElement | null>>([]);
   const codeInputRefs = useRef<Array<HTMLInputElement | null>>([]);
+  const [isProcessing, setIsProcessing] = useState(false);
+  const router = useRouter();
+  const { login, isLoggedIn } = useAuth();
   const { showError, snackbar, hideSnackbar } = useSnackbar();
 
   const phoneValid =
@@ -48,6 +55,13 @@ export default function SignUp({ title = "ثبت نام" }: { title?: string }) 
     if (step === "phone") setTimeout(() => phoneInputRefs.current[0]?.focus(), 50);
     else setTimeout(() => codeInputRefs.current[0]?.focus(), 50);
   }, [step]);
+
+  // Redirect to dashboard when authentication is successful
+  useEffect(() => {
+    if (isLoggedIn && !isProcessing) {
+      router.push("/dashboard");
+    }
+  }, [isLoggedIn, isProcessing, router]);
 
   const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>, idx: number) => {
     const val = e.target.value.replace(/\D/g, "").slice(-1);
@@ -156,12 +170,28 @@ export default function SignUp({ title = "ثبت نام" }: { title?: string }) 
       showError("کد وارد شده نامعتبر است.");
       return;
     }
+    
+    if (isProcessing) return;
+    setIsProcessing(true);
+    
     try {
       const mobile = formatMobile(phoneDigits);
-      await acceptRegisterMobile(mobile, code.join(""));
-      // TODO: handle token + redirect after successful registration
+      const res = await acceptRegisterMobile(mobile, code.join(""));
+      
+      const token = extractToken(res);
+      if (!token) {
+        throw new Error("توکن احراز هویت دریافت نشد");
+      }
+
+      // Login with the token after successful registration
+      login(token);
+      
+      // Set isProcessing to false so redirect can happen
+      setIsProcessing(false);
+      
     } catch (err: any) {
       showError(extractAndTranslateError(err));
+      setIsProcessing(false);
     }
   };
 
@@ -231,12 +261,12 @@ export default function SignUp({ title = "ثبت نام" }: { title?: string }) 
 
               <button
                 onClick={handleVerifyCode}
-                disabled={!codeValid}
+                disabled={!codeValid || isProcessing}
                 className={`w-full py-3 rounded-lg text-white font-semibold transition ${
-                  codeValid ? "bg-[var(--main-color)] hover:bg-[var(--main-color-dark)]" : "bg-gray-400 cursor-not-allowed"
+                  codeValid && !isProcessing ? "bg-[var(--main-color)] hover:bg-[var(--main-color-dark)]" : "bg-gray-400 cursor-not-allowed"
                 }`}
               >
-                ثبت نام و ورود
+                {isProcessing ? "در حال ثبت نام..." : "ثبت نام و ورود"}
               </button>
 
               <button
@@ -244,7 +274,8 @@ export default function SignUp({ title = "ثبت نام" }: { title?: string }) 
                   setStep("phone");
                   setCode(Array(codeLength).fill(""));
                 }}
-                className="mt-2 text-sm text-[var(--main-color)] hover:underline cursor-pointer"
+                disabled={isProcessing}
+                className="mt-2 text-sm text-[var(--main-color)] hover:underline cursor-pointer disabled:opacity-50"
               >
                 بازگشت به مرحله قبل
               </button>
