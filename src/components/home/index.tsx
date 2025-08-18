@@ -1,7 +1,7 @@
 "use client";
 import React, { useState } from "react";
 import Link from "next/link";
-import { ArrowRight, Menu, Square } from "lucide-react";
+import { ArrowRight, Menu, SquareX } from "lucide-react";
 import Image from "next/image";
 import { useAuth } from "@/hooks/useAuth";
 
@@ -11,7 +11,7 @@ export default function Home() {
 
   const links = [
     { label: "خانه", href: "/" },
-    { label: "درباره ما", href: "#" },
+    { label: "داشبور", href: "/" },
     { label: "تماس با ما", href: "#" },
     { label: "خدمات", href: "#" },
   ];
@@ -19,8 +19,8 @@ export default function Home() {
   return (
     <>
       {/* Navbar */}
-      <nav className="w-full bg-white  shadow-md fixed top-0 z-50">
-        <div className="max-w-5xl mx-auto px-4 py-3 flex items-center justify-between">
+      <nav className="w-full fixed top-0 z-50 px-2">
+        <div className="max-w-5xl bg-white shadow-lg/10 ring-2 ring-blue-600 rounded-xl mt-2  mx-auto px-4 py-3 flex items-center justify-between">
 
           {/* Desktop Menu */}
           <div className="hidden md:flex gap-6 text-sm font-semibold text-gray-700">
@@ -34,25 +34,41 @@ export default function Home() {
               </Link>
             ))}
           </div>
-          
-          {/* Logo */}
-          <div className="text-[var(--main-color)] font-extrabold text-xl font-Morabba">
-            <Image alt="logo" src='/images/logo.jpg' width={100} height={100}/>
-          </div>
-
           {/* Mobile Toggle Button */}
           <button
             onClick={() => setMenuOpen(!menuOpen)}
             className="md:hidden text-gray-700"
             aria-label="Toggle Menu"
           >
-            {menuOpen ? <Square size={24} /> : <Menu size={24} />}
+            {menuOpen ? <SquareX size={24} /> : <Menu size={24} />}
           </button>
+          
+          {/* Logo */}
+          <div className="text-[var(--main-color)] font-extrabold text-xl font-Morabba">
+            <Image alt="logo" src='/images/logo.jpg' width={100} height={100}/>
+          </div>
+
         </div>
 
-        {/* Mobile Menu */}
-        {menuOpen && (
-          <div className="absolute top-full left-0 right-0 bg-white shadow-lg border-t border-gray-200 md:hidden">
+        {/* Mobile Menu with animation */}
+        <div className="relative">
+          {/* Overlay */}
+          {menuOpen && (
+            <div
+              className="fixed inset-0 z-40 bg-black/30 backdrop-blur-sm transition-opacity duration-300 md:hidden"
+              style={{ opacity: menuOpen ? 1 : 0 }}
+              onClick={() => setMenuOpen(false)}
+            />
+          )}
+          {/* Animated Menu */}
+          <div
+            className={`absolute top-full left-0 right-0 z-50 md:hidden transition-all duration-300 transform ${
+              menuOpen
+                ? 'opacity-100 translate-y-0 scale-100 pointer-events-auto'
+                : 'opacity-0 -translate-y-4 scale-95 pointer-events-none'
+            } bg-white ring ring-blue-400 shadow-sm/30 mx-2 rounded-xl mt-2 shadow-lg border-t border-gray-200`}
+            style={{ willChange: 'opacity, transform' }}
+          >
             <div className="flex flex-col gap-3 p-4">
               {links.map((link) => (
                 <Link
@@ -66,7 +82,7 @@ export default function Home() {
               ))}
             </div>
           </div>
-        )}
+        </div>
       </nav>
 
       {/* Landing Section */}
@@ -105,6 +121,11 @@ export default function Home() {
           </div>
         )}
       </main>
+
+      {/* Footer */}
+      <footer className="w-full  bg-white border-t border-gray-200 py-4 mt-auto text-center text-gray-500 text-sm font-medium shadow-inner">
+        © {new Date().getFullYear()} ایران راد | تمامی حقوق محفوظ است.
+      </footer>
     </>
   );
 }

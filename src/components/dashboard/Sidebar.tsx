@@ -17,7 +17,7 @@ interface NavItem {
   }>;
 }
 
-const navItems: NavItem[] = [
+const userNavItems: NavItem[] = [
   { href: "/dashboard", label: "داشبورد", icon: <Home /> },
   { href: "/dashboard/profile", label: "پروفایل", icon: <User /> },
   { 
@@ -27,17 +27,45 @@ const navItems: NavItem[] = [
       { href: "/dashboard/animals", label: "لیست حیوانات", icon: <Cat/> }
     ]
   },
-
   { href: "/help", label: "راهنما", icon: <HelpCircle /> },
   { href: "/about", label: "درباره ما", icon: <Info /> },
   { href: "/contact", label: "تماس با ما", icon: <Phone /> },
 ];
 
+const adminNavItems: NavItem[] = [
+  { href: "/dashboard", label: "داشبورد ادمین", icon: <Home /> },
+  { href: "/dashboard/profile", label: "پروفایل", icon: <User /> },
+  { label: "مدیریت کاربران", icon: <Users />, subItems: [
+      { href: "/dashboard/users", label: "لیست کاربران", icon: <Users /> },
+    ] },
+  { label: "گزارشات", icon: <BarChart3 />, subItems: [
+      { href: "/dashboard/animals", label: "لیست حیوانات", icon: <Cat/> }
+    ] },
+  { href: "/dashboard/settings", label: "تنظیمات", icon: <Settings /> },
+  { href: "/help", label: "راهنما", icon: <HelpCircle /> },
+  { href: "/about", label: "درباره ما", icon: <Info /> },
+  { href: "/contact", label: "تماس با ما", icon: <Phone /> },
+];
+
+function getNavItemsByRole(role: string | string[] | undefined): NavItem[] {
+  if (!role) return userNavItems;
+  if (Array.isArray(role)) {
+    if (role.includes("admin")) return adminNavItems;
+    return userNavItems;
+  }
+  if (role === "admin") return adminNavItems;
+  return userNavItems;
+}
+
 export default function Sidebar() {
   const [open, setOpen] = useState(false);
   const [expandedItems, setExpandedItems] = useState<string[]>([]);
-  const { logout, isLoggedIn } = useAuth();
+  const { logout, isLoggedIn, userPayload } = useAuth();
   const router = useRouter();
+
+  // Get role from userPayload (from JWT)
+  const role = userPayload?.role;
+  const navItems = getNavItemsByRole(role);
 
   const handleLogout = () => {
     logout();
@@ -166,7 +194,7 @@ export default function Sidebar() {
               <div className="p-4 border-t border-gray-200">
                 <button
                   onClick={handleLogout}
-                  className="flex items-center gap-3 text-red-600 hover:bg-red-50 p-3 rounded-lg transition-all w-full"
+                  className="flex items-center cursor-pointer justify-center gap-3 text-red-600 hover:bg-red-50 p-3 rounded-lg transition-all w-full"
                 >
                   <LogOut size={20} />
                   <span className="text-sm font-semibold">خروج از حساب</span>
