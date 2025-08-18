@@ -165,10 +165,16 @@ export default function SignIn({ title = "ورود به سامانه" }: { title
       const errorCode = errorData?.message?.code || errorData?.code;
       const errorMsg = errorData?.message?.msg || errorData?.msg || errorData?.message;
       
+      // Log the error for debugging
+      console.log("Signin error:", err);
+      console.log("Error data:", errorData);
+      
       if (errorCode === 1001 || errorMsg === "MOBILE_FIELD_USER_IS_DUPLICATED") {
         showError("این شماره موبایل ثبت نام نشده است. لطفاً ابتدا ثبت نام کنید.");
       } else {
-        showError(extractAndTranslateError(err));
+        // Show a more specific error message
+        const specificError = errorMsg || errorData?.message || "خطایی رخ داد. لطفاً دوباره تلاش کنید.";
+        showError(specificError);
       }
     }
   };
@@ -238,10 +244,16 @@ export default function SignIn({ title = "ورود به سامانه" }: { title
       const errorCode = errorData?.message?.code || errorData?.code;
       const errorMsg = errorData?.message?.msg || errorData?.msg || errorData?.message;
       
+      // Log the error for debugging
+      console.log("Signin verification error:", err);
+      console.log("Error data:", errorData);
+      
       if (errorCode === 1001 || errorMsg === "MOBILE_FIELD_USER_IS_DUPLICATED") {
         showError("این شماره موبایل ثبت نام نشده است. لطفاً ابتدا ثبت نام کنید.");
       } else {
-        showError(extractAndTranslateError(err));
+        // Show a more specific error message
+        const specificError = errorMsg || errorData?.message || "خطایی رخ داد. لطفاً دوباره تلاش کنید.";
+        showError(specificError);
       }
       setIsProcessing(false);
     }

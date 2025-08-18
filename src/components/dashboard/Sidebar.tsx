@@ -1,20 +1,34 @@
 "use client"
-import { AlignJustify, Info, Phone, SquareX, User, LogOut, FileText, ChevronDown, ChevronLeft } from "lucide-react";
+import { AlignJustify, Info, Phone, SquareX, User, LogOut, FileText, ChevronDown, ChevronLeft, Home, Settings, BarChart3, Users, Calendar, Shield, HelpCircle, Cat } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 import Image from "next/image";
 import { useAuth } from "@/hooks/useAuth";
 import { useRouter } from "next/navigation";
 
-const navItems = [
+interface NavItem {
+  href?: string;
+  label: string;
+  icon: React.ReactNode;
+  subItems?: Array<{
+    href: string;
+    label: string;
+    icon?: React.ReactNode;
+  }>;
+}
+
+const navItems: NavItem[] = [
+  { href: "/dashboard", label: "داشبورد", icon: <Home /> },
   { href: "/dashboard/profile", label: "پروفایل", icon: <User /> },
   { 
     label: "گزارش", 
     icon: <FileText />, 
     subItems: [
-      { href: "/dashboard/animals", label: "لیست حیوانات" }
+      { href: "/dashboard/animals", label: "لیست حیوانات", icon: <Cat/> }
     ]
   },
+
+  { href: "/help", label: "راهنما", icon: <HelpCircle /> },
   { href: "/about", label: "درباره ما", icon: <Info /> },
   { href: "/contact", label: "تماس با ما", icon: <Phone /> },
 ];
@@ -136,6 +150,7 @@ export default function Sidebar() {
                               className="flex items-center gap-3 text-gray-800 hover:bg-gray-50 p-2 rounded-lg transition-all text-sm"
                               onClick={() => setOpen(false)}
                             >
+                              {subItem.icon && <span className="text-sm">{subItem.icon}</span>}
                               <span className="text-sm font-medium">{subItem.label}</span>
                             </Link>
                           ))}
