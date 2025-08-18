@@ -13,7 +13,7 @@ export default function PetList() {
     const [showForm, setShowForm] = useState(false);
     const [editingPet, setEditingPet] = useState<Pet | null>(null);
     const [viewingPet, setViewingPet] = useState<Pet | null>(null);
-  
+
     const { showError, showSuccess, snackbar, hideSnackbar } = useSnackbar();
 
     // Load pets on component mount
@@ -66,14 +66,14 @@ export default function PetList() {
         loadPets();
     };
 
-      // Filter and search pets
-  const filteredPets = pets.filter(pet => {
-    const matchesSearch = pet.namePet.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         pet.typePet.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         pet.colorPet.toLowerCase().includes(searchTerm.toLowerCase());
-    
-    return matchesSearch;
-  });
+    // Filter and search pets
+    const filteredPets = pets.filter(pet => {
+        const matchesSearch = pet.namePet.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            pet.typePet.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            pet.colorPet.toLowerCase().includes(searchTerm.toLowerCase());
+
+        return matchesSearch;
+    });
 
     if (loading) {
         return (
@@ -95,19 +95,19 @@ export default function PetList() {
                 {/* Controls */}
                 <div className="bg-white rounded-lg shadow-sm p-4 mb-6">
                     <div className="flex flex-col lg:flex-row gap-4 items-center justify-between">
-                                     {/* Search */}
-             <div className="flex-1 max-w-md">
-               <div className="relative">
-                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
-                 <input
-                   type="text"
-                   placeholder="جستجو در حیوانات..."
-                   value={searchTerm}
-                   onChange={(e) => setSearchTerm(e.target.value)}
-                   className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--main-color)] focus:border-transparent"
-                 />
-               </div>
-             </div>
+                        {/* Search */}
+                        <div className="flex-1 max-w-md">
+                            <div className="relative">
+                                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
+                                <input
+                                    type="text"
+                                    placeholder="جستجو در حیوانات..."
+                                    value={searchTerm}
+                                    onChange={(e) => setSearchTerm(e.target.value)}
+                                    className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--main-color)] focus:border-transparent"
+                                />
+                            </div>
+                        </div>
 
                         {/* Add Button */}
                         <button
@@ -129,13 +129,13 @@ export default function PetList() {
                             </svg>
                         </div>
                         <h3 className="text-lg font-medium text-gray-900 mb-2">هیچ حیوانی یافت نشد</h3>
-                                     <p className="text-gray-500 mb-4">
-               {searchTerm 
-                 ? "لطفاً جستجو را تغییر دهید یا حیوان جدیدی اضافه کنید"
-                 : "برای شروع، حیوان جدیدی اضافه کنید"
-               }
-             </p>
-             {!searchTerm && (
+                        <p className="text-gray-500 mb-4">
+                            {searchTerm
+                                ? "لطفاً جستجو را تغییر دهید یا حیوان جدیدی اضافه کنید"
+                                : "برای شروع، حیوان جدیدی اضافه کنید"
+                            }
+                        </p>
+                        {!searchTerm && (
                             <button
                                 onClick={() => setShowForm(true)}
                                 className="bg-[var(--main-color)] hover:bg-[var(--main-color-dark)] text-white px-4 py-2 rounded-lg transition-colors"
@@ -172,12 +172,12 @@ export default function PetList() {
 
                                     {/* Pet Details */}
                                     <div className="space-y-2 mb-4">
-                                                             <div className="flex justify-between text-sm">
-                       <span className="text-gray-500">جنسیت:</span>
-                       <span className="text-gray-900">
-                         {pet.sex === "MEN" ? "نر" : pet.sex === "WOMEN" ? "ماده" : "نامشخص"}
-                       </span>
-                     </div>
+                                        <div className="flex justify-between text-sm">
+                                            <span className="text-gray-500">جنسیت:</span>
+                                            <span className="text-gray-900">
+                                                {pet.sex === "MEN" ? "نر" : pet.sex === "WOMEN" ? "ماده" : "نامشخص"}
+                                            </span>
+                                        </div>
                                         <div className="flex justify-between text-sm">
                                             <span className="text-gray-500">وزن:</span>
                                             <span className="text-gray-900">{pet.weightPet} کیلوگرم</span>
@@ -231,22 +231,22 @@ export default function PetList() {
                             <div className="text-2xl font-bold text-[var(--main-color)]">{pets.length}</div>
                             <div className="text-sm text-gray-600">کل حیوانات</div>
                         </div>
-                                     <div>
-               <div className="text-2xl font-bold text-blue-600">{pets.filter(p => p.sex === "MEN").length}</div>
-               <div className="text-sm text-gray-600">نر</div>
-             </div>
-             <div>
-               <div className="text-2xl font-bold text-pink-600">{pets.filter(p => p.sex === "WOMEN").length}</div>
-               <div className="text-sm text-gray-600">ماده</div>
-             </div>
-             <div>
-               <div className="text-2xl font-bold text-gray-600">{pets.filter(p => p.sex === "UNKNOWN").length}</div>
-               <div className="text-sm text-gray-600">نامشخص</div>
-             </div>
-                                     <div>
-               <div className="text-2xl font-bold text-green-600">{Array.from(new Set(pets.map(pet => pet.typePet))).length}</div>
-               <div className="text-sm text-gray-600">انواع مختلف</div>
-             </div>
+                        <div>
+                            <div className="text-2xl font-bold text-blue-600">{pets.filter(p => p.sex === "MEN").length}</div>
+                            <div className="text-sm text-gray-600">نر</div>
+                        </div>
+                        <div>
+                            <div className="text-2xl font-bold text-pink-600">{pets.filter(p => p.sex === "WOMEN").length}</div>
+                            <div className="text-sm text-gray-600">ماده</div>
+                        </div>
+                        <div>
+                            <div className="text-2xl font-bold text-gray-600">{pets.filter(p => p.sex === "UNKNOWN").length}</div>
+                            <div className="text-sm text-gray-600">نامشخص</div>
+                        </div>
+                        <div>
+                            <div className="text-2xl font-bold text-green-600">{Array.from(new Set(pets.map(pet => pet.typePet))).length}</div>
+                            <div className="text-sm text-gray-600">انواع مختلف</div>
+                        </div>
                     </div>
                 </div>
             </div>
