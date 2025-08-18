@@ -20,11 +20,11 @@ interface NavItem {
 const userNavItems: NavItem[] = [
   { href: "/dashboard", label: "داشبورد", icon: <Home /> },
   { href: "/dashboard/profile", label: "پروفایل", icon: <User /> },
-  { 
-    label: "گزارش", 
-    icon: <FileText />, 
+  {
+    label: "گزارش",
+    icon: <FileText />,
     subItems: [
-      { href: "/dashboard/animals", label: "لیست حیوانات", icon: <Cat/> }
+      { href: "/dashboard/animals", label: "لیست حیوانات", icon: <Cat /> }
     ]
   },
   { href: "/help", label: "راهنما", icon: <HelpCircle /> },
@@ -35,12 +35,16 @@ const userNavItems: NavItem[] = [
 const adminNavItems: NavItem[] = [
   { href: "/dashboard", label: "داشبورد ادمین", icon: <Home /> },
   { href: "/dashboard/profile", label: "پروفایل", icon: <User /> },
-  { label: "مدیریت کاربران", icon: <Users />, subItems: [
+  {
+    label: "مدیریت کاربران", icon: <Users />, subItems: [
       { href: "/dashboard/users", label: "لیست کاربران", icon: <Users /> },
-    ] },
-  { label: "گزارشات", icon: <BarChart3 />, subItems: [
-      { href: "/dashboard/animals", label: "لیست حیوانات", icon: <Cat/> }
-    ] },
+    ]
+  },
+  {
+    label: "گزارشات", icon: <BarChart3 />, subItems: [
+      { href: "/dashboard/animals", label: "لیست حیوانات", icon: <Cat /> }
+    ]
+  },
   { href: "/dashboard/settings", label: "تنظیمات", icon: <Settings /> },
   { href: "/help", label: "راهنما", icon: <HelpCircle /> },
   { href: "/about", label: "درباره ما", icon: <Info /> },
@@ -74,8 +78,8 @@ export default function Sidebar() {
   };
 
   const toggleExpanded = (label: string) => {
-    setExpandedItems(prev => 
-      prev.includes(label) 
+    setExpandedItems(prev =>
+      prev.includes(label)
         ? prev.filter(item => item !== label)
         : [...prev, label]
     );
@@ -125,13 +129,13 @@ export default function Sidebar() {
           {/* Desktop logo */}
           <div className="hidden md:block text-center p-6 border-b border-gray-200">
             <Link href="/">
-            <Image
-              alt="logo"
-              src="/images/logo.jpg"
-              width={120}
-              height={120}
-              className="mx-auto"
-            />
+              <Image
+                alt="logo"
+                src="/images/logo.jpg"
+                width={120}
+                height={120}
+                className="mx-auto"
+              />
             </Link>
           </div>
 
@@ -155,7 +159,7 @@ export default function Sidebar() {
                     <div>
                       <button
                         onClick={() => toggleExpanded(item.label)}
-                        className="flex items-center justify-between w-full text-gray-700 hover:bg-gray-100 p-3 rounded-lg transition-all mb-2"
+                        className="flex items-center ursor-pointer justify-between w-full text-gray-700 hover:bg-gray-100 p-3 rounded-lg transition-all mb-2"
                       >
                         <div className="flex items-center gap-3">
                           <span className="text-md">{item.icon}</span>
@@ -167,15 +171,15 @@ export default function Sidebar() {
                           <ChevronLeft size={16} />
                         )}
                       </button>
-                      
+
                       {/* Sub-items */}
                       {isExpanded(item.label) && item.subItems && (
-                        <div className="mr-6 space-y-1">
+                        <div className="mr-6 space-y-1 ursor-pointer">
                           {item.subItems.map((subItem) => (
                             <Link
                               key={subItem.href}
                               href={subItem.href}
-                              className="flex items-center gap-3 text-gray-800 hover:bg-gray-50 p-2 rounded-lg transition-all text-sm"
+                              className="flex items-center  gap-3 text-gray-800 hover:bg-gray-50 p-2 rounded-lg transition-all text-sm"
                               onClick={() => setOpen(false)}
                             >
                               {subItem.icon && <span className="text-sm">{subItem.icon}</span>}

@@ -1,7 +1,7 @@
 "use client";
 import { useState, useEffect } from "react";
 import { X, Save, Loader2 } from "lucide-react";
-import { Pet, createPet, updatePet } from "@/services/api/petService";
+import { Pet, createPet, updatePet, getPetById } from "@/services/api/petService";
 import { useSnackbar } from "@/hooks/useSnackbar";
 
 interface PetFormProps {
@@ -73,6 +73,65 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
   const [loading, setLoading] = useState(false);
   const { showError, showSuccess } = useSnackbar();
 
+  const defaultFormData: Partial<Pet> = {
+    namePet: "",
+    typePet: "DOG",
+    blood: "",
+    sex: "MEN",
+    birthDate: "",
+    birthCertificateNumberPet: "",
+    microChipCode: "",
+    colorPet: "UNKNOWN",
+    distinctiveFeature: "",
+    weightPet: 0,
+    heightPet: 0,
+    issuingVeterinarian: "",
+    addressVeterinarian: "",
+    phoneNumberVeterinarian: "",
+    issuingMedicalSystem: "",
+    nameHead: "",
+    nationalCodeHead: "",
+    mobile1Head: "",
+    mobile2Head: "",
+    telHead: "",
+    iso3Head: "",
+    stateHead: "",
+    cityHead: "",
+    addressHead: "",
+    postalCodeHead: "",
+    emailHead: "",
+    telegramHead: "",
+    youtubeHead: "",
+    instagramHead: "",
+    whatsAppHead: "",
+    linkedinHead: "",
+    generalVeterinarian: "",
+    addressGeneralVeterinarian: "",
+    phoneNumberGeneralVeterinarian: "",
+    specialistVeterinarian: "",
+    addressSpecialistVeterinarian: "",
+    phoneNumberSpecialistVeterinarian: "",
+    isSterile: false,
+    vaccineRabiel: false,
+    vaccineLDHPPi: false,
+    vaccineRCP: false,
+    typeFeeding: "",
+    numberMeal: 0,
+    diet: "",
+    prohibitedFoodItems: "",
+    regularlyUsedMedications: "",
+    prohibitedDrugs: "",
+    favoriteEncouragement: "",
+    behavioralHabits: "",
+    susceptibility: "",
+    sensitivities: "",
+    connectOtherPets: false,
+    connectWithBaby: false,
+    nutritionalCounseling: "",
+    expertVeterinaryCounseling: "",
+    trainingAdvice: "",
+  };
+
   // Function to format phone numbers with +98 prefix
   const formatPhoneNumber = (phoneNumber: string): string => {
     if (!phoneNumber) return "";
@@ -101,8 +160,10 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
 
   // Initialize form with pet data if editing
   useEffect(() => {
-    if (pet) {
-      setFormData(pet);
+    if (pet && pet.petId) {
+      getPetById(pet.petId).then((data) => {
+        setFormData({ ...defaultFormData, ...data });
+      });
     }
   }, [pet]);
 
@@ -232,7 +293,7 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
 
       if (pet) {
         // Update existing pet
-        await updatePet(pet.microChipCode || "", submitData as Pet);
+        await updatePet(pet.petId || "", submitData as Pet);
         showSuccess("حیوان با موفقیت ویرایش شد");
       } else {
         // Create new pet

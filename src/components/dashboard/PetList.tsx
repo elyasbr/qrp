@@ -1,7 +1,7 @@
 "use client";
 import { useState, useEffect } from "react";
 import { Plus, Edit, Trash2, Eye, Search, Filter, MoreVertical } from "lucide-react";
-import { Pet, getAllPets, deletePet } from "@/services/api/petService";
+import { Pet, getAllPets, deletePet, getPetById } from "@/services/api/petService";
 import { useSnackbar } from "@/hooks/useSnackbar";
 import Snackbar from "@/components/common/Snackbar";
 import PetForm from "./PetForm";
@@ -50,8 +50,13 @@ export default function PetList() {
         setShowForm(true);
     };
 
-    const handleView = (pet: Pet) => {
-        setViewingPet(pet);
+    const handleView = async (pet: Pet) => {
+        try {
+            const latestPet = await getPetById(pet.petId || "");
+            setViewingPet(latestPet);
+        } catch (error: any) {
+            showError("خطا در دریافت اطلاعات حیوان: " + (error.message || "خطای نامشخص"));
+        }
     };
 
     const handleFormClose = () => {
@@ -211,7 +216,7 @@ export default function PetList() {
                                             ویرایش
                                         </button>
                                         <button
-                                            onClick={() => handleDelete(pet.microChipCode || index.toString())}
+                                            onClick={() => handleDelete(pet.petId || "")}
                                             className="flex-1 flex items-center justify-center gap-1 bg-red-50 hover:bg-red-100 text-red-600 px-3 py-2 rounded-lg text-sm transition-colors"
                                         >
                                             <Trash2 size={16} />

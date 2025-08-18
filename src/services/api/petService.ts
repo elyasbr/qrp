@@ -3,6 +3,7 @@ import api from './api';
 
 // Pet interface based on the API schema
 export interface Pet {
+  petId?: string;
   namePet: string;
   typePet: string;
   blood: string;
