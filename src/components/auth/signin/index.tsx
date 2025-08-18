@@ -812,32 +812,29 @@ export default function SignIn({ title = "ورود به سامانه" }: { title
             </div>
           )}
 
-          {step === "role" && rolesToSelect && rolesToSelect.length > 0 && (
-            <div className="space-y-4">
-              <label className="block text-gray-700 font-medium mb-1">انتخاب نقش</label>
-              <div className="space-y-2">
-                {rolesToSelect.map((role, idx) => (
-                  <button
-                    key={idx}
-                    onClick={() => chooseRole(role)}
-                    disabled={settingRole || isProcessing}
-                    className={`w-full p-3 text-right rounded-lg border transition-all ${
-                      settingRole || isProcessing
-                        ? "bg-gray-100 cursor-not-allowed"
-                        : "bg-white hover:bg-gray-50 border-gray-300 hover:border-[var(--main-color)]"
-                    }`}
-                  >
-                    <div className="font-medium text-gray-900">
-                      {role?.name || role?.label || role?.title || `نقش ${idx + 1}`}
-                    </div>
-                    {role?.description && (
-                      <div className="text-sm text-gray-500 mt-1">{role.description}</div>
-                    )}
-                  </button>
-                ))}
-              </div>
-            </div>
-          )}
+{rolesToSelect && (
+  <div className="space-y-4">
+    <label className="block text-gray-700 font-medium mb-1">انتخاب نقش</label>
+    <div className="space-y-2">
+      {rolesToSelect.map((role, idx) => (
+        <button
+          key={idx}
+          onClick={() => chooseRole(role)}
+          disabled={settingRole || isProcessing}
+          className={`w-full p-3 text-right rounded-lg border transition-all ${
+            settingRole || isProcessing
+              ? "bg-gray-100 cursor-not-allowed"
+              : "bg-white hover:bg-gray-50 border-gray-300 hover:border-[var(--main-color)]"
+          }`}
+        >
+          <div className="font-medium text-gray-900">
+            {role?.slug || `نقش ${idx + 1}`}
+          </div>
+        </button>
+      ))}
+    </div>
+  </div>
+)}
 
           {settingRole && (
             <div className="text-center py-4">
