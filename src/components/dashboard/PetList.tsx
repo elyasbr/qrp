@@ -14,6 +14,8 @@ export default function PetList() {
     const [editingPet, setEditingPet] = useState<Pet | null>(null);
     const [viewingPet, setViewingPet] = useState<Pet | null>(null);
     const loadingRef = useRef(false);
+    const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+    const [petToDelete, setPetToDelete] = useState<Pet | null>(null);
 
     const { showError, showSuccess, snackbar, hideSnackbar } = useSnackbar();
 
@@ -38,8 +40,8 @@ export default function PetList() {
     };
 
     const handleDelete = async (petId: string) => {
-        if (!confirm("آیا از حذف این حیوان اطمینان دارید؟")) return;
-
+        setDeleteModalOpen(false);
+        setPetToDelete(null);
         try {
             await deletePet(petId);
             showSuccess("حیوان با موفقیت حذف شد");
@@ -221,7 +223,10 @@ export default function PetList() {
                                             ویرایش
                                         </button>
                                         <button
-                                            onClick={() => handleDelete(pet.petId || "")}
+                                            onClick={() => {
+                                                setPetToDelete(pet);
+                                                setDeleteModalOpen(true);
+                                            }}
                                             className="flex-1 flex items-center justify-center gap-1 bg-red-50 hover:bg-red-100 text-red-600 px-3 py-2 rounded-lg text-sm transition-colors"
                                         >
                                             <Trash2 size={16} />
@@ -317,6 +322,33 @@ export default function PetList() {
                                     ویرایش
                                 </button>
                             </div>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* Custom Delete Confirmation Modal */}
+            {deleteModalOpen && petToDelete && (
+                <div className="fixed inset-0 bg-white/5 backdrop-blur-sm flex items-center justify-center z-50">
+                    <div className="bg-white rounded-lg shadow-lg p-6 max-w-sm w-full">
+                        <h2 className="text-lg font-bold mb-4 text-gray-900">تایید حذف حیوان</h2>
+                        <p className="mb-6 text-gray-700">آیا مطمئن هستید که می‌خواهید حیوان <span className="font-bold">{petToDelete.namePet}</span> را حذف کنید؟ این عملیات قابل بازگشت نیست.</p>
+                        <div className="flex justify-end gap-3">
+                            <button
+                                onClick={() => {
+                                    setDeleteModalOpen(false);
+                                    setPetToDelete(null);
+                                }}
+                                className="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg transition-colors"
+                            >
+                                انصراف
+                            </button>
+                            <button
+                                onClick={() => handleDelete(petToDelete.petId || "")}
+                                className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors"
+                            >
+                                حذف
+                            </button>
                         </div>
                     </div>
                 </div>
