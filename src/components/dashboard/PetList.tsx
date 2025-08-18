@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Plus, Edit, Trash2, Eye, Search, Filter, MoreVertical } from "lucide-react";
 import { Pet, getAllPets, deletePet, getPetById } from "@/services/api/petService";
 import { useSnackbar } from "@/hooks/useSnackbar";
@@ -13,6 +13,7 @@ export default function PetList() {
     const [showForm, setShowForm] = useState(false);
     const [editingPet, setEditingPet] = useState<Pet | null>(null);
     const [viewingPet, setViewingPet] = useState<Pet | null>(null);
+    const loadingRef = useRef(false);
 
     const { showError, showSuccess, snackbar, hideSnackbar } = useSnackbar();
 
@@ -22,6 +23,8 @@ export default function PetList() {
     }, []);
 
     const loadPets = async () => {
+        if (loadingRef.current) return;
+        loadingRef.current = true;
         try {
             setLoading(true);
             const petsData = await getAllPets();
@@ -30,6 +33,7 @@ export default function PetList() {
             showError("خطا در بارگذاری لیست حیوانات: " + error.message);
         } finally {
             setLoading(false);
+            loadingRef.current = false;
         }
     };
 
@@ -54,6 +58,7 @@ export default function PetList() {
         try {
             const latestPet = await getPetById(pet.petId || "");
             setViewingPet(latestPet);
+            console.log("pet", pet);
         } catch (error: any) {
             showError("خطا در دریافت اطلاعات حیوان: " + (error.message || "خطای نامشخص"));
         }
@@ -101,7 +106,7 @@ export default function PetList() {
                 <div className="bg-white rounded-lg shadow-sm p-4 mb-6">
                     <div className="flex flex-col lg:flex-row gap-4 items-center justify-between">
                         {/* Search */}
-                        <div className="flex-1 max-w-md">
+                        <div className="hidden lg:flex flex-1 max-w-md">
                             <div className="relative">
                                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
                                 <input
@@ -178,18 +183,18 @@ export default function PetList() {
                                     {/* Pet Details */}
                                     <div className="space-y-2 mb-4">
                                         <div className="flex justify-between text-sm">
+                                            <span className="text-gray-500">اسم:</span>
+                                            <span className="text-gray-900">{pet.namePet}</span>
+                                        </div>
+                                        <div className="flex justify-between text-sm">
                                             <span className="text-gray-500">جنسیت:</span>
                                             <span className="text-gray-900">
                                                 {pet.sex === "MEN" ? "نر" : pet.sex === "WOMEN" ? "ماده" : "نامشخص"}
                                             </span>
                                         </div>
                                         <div className="flex justify-between text-sm">
-                                            <span className="text-gray-500">وزن:</span>
-                                            <span className="text-gray-900">{pet.weightPet} کیلوگرم</span>
-                                        </div>
-                                        <div className="flex justify-between text-sm">
-                                            <span className="text-gray-500">رنگ:</span>
-                                            <span className="text-gray-900">{pet.colorPet}</span>
+                                            <span className="text-gray-500">گروه خونی:</span>
+                                            <span className="text-gray-900">{pet.blood}</span>
                                         </div>
                                         {pet.birthDate && (
                                             <div className="flex justify-between text-sm">
@@ -230,7 +235,7 @@ export default function PetList() {
                 )}
 
                 {/* Stats */}
-                <div className="mt-6 bg-white rounded-lg shadow-sm p-4">
+                {/* <div className="mt-6 bg-white rounded-lg shadow-sm p-4">
                     <div className="grid grid-cols-2 md:grid-cols-5 gap-4 text-center">
                         <div>
                             <div className="text-2xl font-bold text-[var(--main-color)]">{pets.length}</div>
@@ -253,7 +258,7 @@ export default function PetList() {
                             <div className="text-sm text-gray-600">انواع مختلف</div>
                         </div>
                     </div>
-                </div>
+                </div> */}
             </div>
 
             {/* Pet Form Modal */}
@@ -267,7 +272,7 @@ export default function PetList() {
 
             {/* Pet View Modal */}
             {viewingPet && (
-                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+                <div className="fixed inset-0 bg-whit backdrop-blur-sm   flex items-center justify-center p-4 z-50">
                     <div className="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
                         <div className="p-6">
                             <div className="flex justify-between items-center mb-4">
