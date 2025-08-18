@@ -51,6 +51,8 @@ export const errorTranslations: ErrorTranslation = {
   "User already exists": "کاربر قبلاً وجود دارد",
   "Registration failed": "ثبت نام ناموفق بود",
   "Account creation failed": "ایجاد حساب کاربری ناموفق بود",
+  "MOBILE_FIELD_USER_IS_DUPLICATED": "این شماره قبلا ثبت نام کرده است.",
+  1001: "این شماره قبلا ثبت نام کرده است.",
   
   // Generic errors
   "Something went wrong": "مشکلی پیش آمد",
@@ -89,6 +91,14 @@ export function translateError(error: string | null | undefined): string {
 // Function to extract and translate API errors
 export function extractAndTranslateError(error: any): string {
   if (!error) return "خطایی رخ داد";
+
+  // Check for known duplicate mobile error by code/message
+  const errorData = error?.response?.data || error?.data || error;
+  const errorCode = errorData?.message?.code || errorData?.code;
+  const errorMsg = errorData?.message?.msg || errorData?.msg || errorData?.message;
+  if (errorCode === 1001 || errorMsg === "MOBILE_FIELD_USER_IS_DUPLICATED") {
+    return "این شماره قبلا ثبت نام کرده است.";
+  }
   
   // Handle different error formats
   let errorMessage = "";

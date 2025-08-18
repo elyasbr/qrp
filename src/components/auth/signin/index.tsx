@@ -159,6 +159,7 @@ export default function SignIn({ title = "ورود به سامانه" }: { title
       const mobile = formatMobile(phoneDigits);
       await otpLoginByMobile(mobile);
       setStep("code");
+      showSuccess("کد تایید ارسال شد.");
     } catch (err: any) {
       // Handle specific error for unregistered mobile number
       const errorData = err?.response?.data || err?.data || err;
@@ -316,7 +317,7 @@ export default function SignIn({ title = "ورود به سامانه" }: { title
               <button
                 onClick={handleSendCode}
                 disabled={!phoneValid}
-                className={`w-full py-3 rounded-lg text-white font-semibold transition ${
+                className={`w-full py-3 cursor-pointer  rounded-lg text-white font-semibold transition ${
                   phoneValid ? "bg-[var(--main-color)] hover:bg-[var(--main-color-dark)]" : "bg-gray-400 cursor-not-allowed"
                 }`}
               >
@@ -352,7 +353,7 @@ export default function SignIn({ title = "ورود به سامانه" }: { title
               <button
                 onClick={handleVerifyCode}
                 disabled={!codeValid || isProcessing}
-                className={`w-full py-3 rounded-lg text-white font-semibold transition ${
+                className={`w-full py-3 cursor-pointer rounded-lg text-white font-semibold transition ${
                   codeValid && !isProcessing ? "bg-[var(--main-color)] hover:bg-[var(--main-color-dark)]" : "bg-gray-400 cursor-not-allowed"
                 }`}
               >
@@ -431,3 +432,7 @@ export default function SignIn({ title = "ورود به سامانه" }: { title
     </>
   );
 }
+function showSuccess(arg0: string) {
+  throw new Error("Function not implemented.");
+}
+

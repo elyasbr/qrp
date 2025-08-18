@@ -50,22 +50,21 @@ export default function Home() {
 
         </div>
 
-        {/* Mobile Menu with animation */}
+        {/* Mobile Menu with smoother animation */}
         <div className="relative">
           {/* Overlay */}
           {menuOpen && (
             <div
-              className="fixed inset-0 z-40 bg-black/30 backdrop-blur-sm transition-opacity duration-300 md:hidden"
-              style={{ opacity: menuOpen ? 1 : 0 }}
+              className={`fixed inset-0 z-40  transition-opacity duration-500 ease-in-out md:hidden ${menuOpen ? 'opacity-100' : 'opacity-0'}`}
               onClick={() => setMenuOpen(false)}
             />
           )}
           {/* Animated Menu */}
           <div
-            className={`absolute top-full left-0 right-0 z-50 md:hidden transition-all duration-300 transform ${
+            className={`absolute top-full left-0 right-0 z-50 md:hidden transition-all duration-500 ease-in-out transform ${
               menuOpen
                 ? 'opacity-100 translate-y-0 scale-100 pointer-events-auto'
-                : 'opacity-0 -translate-y-4 scale-95 pointer-events-none'
+                : 'opacity-0 -translate-y-6 scale-95 pointer-events-none'
             } bg-white ring ring-blue-400 shadow-sm/30 mx-2 rounded-xl mt-2 shadow-lg border-t border-gray-200`}
             style={{ willChange: 'opacity, transform' }}
           >

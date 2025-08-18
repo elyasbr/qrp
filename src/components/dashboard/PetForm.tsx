@@ -93,6 +93,8 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
       cleaned = cleaned.substring(1);
     }
     
+    // Only add +98 if there is something left
+    if (!cleaned) return "";
     // Add +98 prefix
     return `+98${cleaned}`;
   };
