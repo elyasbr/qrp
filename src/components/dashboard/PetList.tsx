@@ -90,7 +90,13 @@ export default function PetList() {
     if (loading) {
         return (
             <div className="flex items-center justify-center min-h-screen">
-                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[var(--main-color)]"></div>
+                <div className="flex flex-col items-center gap-3">
+                    <div className="relative h-16 w-16">
+                        <div className="absolute inset-0 rounded-full border-4 border-[var(--main-color)]/20"></div>
+                        <div className="absolute inset-0 rounded-full border-4 border-transparent border-t-[var(--main-color)] animate-spin"></div>
+                    </div>
+                    <div className="text-[var(--main-color)] font-semibold">در حال بارگذاری...</div>
+                </div>
             </div>
         );
     }

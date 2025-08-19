@@ -1,5 +1,5 @@
 "use client"
-import { AlignJustify, Info, Phone, SquareX, User, LogOut, FileText, ChevronDown, ChevronLeft, Home, Settings, BarChart3, Users, Calendar, Shield, HelpCircle, Cat, SquareChevronRight } from "lucide-react";
+import { AlignJustify, Info, Phone, SquareX, User, LogOut, FileText, ChevronDown, ChevronLeft, Home, Settings, BarChart3, Users, Calendar, Shield, HelpCircle, Cat, SquareChevronRight, PawPrint } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 import Image from "next/image";
@@ -24,12 +24,12 @@ const userNavItems: NavItem[] = [
     label: "گزارش",
     icon: <FileText />,
     subItems: [
-      { href: "/dashboard/animals", label: "لیست حیوانات", icon: <Cat /> }
+      { href: "/dashboard/animals", label: "لیست پت ها ", icon: <PawPrint /> }
     ]
   },
-  { href: "/help", label: "راهنما", icon: <HelpCircle /> },
-  { href: "/about", label: "درباره ما", icon: <Info /> },
-  { href: "/contact", label: "تماس با ما", icon: <Phone /> },
+  { href: "/dashboard", label: "راهنما", icon: <HelpCircle /> },
+  { href: "/dashboard", label: "درباره ما", icon: <Info /> },
+  { href: "/dashboard", label: "تماس با ما", icon: <Phone /> },
 ];
 
 const adminNavItems: NavItem[] = [

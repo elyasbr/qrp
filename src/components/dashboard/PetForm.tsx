@@ -82,6 +82,16 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
   const [selectedVideo, setSelectedVideo] = useState<File | null>(null);
 
+  // Normalize digits to ASCII for backend compatibility
+  const toEnglishDigits = (input: string): string => {
+    if (!input) return input;
+    const persian = "۰۱۲۳۴۵۶۷۸۹";
+    const arabic = "٠١٢٣٤٥٦٧٨٩";
+    return input
+      .replace(/[۰-۹]/g, (d) => String(persian.indexOf(d)))
+      .replace(/[٠-٩]/g, (d) => String(arabic.indexOf(d)));
+  };
+
   const defaultFormData: Partial<Pet> = {
     namePet: "",
     typePet: "DOG",
@@ -220,7 +230,7 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
         typePet: String(formData.typePet || "DOG"),
         blood: String(formData.blood || "A+"),
         sex: String(formData.sex || "MEN"),
-        birthDate: String(formData.birthDate || "2020-01-01"),
+        birthDate: toEnglishDigits(String(formData.birthDate || "2020-01-01")),
         birthCertificateNumberPet: String(formData.birthCertificateNumberPet || "BC123456"),
         microChipCode: String(formData.microChipCode || "MC123456789"),
         colorPet: String(formData.colorPet || "BLACK"),
@@ -368,7 +378,7 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
           {/* Header */}
           <div className="flex justify-between items-center mb-6">
             <h2 className="text-xl font-bold text-gray-900">
-              {pet ? "ویرایش حیوان" : "افزودن حیوان جدید"}
+              {pet ? "ویرایش پت" : "افزودن پت جدید"}
             </h2>
             <button
               onClick={onClose}
@@ -468,23 +478,47 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">تصویر حیوان</label>
-                    <input
-                      type="file"
-                      accept="image/*"
-                      onChange={(e) => setSelectedImage(e.target.files?.[0] || null)}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--main-color)] focus:border-transparent"
-                    />
+                    <label className="block text-sm font-medium text-gray-700 mb-1">عکس شناسایی پت</label>
+                    <label className="flex items-center justify-between gap-3 w-full border-2 border-dashed border-gray-300 hover:border-[var(--main-color)] rounded-xl p-3 cursor-pointer transition-colors">
+                      <div className="flex items-center gap-3">
+                        <span className="inline-flex h-10 w-10 items-center justify-center rounded-lg bg-[var(--main-color)]/10 text-[var(--main-color)]">📷</span>
+                        <div className="text-sm text-gray-600">
+                          <div className="font-semibold">انتخاب تصویر</div>
+                          <div className="text-xs text-gray-500">فرمت‌های مجاز: jpg, png</div>
+                        </div>
+                      </div>
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={(e) => setSelectedImage(e.target.files?.[0] || null)}
+                        className="hidden"
+                      />
+                    </label>
+                    {selectedImage && (
+                      <div className="mt-2 text-xs text-gray-500">{selectedImage.name}</div>
+                    )}
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">ویدیو حیوان</label>
-                    <input
-                      type="file"
-                      accept="video/*"
-                      onChange={(e) => setSelectedVideo(e.target.files?.[0] || null)}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--main-color)] focus:border-transparent"
-                    />
+                    <label className="block text-sm font-medium text-gray-700 mb-1">ویدیو(ها)</label>
+                    <label className="flex items-center justify-between gap-3 w-full border-2 border-dashed border-gray-300 hover:border-[var(--main-color)] rounded-xl p-3 cursor-pointer transition-colors">
+                      <div className="flex items-center gap-3">
+                        <span className="inline-flex h-10 w-10 items-center justify-center rounded-lg bg-[var(--main-color)]/10 text-[var(--main-color)]">🎬</span>
+                        <div className="text-sm text-gray-600">
+                          <div className="font-semibold">انتخاب ویدیو</div>
+                          <div className="text-xs text-gray-500">حداکثر حجم پیشنهادی 20MB</div>
+                        </div>
+                      </div>
+                      <input
+                        type="file"
+                        accept="video/*"
+                        onChange={(e) => setSelectedVideo(e.target.files?.[0] || null)}
+                        className="hidden"
+                      />
+                    </label>
+                    {selectedVideo && (
+                      <div className="mt-2 text-xs text-gray-500">{selectedVideo.name}</div>
+                    )}
                   </div>
 
                   <div>
@@ -534,7 +568,7 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
                         const gregorianDate = (dateValue as DateObject)
                           .convert(gregorian)
                           .format("YYYY-MM-DD");
-                        handleInputChange("birthDate", gregorianDate);
+                        handleInputChange("birthDate", toEnglishDigits(gregorianDate));
                       }}
                       calendarPosition="bottom-right"
                       inputClass="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--main-color)] focus:border-transparent"
