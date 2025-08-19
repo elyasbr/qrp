@@ -383,11 +383,11 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
             {/* Basic Information */}
             <div className="grid grid-cols-1 gap-6">
               <div>
-                <h3 className="text-lg font-semibold text-[var(--main-color)] mb-4">اطلاعات اصلی</h3>
+                <h3 className="text-lg font-semibold text-[var(--main-color)] mb-4">مشخصات حیوان خانگی</h3>
 
                 <div className="space-y-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">نام حیوان *</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">نام پت *</label>
                     <input
                       type="text"
                       value={formData.namePet || ""}
@@ -399,9 +399,7 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      نوع حیوان <span className="text-red-500">*</span>
-                    </label>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">نوع پت <span className="text-red-500">*</span></label>
                     <select
                       value={formData.typePet || "DOG"}
                       onChange={(e) => handleInputChange("typePet", e.target.value)}
@@ -434,7 +432,7 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">جنسیت *</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">جنسیت پت *</label>
                     <select
                       value={formData.sex || "MEN"}
                       onChange={(e) => handleInputChange("sex", e.target.value)}
@@ -446,7 +444,7 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">رنگ</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">رنگ پت</label>
                     <select
                       value={formData.colorPet || "UNKNOWN"}
                       onChange={(e) => handleInputChange("colorPet", e.target.value)}
@@ -490,7 +488,7 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">وزن (کیلوگرم)</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">وزن پت (کیلوگرم)</label>
                     <input
                       type="number"
                       step="0.1"
@@ -502,7 +500,7 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">قد (سانتی‌متر)</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">قد پت (سانتی‌متر)</label>
                     <input
                       type="number"
                       step="0.1"
@@ -514,7 +512,7 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">تاریخ تولد (شمسی)</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">تاریخ تولد پت (شمسی)</label>
                     <DatePicker
                       calendar={persian}
                       locale={persian_fa}
@@ -548,11 +546,11 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
 
               {/* Medical Information */}
               <div>
-                <h3 className="text-lg font-semibold text-[var(--main-color)] mb-4">اطلاعات پزشکی</h3>
+                <h3 className="text-lg font-semibold text-[var(--main-color)] mb-4">ویژگی و اطلاعات سلامتی</h3>
 
                 <div className="space-y-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">کد میکروچیپ</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">کد میکروچیپ پت</label>
                     <input
                       type="text"
                       value={formData.microChipCode || ""}
@@ -562,7 +560,7 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">شماره گواهی تولد</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">شماره شناسنامه پت</label>
                     <input
                       type="text"
                       value={formData.birthCertificateNumberPet || ""}
@@ -572,7 +570,7 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">دامپزشک صادرکننده</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">نام دامپزشک صادر کننده شناسنامه</label>
                     <input
                       type="text"
                       value={formData.issuingVeterinarian || ""}
@@ -592,9 +590,7 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      شماره تلفن دامپزشک <span className="text-red-500">*</span>
-                    </label>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">تلفن و شماره تماس دامپزشک عمومی <span className="text-red-500">*</span></label>
                     <input
                       type="tel"
                       value={formData.phoneNumberVeterinarian || ""}
@@ -606,7 +602,7 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">سیستم پزشکی صادرکننده</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">نظام دامپزشکی صادر کننده شناسنامه</label>
                     <input
                       type="text"
                       value={formData.issuingMedicalSystem || ""}
@@ -626,7 +622,7 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">تعداد وعده غذایی</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">تعداد وعده‌های غذایی روزانه</label>
                     <input
                       type="number"
                       min="0"
@@ -704,7 +700,7 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
 
             {/* Owner Information */}
             <div>
-              <h3 className="text-lg font-semibold text-[var(--main-color)] mb-4">اطلاعات صاحب</h3>
+              <h3 className="text-lg font-semibold text-[var(--main-color)] mb-4">مشخصات سرپرست پت</h3>
               <div className="grid grid-cols-1 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">نام صاحب</label>

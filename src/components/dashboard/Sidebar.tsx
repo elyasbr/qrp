@@ -109,7 +109,7 @@ export default function Sidebar() {
       <aside
         className={`
     fixed top-0 right-0 h-full w-64 bg-white shadow-xl rounded-l-2xl transform-gpu will-change-transform transition-all duration-500 ease-out z-50
-    md:relative md:translate-x-0 md:z-auto md:shadow-none md:rounded-none
+    md:relative md:translate-x-0 md:opacity-100 md:z-auto md:shadow-none md:rounded-none
     ${open ? "translate-x-0 opacity-100" : "translate-x-full opacity-0"}
   `}
       >
