@@ -364,17 +364,7 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
   return (
     <div className="fixed inset-0 bg-white/30 backdrop-blur-sm flex items-center justify-center p-4 z-50">
       <div className="bg-white rounded-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto">
-        <div className="p-6">
-          {/* Mobile Search Box */}
-          <div className="block md:hidden mb-4">
-            <input
-              type="text"
-              value={formSearch}
-              onChange={e => setFormSearch(e.target.value)}
-              placeholder="جستجو در فرم..."
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--main-color)] focus:border-transparent"
-            />
-          </div>
+        <div className="p-6">         
           {/* Header */}
           <div className="flex justify-between items-center mb-6">
             <h2 className="text-xl font-bold text-gray-900">
