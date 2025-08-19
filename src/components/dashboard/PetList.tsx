@@ -1,6 +1,6 @@
 "use client";
 import { useState, useEffect, useRef } from "react";
-import { Plus, Edit, Trash2, Eye, Search, Filter, MoreVertical } from "lucide-react";
+import { Plus, Edit, Trash2, Eye, Search, Filter, MoreVertical, PawPrint } from "lucide-react";
 import { Pet, getAllPets, deletePet, getPetById } from "@/services/api/petService";
 import { useSnackbar } from "@/hooks/useSnackbar";
 import Snackbar from "@/components/common/Snackbar";
@@ -169,7 +169,7 @@ export default function PetList() {
                                 {/* Pet Image Placeholder */}
                                 <div className="h-48 bg-gradient-to-br from-blue-100 to-purple-100 flex items-center justify-center">
                                     <div className="text-center">
-                                        <div className="text-4xl mb-2">🐾</div>
+                                        <div className="text-4xl mb-2"><PawPrint /></div>
                                         <div className="text-sm text-gray-600">{pet.typePet}</div>
                                     </div>
                                 </div>
@@ -180,11 +180,6 @@ export default function PetList() {
                                         <div>
                                             <h3 className="font-semibold text-gray-900 text-lg mb-1">{pet.namePet}</h3>
                                             <p className="text-sm text-gray-600">{pet.typePet}</p>
-                                        </div>
-                                        <div className="relative">
-                                            <button className="p-1 hover:bg-gray-100 rounded">
-                                                <MoreVertical size={16} />
-                                            </button>
                                         </div>
                                     </div>
 
@@ -283,50 +278,58 @@ export default function PetList() {
 
             {/* Pet View Modal */}
             {viewingPet && (
-                <div className="fixed inset-0 bg-whit backdrop-blur-sm   flex items-center justify-center p-4 z-50">
-                    <div className="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-                        <div className="p-6">
-                            <div className="flex justify-between items-center mb-4">
-                                <h2 className="text-xl font-bold text-gray-900">جزئیات حیوان</h2>
-                                <button
-                                    onClick={() => setViewingPet(null)}
-                                    className="text-gray-400 hover:text-gray-600"
-                                >
-                                    ✕
-                                </button>
-                            </div>
-
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <div>
-                                    <h3 className="font-semibold text-gray-900 mb-2">اطلاعات اصلی</h3>
-                                    <div className="space-y-2 text-sm">
-                                        <div><span className="text-gray-500">نام:</span> {viewingPet.namePet}</div>
-                                        <div><span className="text-gray-500">نوع:</span> {viewingPet.typePet}</div>
-                                        <div><span className="text-gray-500">جنسیت:</span> {viewingPet.sex === "MEN" ? "نر" : viewingPet.sex === "WOMEN" ? "ماده" : "نامشخص"}</div>
-                                        <div><span className="text-gray-500">رنگ:</span> {viewingPet.colorPet}</div>
-                                        <div><span className="text-gray-500">وزن:</span> {viewingPet.weightPet} کیلوگرم</div>
-                                        <div><span className="text-gray-500">قد:</span> {viewingPet.heightPet} سانتی‌متر</div>
+                <div className="fixed inset-0 bg-black/20 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+                    <div className="relative w-full max-w-3xl">
+                        <div className="absolute inset-0 -z-10 blur-2xl rounded-3xl bg-gradient-to-tr from-[var(--main-color)]/20 to-purple-400/20" />
+                        <div className="bg-white/90 rounded-2xl shadow-xl ring-1 ring-gray-200 overflow-hidden">
+                            {/* Header */}
+                            <div className="flex items-center justify-between px-6 py-4 border-b">
+                                <div className="flex items-center gap-3">
+                                    <div className="h-12 w-12 rounded-xl bg-[var(--main-color)]/10 flex items-center justify-center text-2xl">🐾</div>
+                                    <div>
+                                        <h2 className="text-lg font-bold text-gray-900">{viewingPet.namePet}</h2>
+                                        <p className="text-xs text-gray-500">{viewingPet.typePet}</p>
                                     </div>
                                 </div>
-
-                                <div>
-                                    <h3 className="font-semibold text-gray-900 mb-2">اطلاعات پزشکی</h3>
-                                    <div className="space-y-2 text-sm">
-                                        <div><span className="text-gray-500">واکسن هاری:</span> {viewingPet.vaccineRabiel ? "بله" : "خیر"}</div>
-                                        <div><span className="text-gray-500">واکسن LDHPPi:</span> {viewingPet.vaccineLDHPPi ? "بله" : "خیر"}</div>
-                                        <div><span className="text-gray-500">واکسن RCP:</span> {viewingPet.vaccineRCP ? "بله" : "خیر"}</div>
-                                        <div><span className="text-gray-500">عقیم شده:</span> {viewingPet.isSterile ? "بله" : "خیر"}</div>
-                                    </div>
-                                </div>
+                                <button onClick={() => setViewingPet(null)} className="text-gray-500 hover:text-gray-700">✕</button>
                             </div>
 
-                            <div className="mt-6 flex justify-end">
-                                <button
-                                    onClick={() => handleEdit(viewingPet)}
-                                    className="bg-[var(--main-color)] hover:bg-[var(--main-color-dark)] text-white px-4 py-2 rounded-lg transition-colors"
-                                >
-                                    ویرایش
-                                </button>
+                            {/* Body */}
+                            <div className="px-6 py-5">
+                                {/* Media preview if exists */}
+                                {(viewingPet.imageUrl || viewingPet.videoUrl) && (
+                                    <div className="mb-5 overflow-hidden rounded-xl ring-1 ring-gray-200">
+                                        {viewingPet.videoUrl ? (
+                                            <video src={viewingPet.videoUrl} className="w-full h-auto" controls />
+                                        ) : (
+                                            <img src={viewingPet.imageUrl as any} alt={viewingPet.namePet} className="w-full h-auto" />
+                                        )}
+                                    </div>
+                                )}
+
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                                    <div className="space-y-3">
+                                        <h3 className="text-sm font-semibold text-[var(--main-color)]">اطلاعات اصلی</h3>
+                                        <div className="grid grid-cols-2 text-sm gap-y-2">
+                                            <span className="text-gray-500">نام</span><span className="text-gray-900">{viewingPet.namePet}</span>
+                                            <span className="text-gray-500">نوع</span><span className="text-gray-900">{viewingPet.typePet}</span>
+                                            <span className="text-gray-500">جنسیت</span><span className="text-gray-900">{viewingPet.sex === "MEN" ? "نر" : viewingPet.sex === "WOMEN" ? "ماده" : "نامشخص"}</span>
+                                            <span className="text-gray-500">رنگ</span><span className="text-gray-900">{viewingPet.colorPet}</span>
+                                            <span className="text-gray-500">وزن</span><span className="text-gray-900">{viewingPet.weightPet} کیلوگرم</span>
+                                            <span className="text-gray-500">قد</span><span className="text-gray-900">{viewingPet.heightPet} سانتی‌متر</span>
+                                        </div>
+                                    </div>
+
+                                    <div className="space-y-3">
+                                        <h3 className="text-sm font-semibold text-[var(--main-color)]">اطلاعات پزشکی</h3>
+                                        <div className="grid grid-cols-2 text-sm gap-y-2">
+                                            <span className="text-gray-500">واکسن هاری</span><span className="text-gray-900">{viewingPet.vaccineRabiel ? "بله" : "خیر"}</span>
+                                            <span className="text-gray-500">واکسن LDHPPi</span><span className="text-gray-900">{viewingPet.vaccineLDHPPi ? "بله" : "خیر"}</span>
+                                            <span className="text-gray-500">واکسن RCP</span><span className="text-gray-900">{viewingPet.vaccineRCP ? "بله" : "خیر"}</span>
+                                            <span className="text-gray-500">عقیم شده</span><span className="text-gray-900">{viewingPet.isSterile ? "بله" : "خیر"}</span>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
