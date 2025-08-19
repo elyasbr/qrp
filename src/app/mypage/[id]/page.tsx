@@ -9,8 +9,11 @@ async function fetchPet(id: string): Promise<Pet | null> {
   }
 }
 
-export default async function QRPublicPage({ params }: { params: { id: string } }) {
-  const pet = await fetchPet(params.id);
+export default async function QRPublicPage(props: any) {
+  const rawParams = props?.params;
+  const params = rawParams && typeof rawParams.then === "function" ? await rawParams : rawParams;
+  const id: string | undefined = params?.id;
+  const pet = id ? await fetchPet(id) : null;
 
   if (!pet) {
     return (
