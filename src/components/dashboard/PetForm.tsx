@@ -1,7 +1,13 @@
 "use client";
 import { useState, useEffect } from "react";
 import { X, Save, Loader2 } from "lucide-react";
+import DatePicker from "react-multi-date-picker";
+import DateObject from "react-date-object";
+import persian from "react-date-object/calendars/persian";
+import persian_fa from "react-date-object/locales/persian_fa";
+import gregorian from "react-date-object/calendars/gregorian";
 import { Pet, createPet, updatePet, getPetById } from "@/services/api/petService";
+import { uploadFile } from "@/services/api/uploadService";
 import { useSnackbar } from "@/hooks/useSnackbar";
 
 interface PetFormProps {
@@ -73,6 +79,8 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
   const [loading, setLoading] = useState(false);
   const { showError, showSuccess } = useSnackbar();
   const [formSearch, setFormSearch] = useState("");
+  const [selectedImage, setSelectedImage] = useState<File | null>(null);
+  const [selectedVideo, setSelectedVideo] = useState<File | null>(null);
 
   const defaultFormData: Partial<Pet> = {
     namePet: "",
@@ -207,7 +215,7 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
     
     try {
       // Prepare data with all required fields having proper values
-      const submitData = {
+      const submitData: any = {
         namePet: String(formData.namePet || "سگ تست"),
         typePet: String(formData.typePet || "DOG"),
         blood: String(formData.blood || "A+"),
@@ -265,6 +273,31 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
         expertVeterinaryCounseling: String(formData.expertVeterinaryCounseling || "مشاوره دامپزشکی استاندارد"),
         trainingAdvice: String(formData.trainingAdvice || "مشاوره آموزش استاندارد")
       };
+
+      // Upload files if selected
+      if (selectedImage) {
+        try {
+          const imgRes = await uploadFile(selectedImage);
+          submitData.imageUrl = imgRes.url;
+        } catch (err) {
+          console.error("Image upload failed", err);
+          showError("آپلود تصویر ناموفق بود");
+          setLoading(false);
+          return;
+        }
+      }
+
+      if (selectedVideo) {
+        try {
+          const vidRes = await uploadFile(selectedVideo);
+          submitData.videoUrl = vidRes.url;
+        } catch (err) {
+          console.error("Video upload failed", err);
+          showError("آپلود ویدیو ناموفق بود");
+          setLoading(false);
+          return;
+        }
+      }
       
       // Double-check that critical required fields are not empty
       const criticalFields = [
@@ -348,9 +381,9 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
           {/* Form */}
           <form onSubmit={handleSubmit} className="space-y-6">
             {/* Basic Information */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 gap-6">
               <div>
-                <h3 className="text-lg font-semibold text-gray-900 mb-4">اطلاعات اصلی</h3>
+                <h3 className="text-lg font-semibold text-[var(--main-color)] mb-4">اطلاعات اصلی</h3>
 
                 <div className="space-y-4">
                   <div>
@@ -382,13 +415,22 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
 
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">گروه خونی</label>
-                    <input
-                      type="text"
+                    <select
                       value={formData.blood || ""}
                       onChange={(e) => handleInputChange("blood", e.target.value)}
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--main-color)] focus:border-transparent"
-                      placeholder="مثال: A+، B+، O+"
-                    />
+                    >
+                      <option value="">انتخاب کنید</option>
+                      <option value="A+">A+</option>
+                      <option value="A-">A-</option>
+                      <option value="B+">B+</option>
+                      <option value="B-">B-</option>
+                      <option value="AB+">AB+</option>
+                      <option value="AB-">AB-</option>
+                      <option value="O+">O+</option>
+                      <option value="O-">O-</option>
+                      <option value="UNKNOWN">نامشخص</option>
+                    </select>
                   </div>
 
                   <div>
@@ -400,7 +442,6 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
                     >
                       <option value="MEN">نر</option>
                       <option value="WOMEN">ماده</option>
-                      <option value="UNKNOWN">نامشخص</option>
                     </select>
                   </div>
 
@@ -429,6 +470,26 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
                   </div>
 
                   <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">تصویر حیوان</label>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={(e) => setSelectedImage(e.target.files?.[0] || null)}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--main-color)] focus:border-transparent"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">ویدیو حیوان</label>
+                    <input
+                      type="file"
+                      accept="video/*"
+                      onChange={(e) => setSelectedVideo(e.target.files?.[0] || null)}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--main-color)] focus:border-transparent"
+                    />
+                  </div>
+
+                  <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">وزن (کیلوگرم)</label>
                     <input
                       type="number"
@@ -453,12 +514,33 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">تاریخ تولد</label>
-                    <input
-                      type="date"
-                      value={formData.birthDate || ""}
-                      onChange={(e) => handleInputChange("birthDate", e.target.value)}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--main-color)] focus:border-transparent"
+                    <label className="block text-sm font-medium text-gray-700 mb-1">تاریخ تولد (شمسی)</label>
+                    <DatePicker
+                      calendar={persian}
+                      locale={persian_fa}
+                      value={
+                        formData.birthDate
+                          ? new DateObject({
+                              date: formData.birthDate,
+                              calendar: gregorian,
+                              format: "YYYY-MM-DD",
+                            }).convert(persian)
+                          : undefined
+                      }
+                      onChange={(value: any) => {
+                        const dateValue = Array.isArray(value) ? value[0] : value;
+                        if (!dateValue) {
+                          handleInputChange("birthDate", "");
+                          return;
+                        }
+                        const gregorianDate = (dateValue as DateObject)
+                          .convert(gregorian)
+                          .format("YYYY-MM-DD");
+                        handleInputChange("birthDate", gregorianDate);
+                      }}
+                      calendarPosition="bottom-right"
+                      inputClass="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--main-color)] focus:border-transparent"
+                      placeholder="تاریخ تولد را انتخاب کنید"
                     />
                   </div>
                 </div>
@@ -466,7 +548,7 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
 
               {/* Medical Information */}
               <div>
-                <h3 className="text-lg font-semibold text-gray-900 mb-4">اطلاعات پزشکی</h3>
+                <h3 className="text-lg font-semibold text-[var(--main-color)] mb-4">اطلاعات پزشکی</h3>
 
                 <div className="space-y-4">
                   <div>
@@ -622,8 +704,8 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
 
             {/* Owner Information */}
             <div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">اطلاعات صاحب</h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <h3 className="text-lg font-semibold text-[var(--main-color)] mb-4">اطلاعات صاحب</h3>
+              <div className="grid grid-cols-1 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">نام صاحب</label>
                   <input
@@ -787,8 +869,8 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
 
             {/* Veterinarian Information */}
             <div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">اطلاعات دامپزشک</h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <h3 className="text-lg font-semibold text-[var(--main-color)] mb-4">اطلاعات دامپزشک</h3>
+              <div className="grid grid-cols-1 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">دامپزشک عمومی</label>
                   <input
@@ -861,8 +943,8 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
 
             {/* Additional Information */}
             <div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">اطلاعات تکمیلی</h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <h3 className="text-lg font-semibold text-[var(--main-color)] mb-4">اطلاعات تکمیلی</h3>
+              <div className="grid grid-cols-1 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">رژیم غذایی</label>
                   <textarea

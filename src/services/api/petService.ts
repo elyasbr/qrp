@@ -1,5 +1,5 @@
 import { AxiosError } from 'axios';
-import api from './api';
+import api, { publicApi } from './api';
 
 // Pet interface based on the API schema
 export interface Pet {
@@ -62,6 +62,8 @@ export interface Pet {
   nutritionalCounseling: string;
   expertVeterinaryCounseling: string;
   trainingAdvice: string;
+  imageUrl?: string;
+  videoUrl?: string;
 }
 
 // Pagination request interface
@@ -106,6 +108,16 @@ export const getPetById = async (dataPetId: string): Promise<Pet> => {
     return response.data.result;
   } catch (error) {
     throw new Error((error as AxiosError)?.message || 'Failed to fetch pet');
+  }
+};
+
+// Public: Get Pet by ID without auth (for QR landing)
+export const getPetByIdPublic = async (dataPetId: string): Promise<Pet> => {
+  try {
+    const response = await publicApi.get<{ statusCode: number; result: Pet }>(`/pet/${dataPetId}`);
+    return (response as any).data.result;
+  } catch (error) {
+    throw new Error((error as any)?.message || 'Failed to fetch pet');
   }
 };
 

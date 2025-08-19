@@ -1,5 +1,5 @@
 "use client"
-import { AlignJustify, Info, Phone, SquareX, User, LogOut, FileText, ChevronDown, ChevronLeft, Home, Settings, BarChart3, Users, Calendar, Shield, HelpCircle, Cat } from "lucide-react";
+import { AlignJustify, Info, Phone, SquareX, User, LogOut, FileText, ChevronDown, ChevronLeft, Home, Settings, BarChart3, Users, Calendar, Shield, HelpCircle, Cat, SquareChevronRight } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 import Image from "next/image";
@@ -98,19 +98,19 @@ export default function Sidebar() {
       </button>
 
       {/* Overlay */}
-      {open && (
-        <div
-          className="fixed inset-0 bg-black/40 z-40 md:hidden"
-          onClick={() => setOpen(false)}
-        />
-      )}
+      <div
+        className={`fixed inset-0 z-40 md:hidden transition-opacity duration-300 backdrop-blur-sm ${
+          open ? "opacity-100 bg-black/30 pointer-events-auto" : "opacity-0 pointer-events-none"
+        }`}
+        onClick={() => setOpen(false)}
+      />
 
       {/* Sidebar */}
       <aside
         className={`
-    fixed top-0 right-0 h-full w-64 bg-white shadow-lg transform transition-transform duration-300 ease-in-out z-50
-    md:relative md:translate-x-0 md:z-auto md:shadow-none
-    ${open ? "translate-x-0" : "translate-x-full"}
+    fixed top-0 right-0 h-full w-64 bg-white shadow-xl rounded-l-2xl transform-gpu will-change-transform transition-all duration-500 ease-out z-50
+    md:relative md:translate-x-0 md:z-auto md:shadow-none md:rounded-none
+    ${open ? "translate-x-0 opacity-100" : "translate-x-full opacity-0"}
   `}
       >
         <div className="flex flex-col h-full">
@@ -121,8 +121,8 @@ export default function Sidebar() {
                 <Image alt="logo" src="/images/logo.jpg" width={100} height={100} />
               </Link>
             </div>
-            <button onClick={() => setOpen(false)} className="text-[var(--main-color)]">
-              <SquareX size={24} />
+            <button onClick={() => setOpen(false)} className="text-gray-600">
+              <SquareChevronRight size={24} />
             </button>
           </div>
 
@@ -141,7 +141,7 @@ export default function Sidebar() {
 
           {/* Navigation + Logout */}
           <nav className="flex flex-col flex-1">
-            <div className="p-4 flex-1">
+            <div className={`p-4 flex-1 transition-all duration-300 ${open ? "opacity-100 translate-y-0" : "opacity-0 translate-y-2 md:opacity-100 md:translate-y-0"}`}>
               {navItems.map((item) => (
                 <div key={item.label}>
                   {item.href ? (

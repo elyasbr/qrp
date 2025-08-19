@@ -20,7 +20,7 @@ export default function Home() {
     <>
       {/* Navbar */}
       <nav className="w-full fixed top-0 z-50 px-2">
-        <div className="max-w-5xl bg-white shadow-lg/10 ring-2 ring-blue-600 rounded-xl mt-2  mx-auto px-4 py-3 flex items-center justify-between">
+        <div className="max-w-5xl bg-white shadow-lg/10 ring-2 ring-[var(--main-color)] rounded-xl mt-2  mx-auto px-4 py-3 flex items-center justify-between">
 
           {/* Desktop Menu */}
           <div className="hidden md:flex gap-6 text-sm font-semibold text-gray-700">
@@ -87,14 +87,16 @@ export default function Home() {
       {/* Landing Section */}
       <main className="min-h-screen flex flex-col items-center justify-center px-6 py-12 bg-[#f8f9fb] text-[var(--foreground)] font-Morabba pt-32">
         {/* Header */}
-        <h1 className="text-4xl md:text-5xl font-extrabold text-center text-[var(--main-color)] mb-6 leading-tight">
-          سامانه بیمه<br />آنلاین و هوشمند
+        <h1 className="text-3xl md:text-5xl font-extrabold text-center text-[var(--main-color)] mb-4 leading-tight text-balance max-w-4xl mx-auto">
+          سامانه آنلاین و هوشمند<br />حیوانات خانگی، ایران راد
         </h1>
 
         {/* Description */}
-        <p className="text-center text-gray-600 text-base md:text-lg max-w-md mb-8">
-          مدیریت درخواست‌ها، پشتیبانی و خدمات بیمه‌ای در بستری ساده، سریع و امن. هم‌اکنون وارد حساب کاربری خود شوید یا ثبت‌نام کنید.
-        </p>
+        <div className=" text-gray-600 text-base md:text-xl lg:max-w-2xl max-w-4xl mb-8 space-y-2 text-center font-extrabold leading-relaxed ">
+          <p>
+            مرجع جامع ثبت اطلاعات، مدیریت، سلامت و دریافت مشاوره تخصصی غذایی و درمانی. هم اکنون وارد حساب کاربری خود شوید یا ثبت نام کنید.
+          </p>
+        </div>
 
         {/* CTA Buttons */}
         {isLoggedIn ? (
