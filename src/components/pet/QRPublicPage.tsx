@@ -83,7 +83,7 @@ export default function QRPublicPage({ pet, isLoading, error }: QRPublicPageProp
 
       {/* Main Content */}
       <div className="max-w-6xl mx-auto px-4 py-8">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <div className="grid grid-cols-1 gap-8">
 
           {/* Left Column */}
           <div className="space-y-6">
@@ -166,7 +166,7 @@ export default function QRPublicPage({ pet, isLoading, error }: QRPublicPageProp
             {/* Section 2: Owner Information */}
             <div className="bg-white rounded-xl shadow-lg p-6">
               <div className="flex items-center gap-3 mb-6">
-                <div className="bg-green-500 p-2 rounded-lg">
+                <div className="bg-[var(--main-color)] p-2 rounded-lg">
                   <User className="text-white text-xl" />
                 </div>
                 <h2 className="text-xl font-bold text-gray-800">مشخصات سرپرست پت</h2>
@@ -265,7 +265,7 @@ export default function QRPublicPage({ pet, isLoading, error }: QRPublicPageProp
             {/* Section 3: Health Information */}
             <div className="bg-white rounded-xl shadow-lg p-6">
               <div className="flex items-center gap-3 mb-6">
-                <div className="bg-red-500 p-2 rounded-lg">
+                <div className="bg-[var(--main-color)] p-2 rounded-lg">
                   <Heart className="text-white text-xl" />
                 </div>
                 <h2 className="text-xl font-bold text-gray-800">ویژگی و اطلاعات سلامتی</h2>
@@ -338,7 +338,7 @@ export default function QRPublicPage({ pet, isLoading, error }: QRPublicPageProp
             {/* Section 4: Behavioral Information */}
             <div className="bg-white rounded-xl shadow-lg p-6">
               <div className="flex items-center gap-3 mb-6">
-                <div className="bg-purple-500 p-2 rounded-lg">
+                <div className="bg-[var(--main-color)] p-2 rounded-lg">
                   <Shield className="text-white text-xl" />
                 </div>
                 <h2 className="text-xl font-bold text-gray-800">اطلاعات و ویژگی‌های رفتاری شخصیتی</h2>
@@ -382,7 +382,7 @@ export default function QRPublicPage({ pet, isLoading, error }: QRPublicPageProp
             {/* Section 5: Consultations */}
             <div className="bg-white rounded-xl shadow-lg p-6">
               <div className="flex items-center gap-3 mb-6">
-                <div className="bg-blue-500 p-2 rounded-lg">
+                <div className="bg-[var(--main-color)] p-2 rounded-lg">
                   <FileText className="text-white text-xl" />
                 </div>
                 <h2 className="text-xl font-bold text-gray-800">مشاوره‌ها</h2>
@@ -417,7 +417,7 @@ export default function QRPublicPage({ pet, isLoading, error }: QRPublicPageProp
         {/* Veterinary Contact Information */}
         <div className="mt-8 bg-white rounded-xl shadow-lg p-6">
           <h2 className="text-xl font-bold text-gray-800 mb-6">اطلاعات تماس دامپزشکان</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 gap-6">
             <div className="p-4 bg-gray-50 rounded-lg">
               <h3 className="font-semibold text-gray-800 mb-3">دامپزشک صادرکننده شناسنامه</h3>
               <div className="space-y-2">
