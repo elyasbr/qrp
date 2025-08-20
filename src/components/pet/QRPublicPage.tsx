@@ -74,7 +74,7 @@ export default function QRPublicPage({ pet, isLoading, error }: QRPublicPageProp
           </div> */}
           <div className="text-center">
             <h1 className="text-3xl font-bold text-[var(--main-color)] mb-2">
-              فیلدهای مربوط به QR بیمه پت خانگی
+              اطلاعات مربوط به پت
             </h1>
             <p className="text-gray-600">ایران راد - سامانه هوشمند پت خانگی</p>
           </div>
