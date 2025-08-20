@@ -311,9 +311,9 @@ export default function PetList() {
                 <div className="fixed inset-0 bg-black/20 backdrop-blur-sm flex items-center justify-center p-4 z-50" onClick={() => setViewingPet(null)}>
                     <div className="relative w-full max-w-3xl" onClick={(e) => e.stopPropagation()}>
                         <div className="absolute inset-0 -z-10 blur-2xl rounded-3xl bg-gradient-to-tr from-[var(--main-color)]/20 to-purple-400/20" />
-                        <div className="bg-white/90 rounded-2xl shadow-xl ring-1 ring-gray-200 overflow-hidden">
+                        <div className="bg-white/90 rounded-2xl shadow-xl ring-1 ring-gray-200 flex flex-col max-h-[90vh] overflow-hidden">
                             {/* Header */}
-                            <div className="flex items-center justify-between px-6 py-4 border-b">
+                            <div className="sticky top-0 bg-white/90 z-10 flex items-center justify-between px-6 py-4 border-b">
                                 <div className="flex items-center gap-3">
                                     <div className="h-12 w-12 rounded-xl bg-[var(--main-color)]/10 flex items-center justify-center text-2xl">🐾</div>
                                     <div>
@@ -336,7 +336,7 @@ export default function PetList() {
                             </div>
 
                             {/* Body */}
-                            <div className="px-6 py-5">
+                            <div className="px-6 py-5 overflow-y-auto flex-1">
                                 {/* Media preview if exists */}
                                 {(viewingPet.imageUrl || viewingPet.videoUrl) && (
                                     <div className="mb-5 overflow-hidden rounded-xl ring-1 ring-gray-200">
@@ -460,7 +460,7 @@ export default function PetList() {
                                 </div>
                             </div>
                             {/* Footer Close */}
-                            <div className="px-6 py-4 border-t flex justify-end bg-white/90">
+                            <div className="sticky bottom-0 px-6 py-4 border-t flex justify-end bg-white/90 z-10">
                                 <button onClick={() => setViewingPet(null)} className="px-4 py-2 bg-[var(--main-color)] hover:bg-[var(--main-color-dark)] text-white rounded-lg transition-colors">بستن</button>
                             </div>
                         </div>

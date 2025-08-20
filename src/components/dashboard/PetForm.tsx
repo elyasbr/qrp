@@ -446,7 +446,7 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">نوعپت <span className="text-red-500">*</span></label>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">نوع پت <span className="text-red-500">*</span></label>
                     <select
                       value={formData.typePet || "DOG"}
                       onChange={(e) => handleInputChange("typePet", e.target.value)}
@@ -586,7 +586,7 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">نامدامپزشک صادر کننده شناسنامه</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">نام دامپزشک صادر کننده شناسنامه</label>
                     <input
                       type="text"
                       value={formData.issuingVeterinarian || ""}
@@ -628,7 +628,7 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
 
               {/* Health Information */}
               <div>
-                <h3 className="text-lg font-semibold text-[var(--main-color)] mb-4">ویژگی و اطالعات سالمتی</h3>
+                <h3 className="text-lg font-semibold text-[var(--main-color)] mb-4">ویژگی و اطلاعات سلامتی</h3>
 
                 <div className="space-y-4">
                   <div>
@@ -968,7 +968,7 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
 
             {/* Behavioral Information */}
             <div>
-              <h3 className="text-lg font-semibold text-[var(--main-color)] mb-4">اطالعات و ویژگی های رفتاری شخصیتی</h3>
+              <h3 className="text-lg font-semibold text-[var(--main-color)] mb-4">اطلاعات و ویژگی های رفتاری شخصیتی</h3>
               <div className="grid grid-cols-1 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">عادت های رفتاری</label>
@@ -985,6 +985,15 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
                   <textarea
                     value={formData.sensitivities || ""}
                     onChange={(e) => handleInputChange("sensitivities", e.target.value)}
+                    rows={3}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--main-color)] focus:border-transparent"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">مهارت ها واستعدادها</label>
+                  <textarea
+                    value={formData.susceptibility || ""}
+                    onChange={(e) => handleInputChange("susceptibility", e.target.value)}
                     rows={3}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--main-color)] focus:border-transparent"
                   />
@@ -1072,6 +1081,25 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
                     />
                   </label>
                 </div>
+
+                <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">عکس شناسایی پت</label>
+                    <label className="flex items-center justify-between gap-3 w-full border-2 border-dashed border-gray-300 hover:border-[var(--main-color)] rounded-xl p-3 cursor-pointer transition-colors">
+                      <div className="flex items-center gap-3">
+                        <span className="inline-flex h-10 w-10 items-center justify-center rounded-lg bg-[var(--main-color)]/10 text-[var(--main-color)]">📄</span>
+                        <div className="text-sm text-gray-600">
+                          <div className="font-semibold">انتخاب عکس</div>
+                          <div className="text-xs text-gray-500">حداکثر حجم پیشنهادی 5MB</div>
+                        </div>
+                      </div>
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={(e) => setSelectedImage(e.target.files?.[0] || null)}
+                        className="hidden"
+                      />
+                    </label>
+                  </div>
               </div>
             </div>
 
