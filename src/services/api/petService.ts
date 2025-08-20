@@ -6,6 +6,7 @@ export interface Pet {
   petId?: string;
   namePet: string;
   typePet: string;
+  breedName?: string;
   blood: string;
   sex: "MEN" | "WOMEN" | "UNKNOWN";
   birthDate: string;
