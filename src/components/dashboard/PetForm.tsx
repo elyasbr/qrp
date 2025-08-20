@@ -414,7 +414,7 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
                 <div className="space-y-4">
                   
                   
-                  {/* <div>
+                  <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">عکس شناسایی پت</label>
                     <label className="flex items-center justify-between gap-3 w-full border-2 border-dashed border-gray-300 hover:border-[var(--main-color)] rounded-xl p-3 cursor-pointer transition-colors">
                       <div className="flex items-center gap-3">
@@ -431,7 +431,7 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
                         className="hidden"
                       />
                     </label>
-                  </div> */}
+                  </div>
 
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">نام پت *</label>

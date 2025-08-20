@@ -178,7 +178,7 @@ export default function PetList() {
                         )}
                     </div>
                 ) : (
-                    <div className="grid grid-cols-1 gap-6">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                         {filteredPets.map((pet, index) => (
                             <div key={index} className="bg-white rounded-lg shadow-sm overflow-hidden hover:shadow-md transition-shadow">
                                 {/* Pet Image Placeholder */}
@@ -329,7 +329,9 @@ export default function PetList() {
                                         <QrCode size={16} />
                                         QR Code
                                     </button>
-                                    <button onClick={() => setViewingPet(null)} className="text-gray-500 hover:text-gray-700">✕</button>
+                                    <button onClick={() => setViewingPet(null)} className="text-gray-400 hover:text-[var(--main-color)] transition-colors" aria-label="Close">
+                                        ✕
+                                    </button>
                                 </div>
                             </div>
 

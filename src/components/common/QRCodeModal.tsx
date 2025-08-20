@@ -13,6 +13,7 @@ interface QRCodeModalProps {
 export default function QRCodeModal({ isOpen, onClose, petId, petName }: QRCodeModalProps) {
   const [qrCodeDataUrl, setQrCodeDataUrl] = useState<string>("");
   const [isGenerating, setIsGenerating] = useState(false);
+  const [copied, setCopied] = useState(false);
 
   useEffect(() => {
     if (isOpen && petId) {
@@ -85,8 +86,8 @@ export default function QRCodeModal({ isOpen, onClose, petId, petName }: QRCodeM
     const petUrl = `${window.location.origin}/pet/${petId}`;
     try {
       await navigator.clipboard.writeText(petUrl);
-      // You can add a toast notification here
-      console.log("URL copied to clipboard");
+      setCopied(true);
+      window.setTimeout(() => setCopied(false), 2000);
     } catch (error) {
       console.error("Error copying URL:", error);
     }
@@ -97,6 +98,13 @@ export default function QRCodeModal({ isOpen, onClose, petId, petName }: QRCodeM
   return (
     <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50">
       <div className="bg-white rounded-2xl shadow-xl max-w-md w-full p-6">
+        {copied && (
+          <div className="fixed left-1/2 -translate-x-1/2 bottom-6 z-[60]">
+            <div className="px-4 py-2 bg-[var(--main-color)] text-white text-sm rounded-full shadow-lg">
+              کپی شد
+            </div>
+          </div>
+        )}
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
           <div>
