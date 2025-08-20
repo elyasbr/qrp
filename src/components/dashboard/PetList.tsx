@@ -321,13 +321,6 @@ export default function PetList() {
                                     </div>
                                 </div>
                                 <div className="flex items-center gap-2">
-                                    <button
-                                        onClick={() => handleQRCode(viewingPet)}
-                                        className="flex items-center gap-1 bg-green-50 hover:bg-green-100 text-green-600 px-3 py-2 rounded-lg text-sm transition-colors"
-                                    >
-                                        <QrCode size={16} />
-                                        QR Code
-                                    </button>
                                     <button onClick={() => setViewingPet(null)} className="text-gray-400 hover:text-[var(--main-color)] transition-colors" aria-label="Close">
                                         ✕
                                     </button>
