@@ -5,7 +5,7 @@ export default function Dashboard() {
   return (
     <main className="min-h-screen flex flex-col items-center justify-center px-6 py-12 font-Morabba pt-32">
       <h1 className="text-3xl md:text-5xl font-extrabold text-center text-[var(--main-color)] mb-4 leading-tight text-balance max-w-4xl mx-auto">
-          سامانه آنلاین و هوشمند<br />حیوانات خانگی، ایران راد
+          سامانه آنلاین و هوشمند<br />پت خانگی، ایران راد
         </h1>
 
         {/* Description */}

@@ -29,9 +29,9 @@ export default async function QRPublicPage(props: any) {
   return (
     <div className="min-h-screen flex items-center justify-center p-6">
       <div className="max-w-2xl w-full bg-white rounded-xl border p-6 shadow-sm space-y-4">
-        <h1 className="text-2xl font-bold text-[var(--main-color)]">اطلاعات حیوان</h1>
+        <h1 className="text-2xl font-bold text-[var(--main-color)]">اطلاعات پت</h1>
         <div className="grid grid-cols-1 gap-3 text-sm">
-          <div className="flex justify-between"><span className="text-gray-500">نام حیوان:</span><span>{pet.namePet}</span></div>
+          <div className="flex justify-between"><span className="text-gray-500">نام پت:</span><span>{pet.namePet}</span></div>
           <div className="flex justify-between"><span className="text-gray-500">نوع:</span><span>{pet.typePet}</span></div>
           <div className="flex justify-between"><span className="text-gray-500">رنگ:</span><span>{pet.colorPet}</span></div>
           <div className="flex justify-between"><span className="text-gray-500">گروه خونی:</span><span>{pet.blood}</span></div>

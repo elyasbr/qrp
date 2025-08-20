@@ -32,7 +32,7 @@ export default function PetList() {
             const petsData = await getAllPets();
             setPets(petsData);
         } catch (error: any) {
-            showError("خطا در بارگذاری لیست حیوانات: " + error.message);
+            showError("خطا در بارگذاری لیست پت ");
         } finally {
             setLoading(false);
             loadingRef.current = false;
@@ -47,7 +47,7 @@ export default function PetList() {
             showSuccess("پت با موفقیت حذف شد");
             loadPets(); // Reload the list
         } catch (error: any) {
-            showError("خطا در حذف حیوان: " + error.message);
+            showError("خطا در حذف پت: " + error.message);
         }
     };
 
@@ -62,7 +62,7 @@ export default function PetList() {
             setViewingPet(latestPet);
             console.log("pet", pet);
         } catch (error: any) {
-            showError("خطا در دریافت اطلاعات حیوان: " + (error.message || "خطای نامشخص"));
+            showError("خطا در دریافت اطلاعات پت: " + (error.message || "خطای نامشخص"));
         }
     };
 
@@ -106,8 +106,8 @@ export default function PetList() {
             <div className="p-6 bg-gray-50 min-h-screen mt-14 lg:mt-0">
                 {/* Header */}
                 <div className="mb-6">
-                    <h1 className="text-2xl font-bold text-gray-900 mb-2">لیست حیوانات</h1>
-                    <p className="text-gray-600">مدیریت و مشاهده حیوانات ثبت شده</p>
+                    <h1 className="text-2xl font-bold text-gray-900 mb-2">لیست پت</h1>
+                    <p className="text-gray-600">مدیریت و مشاهده پت ثبت شده</p>
                 </div>
 
                 {/* Controls */}
@@ -119,7 +119,7 @@ export default function PetList() {
                                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
                                 <input
                                     type="text"
-                                    placeholder="جستجو در حیوانات..."
+                                    placeholder="جستجو در پت..."
                                     value={searchTerm}
                                     onChange={(e) => setSearchTerm(e.target.value)}
                                     className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--main-color)] focus:border-transparent"
@@ -146,7 +146,7 @@ export default function PetList() {
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
                             </svg>
                         </div>
-                        <h3 className="text-lg font-medium text-gray-900 mb-2">هیچ حیوانی یافت نشد</h3>
+                        <h3 className="text-lg font-medium text-gray-900 mb-2">هیچ پت یافت نشد</h3>
                         <p className="text-gray-500 mb-4">
                             {searchTerm
                                 ? "لطفاً جستجو را تغییر دهید یا پت جدیدی اضافه کنید"
@@ -245,7 +245,7 @@ export default function PetList() {
                     <div className="grid grid-cols-2 md:grid-cols-5 gap-4 text-center">
                         <div>
                             <div className="text-2xl font-bold text-[var(--main-color)]">{pets.length}</div>
-                            <div className="text-sm text-gray-600">کل حیوانات</div>
+                            <div className="text-sm text-gray-600">کل پ</div>
                         </div>
                         <div>
                             <div className="text-2xl font-bold text-blue-600">{pets.filter(p => p.sex === "MEN").length}</div>
@@ -340,7 +340,7 @@ export default function PetList() {
             {deleteModalOpen && petToDelete && (
                 <div className="fixed inset-0 bg-white/5 backdrop-blur-sm flex items-center justify-center z-50">
                     <div className="bg-white rounded-lg shadow-lg p-6 max-w-sm w-full">
-                        <h2 className="text-lg font-bold mb-4 text-gray-900">تایید حذف حیوان</h2>
+                        <h2 className="text-lg font-bold mb-4 text-gray-900">تایید حذف پت</h2>
                         <p className="mb-6 text-gray-700">آیا مطمئن هستید که می‌خواهید پت <span className="font-bold">{petToDelete.namePet}</span> را حذف کنید؟ این عملیات قابل بازگشت نیست.</p>
                         <div className="flex justify-end gap-3">
                             <button

@@ -27,9 +27,7 @@ const userNavItems: NavItem[] = [
       { href: "/dashboard/animals", label: "لیست پت ها ", icon: <PawPrint /> }
     ]
   },
-  { href: "/dashboard", label: "راهنما", icon: <HelpCircle /> },
-  { href: "/dashboard", label: "درباره ما", icon: <Info /> },
-  { href: "/dashboard", label: "تماس با ما", icon: <Phone /> },
+  { href: "/contact", label: "تماس با ما", icon: <Phone /> },
 ];
 
 const adminNavItems: NavItem[] = [
@@ -42,7 +40,7 @@ const adminNavItems: NavItem[] = [
   },
   {
     label: "گزارشات", icon: <BarChart3 />, subItems: [
-      { href: "/dashboard/animals", label: "لیست حیوانات", icon: <Cat /> }
+      { href: "/dashboard/animals", label: "لیست پت", icon: <Cat /> }
     ]
   },
   { href: "/dashboard/settings", label: "تنظیمات", icon: <Settings /> },

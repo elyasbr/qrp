@@ -706,7 +706,7 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
                       onChange={(e) => handleInputChange("connectOtherPets", e.target.checked)}
                       className="mr-2"
                     />
-                    <span className="text-sm text-gray-700">ارتباط با حیوانات دیگر</span>
+                    <span className="text-sm text-gray-700">ارتباط با پت دیگر</span>
                   </label>
 
                   <label className="flex items-center">
