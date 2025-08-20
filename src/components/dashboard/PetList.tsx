@@ -199,7 +199,7 @@ export default function PetList() {
                                     <div className="flex items-start justify-between mb-3">
                                         <div>
                                             <h3 className="font-semibold text-gray-900 text-lg mb-1">{pet.namePet}</h3>
-                                            <p className="text-sm text-gray-600">{pet.typePet}</p>
+                                            <span className="text-sm text-gray-600">{pet.typePet}</span>
                                         </div>
                                     </div>
 
@@ -216,8 +216,8 @@ export default function PetList() {
                                             </span>
                                         </div>
                                         <div className="flex justify-between text-sm">
-                                            <span className="text-gray-500">گروه خونی:</span>
-                                            <span className="text-gray-900">{pet.blood}</span>
+                                            <span className="text-gray-500">کد میکروچیپ:</span>
+                                            <span className="text-gray-900">{pet.microChipCode}</span>
                                         </div>
                                         {pet.birthDate && (
                                             <div className="flex justify-between text-sm">
