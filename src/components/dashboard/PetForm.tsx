@@ -354,13 +354,6 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
         }
       }
 
-      console.log("Final submitData:", submitData);
-      console.log("Critical fields check:", criticalFields.map(field => ({
-        field,
-        value: submitData[field as keyof typeof submitData],
-        type: typeof submitData[field as keyof typeof submitData]
-      })));
-
       if (pet) {
         // Update existing pet
         await updatePet(pet.petId || "", submitData as Pet);

@@ -13,10 +13,6 @@ interface QRPublicPageProps {
 }
 
 export default function QRPublicPage({ pet, isLoading, error }: QRPublicPageProps) {
-  // Debug logging
-  useEffect(() => {
-    console.log("QRPublicPage render:", { pet, isLoading, error });
-  }, [pet, isLoading, error]);
 
   if (isLoading) {
     return (
@@ -89,76 +85,25 @@ export default function QRPublicPage({ pet, isLoading, error }: QRPublicPageProp
           <div className="space-y-6">
 
             {/* Section 1: Pet Characteristics */}
-            <div className="bg-white rounded-xl shadow-lg p-6">
-              <div className="flex items-center gap-3 mb-6">
-                <div className="bg-[var(--main-color)] p-2 rounded-lg">
-                  <PawPrint className="text-white text-xl" />
-                </div>
-                <h2 className="text-xl font-bold text-gray-800">مشخصات پت خانگی</h2>
+            <div className="bg-white rounded-lg ring-1 ring-gray-200 p-4">
+              <h3 className="text-md font-bold text-[var(--main-color)] mb-3">مشخصات حیوان خانگی</h3>
+              <div className="grid grid-cols-2 gap-y-2 text-sm">
+                <span className="text-gray-500">نام پت</span><span className="text-gray-900">{pet.namePet}</span>
+                <span className="text-gray-500">نوع پت</span><span className="text-gray-900">{pet.typePet}</span>
+                <span className="text-gray-500">جنسیت</span><span className="text-gray-900">{pet.sex === "MEN" ? "نر" : pet.sex === "WOMEN" ? "ماده" : "نامشخص"}</span>
+                <span className="text-gray-500">تاریخ تولد</span><span className="text-gray-900">{formatPersianDate(pet.birthDate)}</span>
+                <span className="text-gray-500">شماره شناسنامه</span><span className="text-gray-900">{pet.birthCertificateNumberPet}</span>
+                <span className="text-gray-500">کد میکروچیپ</span><span className="text-gray-900">{pet.microChipCode}</span>
+                <span className="text-gray-500">رنگ پت</span><span className="text-gray-900">{pet.colorPet}</span>
+                <span className="text-gray-500">وزن</span><span className="text-gray-900">{pet.weightPet} کیلوگرم</span>
+                <span className="text-gray-500">قد</span><span className="text-gray-900">{pet.heightPet} سانتی‌متر</span>
+                <span className="text-gray-500">دامپزشک صادر کننده</span><span className="text-gray-900">{pet.issuingVeterinarian}</span>
+                <span className="text-gray-500">نظام دامپزشکی</span><span className="text-gray-900">{pet.issuingMedicalSystem}</span>
               </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="space-y-3">
-                  <div className="flex justify-between p-3 bg-gray-50 rounded-lg">
-                    <span className="text-gray-600 font-medium">نام پت:</span>
-                    <span className="font-semibold text-gray-800">{pet.namePet}</span>
-                  </div>
-                  <div className="flex justify-between p-3 bg-gray-50 rounded-lg">
-                    <span className="text-gray-600 font-medium">نوع پت:</span>
-                    <span className="font-semibold text-gray-800">{pet.typePet}</span>
-                  </div>
-                  <div className="flex justify-between p-3 bg-gray-50 rounded-lg">
-                    <span className="text-gray-600 font-medium">جنسیت:</span>
-                    <span className="font-semibold text-gray-800">
-                      {pet.sex === "MEN" ? "نر" : pet.sex === "WOMEN" ? "ماده" : "نامشخص"}
-                    </span>
-                  </div>
-                  <div className="flex justify-between p-3 bg-gray-50 rounded-lg">
-                    <span className="text-gray-600 font-medium">تاریخ تولد:</span>
-                    <span className="font-semibold text-gray-800">{formatPersianDate(pet.birthDate)}</span>
-                  </div>
-                  <div className="flex justify-between p-3 bg-gray-50 rounded-lg">
-                    <span className="text-gray-600 font-medium">گروه خونی:</span>
-                    <span className="font-semibold text-gray-800">{pet.blood}</span>
-                  </div>
-                  <div className="flex justify-between p-3 bg-gray-50 rounded-lg">
-                    <span className="text-gray-600 font-medium">رنگ:</span>
-                    <span className="font-semibold text-gray-800">{pet.colorPet}</span>
-                  </div>
-                </div>
-
-                <div className="space-y-3">
-                  <div className="flex justify-between p-3 bg-gray-50 rounded-lg">
-                    <span className="text-gray-600 font-medium">وزن:</span>
-                    <span className="font-semibold text-gray-800">{pet.weightPet} کیلوگرم</span>
-                  </div>
-                  <div className="flex justify-between p-3 bg-gray-50 rounded-lg">
-                    <span className="text-gray-600 font-medium">قد:</span>
-                    <span className="font-semibold text-gray-800">{pet.heightPet} سانتی‌متر</span>
-                  </div>
-                  <div className="flex justify-between p-3 bg-gray-50 rounded-lg">
-                    <span className="text-gray-600 font-medium">شماره شناسنامه:</span>
-                    <span className="font-semibold text-gray-800">{pet.birthCertificateNumberPet}</span>
-                  </div>
-                  <div className="flex justify-between p-3 bg-gray-50 rounded-lg">
-                    <span className="text-gray-600 font-medium">کد میکروچیپ:</span>
-                    <span className="font-semibold text-gray-800">{pet.microChipCode}</span>
-                  </div>
-                  <div className="flex justify-between p-3 bg-gray-50 rounded-lg">
-                    <span className="text-gray-600 font-medium">دامپزشک صادرکننده:</span>
-                    <span className="font-semibold text-gray-800">{pet.issuingVeterinarian}</span>
-                  </div>
-                  <div className="flex justify-between p-3 bg-gray-50 rounded-lg">
-                    <span className="text-gray-600 font-medium">نظام دامپزشکی:</span>
-                    <span className="font-semibold text-gray-800">{pet.issuingMedicalSystem}</span>
-                  </div>
-                </div>
-              </div>
-
               {pet.distinctiveFeature && (
-                <div className="mt-4 p-4 bg-blue-50 rounded-lg">
-                  <h3 className="font-semibold text-blue-800 mb-2">ویژگی بارز ظاهری:</h3>
-                  <p className="text-blue-700">{pet.distinctiveFeature}</p>
+                <div className="mt-3 text-sm">
+                  <div className="text-gray-700 font-semibold mb-1">ویژگی بارز ظاهری</div>
+                  <div className="text-gray-700">{pet.distinctiveFeature}</div>
                 </div>
               )}
             </div>

@@ -64,7 +64,6 @@ export default function PetList() {
         try {
             const latestPet = await getPetById(pet.petId || "");
             setViewingPet(latestPet);
-            console.log("pet", pet);
         } catch (error: any) {
             showError("خطا در دریافت اطلاعات پت: " + (error.message || "خطای نامشخص"));
         }
