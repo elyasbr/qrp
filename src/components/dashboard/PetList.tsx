@@ -308,8 +308,8 @@ export default function PetList() {
 
             {/* Pet View Modal */}
             {viewingPet && (
-                <div className="fixed inset-0 bg-black/20 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-                    <div className="relative w-full max-w-3xl">
+                <div className="fixed inset-0 bg-black/20 backdrop-blur-sm flex items-center justify-center p-4 z-50" onClick={() => setViewingPet(null)}>
+                    <div className="relative w-full max-w-3xl" onClick={(e) => e.stopPropagation()}>
                         <div className="absolute inset-0 -z-10 blur-2xl rounded-3xl bg-gradient-to-tr from-[var(--main-color)]/20 to-purple-400/20" />
                         <div className="bg-white/90 rounded-2xl shadow-xl ring-1 ring-gray-200 overflow-hidden">
                             {/* Header */}
@@ -458,6 +458,10 @@ export default function PetList() {
                                         </div>
                                     </div>
                                 </div>
+                            </div>
+                            {/* Footer Close */}
+                            <div className="px-6 py-4 border-t flex justify-end bg-white/90">
+                                <button onClick={() => setViewingPet(null)} className="px-4 py-2 bg-[var(--main-color)] hover:bg-[var(--main-color-dark)] text-white rounded-lg transition-colors">بستن</button>
                             </div>
                         </div>
                     </div>
