@@ -406,7 +406,16 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
             <div className="grid grid-cols-1 gap-6">
               <div>
                 <h3 className="text-lg font-semibold text-[var(--main-color)] mb-4">مشخصات حیوان خانگی</h3>
-
+                <div className="mb-4">
+                  <label className="block text-sm font-medium text-gray-700 mb-1"> شماره بیمه</label>
+                  <input
+                    type="text"
+                    value={(formData as any)?.Insurancenumber || ""}
+                    readOnly
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg bg-gray-50 text-gray-700"
+                    placeholder=""
+                  />
+                </div>
                 <div className="space-y-4">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">عکس شناسایی پت</label>
