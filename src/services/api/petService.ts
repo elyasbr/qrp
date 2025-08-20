@@ -114,10 +114,18 @@ export const getPetById = async (dataPetId: string): Promise<Pet> => {
 // Public: Get Pet by ID without auth (for QR landing)
 export const getPetByIdPublic = async (dataPetId: string): Promise<Pet> => {
   try {
+    console.log("Making API call to:", `/pet/${dataPetId}`); // Debug log
     const response = await publicApi.get<{ statusCode: number; result: Pet }>(`/pet/${dataPetId}`);
-    return (response as any).data.result;
+    console.log("API response:", response); // Debug log
+    return response.data.result;
   } catch (error) {
-    throw new Error((error as any)?.message || 'Failed to fetch pet');
+    console.error("API error:", error); // Debug log
+    if (error && typeof error === 'object' && 'response' in error) {
+      const axiosError = error as any;
+      const message = axiosError.response?.data?.message || axiosError.message || 'Failed to fetch pet';
+      throw new Error(message);
+    }
+    throw new Error('Failed to fetch pet');
   }
 };
 
