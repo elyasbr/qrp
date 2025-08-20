@@ -27,7 +27,6 @@ const userNavItems: NavItem[] = [
       { href: "/dashboard/animals", label: "لیست پت ها ", icon: <PawPrint /> }
     ]
   },
-  { href: "/contact", label: "تماس با ما", icon: <Phone /> },
 ];
 
 const adminNavItems: NavItem[] = [

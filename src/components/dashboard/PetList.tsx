@@ -1,10 +1,11 @@
 "use client";
 import { useState, useEffect, useRef } from "react";
-import { Plus, Edit, Trash2, Eye, Search, Filter, MoreVertical, PawPrint } from "lucide-react";
+import { Plus, Edit, Trash2, Eye, Search, Filter, MoreVertical, PawPrint, QrCode } from "lucide-react";
 import { Pet, getAllPets, deletePet, getPetById } from "@/services/api/petService";
 import { useSnackbar } from "@/hooks/useSnackbar";
 import Snackbar from "@/components/common/Snackbar";
 import PetForm from "./PetForm";
+import QRCodeModal from "@/components/common/QRCodeModal";
 
 export default function PetList() {
     const [pets, setPets] = useState<Pet[]>([]);
@@ -16,6 +17,8 @@ export default function PetList() {
     const loadingRef = useRef(false);
     const [deleteModalOpen, setDeleteModalOpen] = useState(false);
     const [petToDelete, setPetToDelete] = useState<Pet | null>(null);
+    const [qrModalOpen, setQrModalOpen] = useState(false);
+    const [selectedPetForQR, setSelectedPetForQR] = useState<Pet | null>(null);
 
     const { showError, showSuccess, snackbar, hideSnackbar } = useSnackbar();
 
@@ -70,6 +73,17 @@ export default function PetList() {
         setShowForm(false);
         setEditingPet(null);
         setViewingPet(null);
+    };
+
+    const handleQRCode = (pet: Pet) => {
+        setSelectedPetForQR(pet);
+        setQrModalOpen(true);
+        showSuccess(`QR Code برای ${pet.namePet} آماده شد`);
+    };
+
+    const handleQRModalClose = () => {
+        setQrModalOpen(false);
+        setSelectedPetForQR(null);
     };
 
     const handleFormSuccess = () => {
@@ -167,10 +181,16 @@ export default function PetList() {
                         {filteredPets.map((pet, index) => (
                             <div key={index} className="bg-white rounded-lg shadow-sm overflow-hidden hover:shadow-md transition-shadow">
                                 {/* Pet Image Placeholder */}
-                                <div className="h-48 bg-gradient-to-br from-blue-100 to-purple-100 flex items-center justify-center">
+                                <div className="h-48 bg-gradient-to-br from-blue-100 to-purple-100 flex items-center justify-center relative">
                                     <div className="text-center">
                                         <div className="text-4xl mb-2"><PawPrint /></div>
                                         <div className="text-sm text-gray-600">{pet.typePet}</div>
+                                    </div>
+                                    {/* QR Code Indicator */}
+                                    <div className="absolute top-2 right-2">
+                                        <div className="bg-white/80 backdrop-blur-sm rounded-full p-1">
+                                            <QrCode size={16} className="text-[var(--main-color)]" />
+                                        </div>
                                     </div>
                                 </div>
 
@@ -208,27 +228,36 @@ export default function PetList() {
                                     </div>
 
                                     {/* Action Buttons */}
-                                    <div className="flex gap-2">
+                                    <div className="grid grid-cols-2 gap-2 mb-2">
                                         <button
                                             onClick={() => handleView(pet)}
-                                            className="flex-1 flex items-center justify-center gap-1 bg-blue-50 hover:bg-blue-100 text-blue-600 px-3 py-2 rounded-lg text-sm transition-colors"
+                                            className="flex items-center justify-center gap-1 bg-blue-50 hover:bg-blue-100 text-blue-600 px-3 py-2 rounded-lg text-sm transition-colors"
                                         >
                                             <Eye size={16} />
                                             مشاهده
                                         </button>
                                         <button
                                             onClick={() => handleEdit(pet)}
-                                            className="flex-1 flex items-center justify-center gap-1 bg-yellow-50 hover:bg-yellow-100 text-yellow-600 px-3 py-2 rounded-lg text-sm transition-colors"
+                                            className="flex items-center justify-center gap-1 bg-yellow-50 hover:bg-yellow-100 text-yellow-600 px-3 py-2 rounded-lg text-sm transition-colors"
                                         >
                                             <Edit size={16} />
                                             ویرایش
+                                        </button>
+                                    </div>
+                                    <div className="grid grid-cols-2 gap-2">
+                                        <button
+                                            onClick={() => handleQRCode(pet)}
+                                            className="flex items-center justify-center gap-1 bg-green-50 hover:bg-green-100 text-green-600 px-3 py-2 rounded-lg text-sm transition-colors"
+                                        >
+                                            <QrCode size={16} />
+                                            QR Code
                                         </button>
                                         <button
                                             onClick={() => {
                                                 setPetToDelete(pet);
                                                 setDeleteModalOpen(true);
                                             }}
-                                            className="flex-1 flex items-center justify-center gap-1 bg-red-50 hover:bg-red-100 text-red-600 px-3 py-2 rounded-lg text-sm transition-colors"
+                                            className="flex items-center justify-center gap-1 bg-red-50 hover:bg-red-100 text-red-600 px-3 py-2 rounded-lg text-sm transition-colors"
                                         >
                                             <Trash2 size={16} />
                                             حذف
@@ -291,7 +320,16 @@ export default function PetList() {
                                         <p className="text-xs text-gray-500">{viewingPet.typePet}</p>
                                     </div>
                                 </div>
-                                <button onClick={() => setViewingPet(null)} className="text-gray-500 hover:text-gray-700">✕</button>
+                                <div className="flex items-center gap-2">
+                                    <button
+                                        onClick={() => handleQRCode(viewingPet)}
+                                        className="flex items-center gap-1 bg-green-50 hover:bg-green-100 text-green-600 px-3 py-2 rounded-lg text-sm transition-colors"
+                                    >
+                                        <QrCode size={16} />
+                                        QR Code
+                                    </button>
+                                    <button onClick={() => setViewingPet(null)} className="text-gray-500 hover:text-gray-700">✕</button>
+                                </div>
                             </div>
 
                             {/* Body */}
@@ -361,6 +399,16 @@ export default function PetList() {
                         </div>
                     </div>
                 </div>
+            )}
+
+            {/* QR Code Modal */}
+            {qrModalOpen && selectedPetForQR && (
+                <QRCodeModal
+                    isOpen={qrModalOpen}
+                    onClose={handleQRModalClose}
+                    petId={selectedPetForQR.petId || ""}
+                    petName={selectedPetForQR.namePet}
+                />
             )}
 
             {/* Snackbar */}
