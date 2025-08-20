@@ -44,7 +44,7 @@ export default function PetList() {
         setPetToDelete(null);
         try {
             await deletePet(petId);
-            showSuccess("حیوان با موفقیت حذف شد");
+            showSuccess("پت با موفقیت حذف شد");
             loadPets(); // Reload the list
         } catch (error: any) {
             showError("خطا در حذف حیوان: " + error.message);
@@ -73,7 +73,7 @@ export default function PetList() {
     };
 
     const handleFormSuccess = () => {
-        showSuccess(editingPet ? "حیوان با موفقیت ویرایش شد" : "حیوان با موفقیت اضافه شد");
+        showSuccess(editingPet ? "پت با موفقیت ویرایش شد" : "پت با موفقیت اضافه شد");
         handleFormClose();
         loadPets();
     };
@@ -133,7 +133,7 @@ export default function PetList() {
                             className="flex items-center gap-2 bg-[var(--main-color)] hover:bg-[var(--main-color-dark)] text-white px-4 py-2 rounded-lg transition-colors"
                         >
                             <Plus size={20} />
-                            افزودن حیوان جدید
+                            افزودن پت جدید
                         </button>
                     </div>
                 </div>
@@ -149,8 +149,8 @@ export default function PetList() {
                         <h3 className="text-lg font-medium text-gray-900 mb-2">هیچ حیوانی یافت نشد</h3>
                         <p className="text-gray-500 mb-4">
                             {searchTerm
-                                ? "لطفاً جستجو را تغییر دهید یا حیوان جدیدی اضافه کنید"
-                                : "برای شروع، حیوان جدیدی اضافه کنید"
+                                ? "لطفاً جستجو را تغییر دهید یا پت جدیدی اضافه کنید"
+                                : "برای شروع، پت جدیدی اضافه کنید"
                             }
                         </p>
                         {!searchTerm && (
@@ -158,7 +158,7 @@ export default function PetList() {
                                 onClick={() => setShowForm(true)}
                                 className="bg-[var(--main-color)] hover:bg-[var(--main-color-dark)] text-white px-4 py-2 rounded-lg transition-colors"
                             >
-                                افزودن حیوان جدید
+                                افزودن پت جدید
                             </button>
                         )}
                     </div>
@@ -341,7 +341,7 @@ export default function PetList() {
                 <div className="fixed inset-0 bg-white/5 backdrop-blur-sm flex items-center justify-center z-50">
                     <div className="bg-white rounded-lg shadow-lg p-6 max-w-sm w-full">
                         <h2 className="text-lg font-bold mb-4 text-gray-900">تایید حذف حیوان</h2>
-                        <p className="mb-6 text-gray-700">آیا مطمئن هستید که می‌خواهید حیوان <span className="font-bold">{petToDelete.namePet}</span> را حذف کنید؟ این عملیات قابل بازگشت نیست.</p>
+                        <p className="mb-6 text-gray-700">آیا مطمئن هستید که می‌خواهید پت <span className="font-bold">{petToDelete.namePet}</span> را حذف کنید؟ این عملیات قابل بازگشت نیست.</p>
                         <div className="flex justify-end gap-3">
                             <button
                                 onClick={() => {

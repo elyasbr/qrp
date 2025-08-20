@@ -338,11 +338,11 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
       if (pet) {
         // Update existing pet
         await updatePet(pet.petId || "", submitData as Pet);
-        showSuccess("حیوان با موفقیت ویرایش شد");
+        showSuccess("پت با موفقیت ویرایش شد");
       } else {
         // Create new pet
         await createPet(submitData as Pet);
-        showSuccess("حیوان با موفقیت اضافه شد");
+        showSuccess("پت با موفقیت اضافه شد");
       }
       onSuccess();
     } catch (error: any) {
@@ -383,7 +383,7 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
             {/* Basic Information */}
             <div className="grid grid-cols-1 gap-6">
               <div>
-                <h3 className="text-lg font-semibold text-[var(--main-color)] mb-4">مشخصات حیوان خانگی</h3>
+                <h3 className="text-lg font-semibold text-[var(--main-color)] mb-4">مشخصات پت خانگی</h3>
 
                 <div className="space-y-4">
                   <div>
@@ -394,7 +394,7 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
                       onChange={(e) => handleInputChange("namePet", e.target.value)}
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--main-color)] focus:border-transparent"
                       required
-                      placeholder="نام حیوان را وارد کنید"
+                      placeholder="نام پت را وارد کنید"
                     />
                   </div>
 
