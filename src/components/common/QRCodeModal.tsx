@@ -8,9 +8,10 @@ interface QRCodeModalProps {
   onClose: () => void;
   petId: string;
   petName: string;
+  insuranceNumber?: string;
 }
 
-export default function QRCodeModal({ isOpen, onClose, petId, petName }: QRCodeModalProps) {
+export default function QRCodeModal({ isOpen, onClose, petId, petName, insuranceNumber }: QRCodeModalProps) {
   const [qrCodeDataUrl, setQrCodeDataUrl] = useState<string>("");
   const [isGenerating, setIsGenerating] = useState(false);
   const [copied, setCopied] = useState(false);
@@ -26,11 +27,16 @@ export default function QRCodeModal({ isOpen, onClose, petId, petName }: QRCodeM
     
     setIsGenerating(true);
     try {
-      // Generate the URL for the pet
-      const petUrl = `${window.location.origin}/pet/${petId}`;
+      // Create QR code data with insurance number
+      const qrData = {
+        url: `${window.location.origin}/pet/${petId}`,
+        petName: petName,
+        insuranceNumber: insuranceNumber || "تعیین نشده",
+        timestamp: new Date().toISOString()
+      };
       
-      // Generate QR code
-      const qrCodeDataUrl = await QRCode.toDataURL(petUrl, {
+      // Generate QR code with JSON data
+      const qrCodeDataUrl = await QRCode.toDataURL(JSON.stringify(qrData), {
         width: 300,
         margin: 2,
         color: {
@@ -67,9 +73,13 @@ export default function QRCodeModal({ isOpen, onClose, petId, petName }: QRCodeM
       const blob = await response.blob();
       
       if (navigator.share) {
+        const shareText = insuranceNumber 
+          ? `Scan this QR code to view ${petName}'s information\nشماره بیمه: ${insuranceNumber}`
+          : `Scan this QR code to view ${petName}'s information`;
+        
         await navigator.share({
           title: `QR Code for ${petName}`,
-          text: `Scan this QR code to view ${petName}'s information`,
+          text: shareText,
           files: [new File([blob], `qr-code-${petName}.png`, { type: 'image/png' })]
         });
       } else {
@@ -84,8 +94,11 @@ export default function QRCodeModal({ isOpen, onClose, petId, petName }: QRCodeM
 
   const copyUrl = async () => {
     const petUrl = `${window.location.origin}/pet/${petId}`;
+    const copyText = insuranceNumber 
+      ? `${petUrl}\nشماره بیمه: ${insuranceNumber}`
+      : petUrl;
     try {
-      await navigator.clipboard.writeText(petUrl);
+      await navigator.clipboard.writeText(copyText);
       setCopied(true);
       window.setTimeout(() => setCopied(false), 2000);
     } catch (error) {
@@ -141,6 +154,11 @@ export default function QRCodeModal({ isOpen, onClose, petId, petName }: QRCodeM
               <p className="text-xs text-gray-500 font-mono bg-gray-100 p-2 rounded">
                 {`${window.location.origin}/pet/${petId}`}
               </p>
+              {insuranceNumber && (
+                <p className="text-xs text-gray-500 font-mono bg-blue-100 p-2 rounded mt-2">
+                  شماره بیمه: {insuranceNumber}
+                </p>
+              )}
             </div>
           ) : (
             <div className="text-center text-gray-500">

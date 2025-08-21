@@ -57,9 +57,9 @@ export default function QRPublicPage({ pet, isLoading, error }: QRPublicPageProp
   return (
     <div className="min-h-screen bg-[#f8f9fb] font-Morabba">
       {/* Header */}
-      <div className="bg-white shadow-sm border-b border-gray-200">
-        <div className="max-w-6xl mx-auto px-4 py-6">
-          {/* <div className="flex items-center justify-center md:justify-start mb-4">
+      {/* <div className="bg-white shadow-sm border-b border-gray-200">
+        <div className="max-w-6xl mx-auto px-4 py-6"> */}
+      {/* <div className="flex items-center justify-center md:justify-start mb-4">
             <Link
               href="/"
               className="flex items-center gap-2 bg-[var(--main-color)] text-white px-4 py-2 rounded-lg hover:bg-[var(--main-color-dark)] transition-colors duration-200 shadow-md"
@@ -68,14 +68,14 @@ export default function QRPublicPage({ pet, isLoading, error }: QRPublicPageProp
               <span className="font-medium">بازگشت به خانه</span>
             </Link>
           </div> */}
-          <div className="text-center">
-            <h1 className="text-3xl font-bold text-[var(--main-color)] mb-2">
-              اطلاعات مربوط به پت
-            </h1>
-            <p className="text-gray-600">ایران راد - سامانه هوشمند پت خانگی</p>
-          </div>
+      {/* <div className="text-center">
+        <h1 className="text-3xl font-bold text-[var(--main-color)] mb-2">
+          اطلاعات مربوط به پت
+        </h1>
+        <p className="text-gray-600">ایران راد - سامانه هوشمند پت خانگی</p> */}
+      {/* </div>
         </div>
-      </div>
+      </div> */}
 
       {/* Main Content */}
       <div className="max-w-6xl mx-auto px-4 py-8">
@@ -90,6 +90,7 @@ export default function QRPublicPage({ pet, isLoading, error }: QRPublicPageProp
               <div className="grid grid-cols-2 gap-y-2 text-sm">
                 <span className="text-gray-500">نام پت</span><span className="text-gray-900">{pet.namePet}</span>
                 <span className="text-gray-500">نوع پت</span><span className="text-gray-900">{pet.typePet}</span>
+                <span className="text-gray-500">نام نژاد</span><span className="text-gray-900">{pet.blood}</span>
                 <span className="text-gray-500">جنسیت</span><span className="text-gray-900">{pet.sex === "MEN" ? "نر" : pet.sex === "WOMEN" ? "ماده" : "نامشخص"}</span>
                 <span className="text-gray-500">تاریخ تولد</span><span className="text-gray-900">{formatPersianDate(pet.birthDate)}</span>
                 <span className="text-gray-500">شماره شناسنامه</span><span className="text-gray-900">{pet.birthCertificateNumberPet}</span>
@@ -97,8 +98,9 @@ export default function QRPublicPage({ pet, isLoading, error }: QRPublicPageProp
                 <span className="text-gray-500">رنگ پت</span><span className="text-gray-900">{pet.colorPet}</span>
                 <span className="text-gray-500">وزن</span><span className="text-gray-900">{pet.weightPet} کیلوگرم</span>
                 <span className="text-gray-500">قد</span><span className="text-gray-900">{pet.heightPet} سانتی‌متر</span>
-                <span className="text-gray-500">دامپزشک صادر کننده</span><span className="text-gray-900">{pet.issuingVeterinarian}</span>
-                <span className="text-gray-500">نظام دامپزشکی</span><span className="text-gray-900">{pet.issuingMedicalSystem}</span>
+                <span className="text-gray-500">نام دامپزشک صادر کننده شناسنامه</span><span className="text-gray-900">{pet.issuingVeterinarian}</span>
+                <span className="text-gray-500" >  نظام دامپزشکی صادر کننده شناسنامه
+                </span><span className="text-gray-900">{pet.issuingMedicalSystem === "IRAN" ? "ایران" : pet.issuingMedicalSystem === "IRAN_RAD" ? "ایران راد" : "نامشخص"}</span>
               </div>
               {pet.distinctiveFeature && (
                 <div className="mt-3 text-sm">
@@ -119,9 +121,9 @@ export default function QRPublicPage({ pet, isLoading, error }: QRPublicPageProp
                 <span className="text-gray-500">تلفن ثابت</span><span className="text-gray-900">{pet.telHead}</span>
                 <span className="text-gray-500">استان</span><span className="text-gray-900">{pet.stateHead}</span>
                 <span className="text-gray-500">شهر</span><span className="text-gray-900">{pet.cityHead}</span>
+                <span className="text-gray-500">آدرس</span><span className="text-gray-900">{pet.addressHead}</span>
                 <span className="text-gray-500">کد پستی</span><span className="text-gray-900">{pet.postalCodeHead}</span>
                 <span className="text-gray-500">ایمیل</span><span className="text-gray-900">{pet.emailHead}</span>
-                <span className="text-gray-500">آدرس</span><span className="text-gray-900">{pet.addressHead}</span>
                 {pet.telegramHead && (<><span className="text-gray-500">تلگرام</span><span className="text-gray-900">{pet.telegramHead}</span></>)}
                 {pet.whatsAppHead && (<><span className="text-gray-500">واتساپ</span><span className="text-gray-900">{pet.whatsAppHead}</span></>)}
                 {pet.instagramHead && (<><span className="text-gray-500">اینستاگرام</span><span className="text-gray-900">{pet.instagramHead}</span></>)}

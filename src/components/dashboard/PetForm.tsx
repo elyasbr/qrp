@@ -26,6 +26,7 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
     birthDate: "",
     birthCertificateNumberPet: "",
     microChipCode: "",
+    insuranceNumber: "",
     colorPet: "UNKNOWN",
     distinctiveFeature: "",
     weightPet: 0,
@@ -104,6 +105,7 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
     birthDate: "",
     birthCertificateNumberPet: "",
     microChipCode: "",
+    insuranceNumber: "",
     colorPet: "UNKNOWN",
     distinctiveFeature: "",
     weightPet: 0,
@@ -384,8 +386,8 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
   };
 
   return (
-    <div className="fixed inset-0 bg-white/30 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-      <div className="bg-white rounded-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+    <div className="fixed inset-0 bg-white/30 backdrop-blur-sm flex items-center justify-center p-2 z-50">
+      <div className="bg-white rounded-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto ring-3 ring-[var(--main-color)]">
         <div className="p-6">
           {/* Header */}
           <div className="flex justify-between items-center mb-6">
@@ -410,7 +412,7 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
                   <label className="block text-sm font-medium text-gray-700 mb-1"> شماره بیمه</label>
                   <input
                     type="text"
-                    value={(formData as any)?.Insurancenumber || ""}
+                    value={formData.insuranceNumber || ""}
                     readOnly
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg bg-gray-50 text-gray-700"
                     placeholder=""
@@ -460,19 +462,17 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
                       <option value="CAT">گربه</option>
                     </select>
                   </div>
-
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">نام نژاد </label>
                     <input
                       type="text"
-                      value={formData.breedName || ""}
-                      onChange={(e) => handleInputChange("breedName", e.target.value)}
+                      value={formData.blood || ""}
+                      onChange={(e) => handleInputChange("blood", e.target.value)}
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--main-color)] focus:border-transparent"
                       required
                       placeholder="نام نژاد را وارد کنید"
                     />
                   </div>
-
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">جنسیت پت *</label>
                     <select
@@ -484,11 +484,6 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
                       <option value="WOMEN">ماده</option>
                     </select>
                   </div>
-
-
-
-
-
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">تاریخ تولد پت</label>
                     <DatePicker
@@ -1156,8 +1151,8 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
             </div>
 
             {/* Form Actions */}
-            <div className="flex justify-between gap-3 pt-6 border-t">
-              <button
+            <div className="w-full flex justify-between gap-3 pt-6 border-t">
+              {/* <button
                 type="button"
                 onClick={() => {
                   setFormData({
@@ -1223,19 +1218,19 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
                 className="px-4 py-2 text-blue-600 bg-blue-50 hover:bg-blue-100 rounded-lg transition-colors"
               >
                 پر کردن داده‌های تست
-              </button>
-              <div className="flex gap-3">
+              </button> */}
+              <div className="flex justify-end gap-3 w-full">
                 <button
                   type="button"
                   onClick={onClose}
-                  className="px-4 py-2 text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors"
+                  className="px-4 py-2 cursor-pointer text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors"
                 >
                   انصراف
                 </button>
                 <button
                   type="submit"
                   disabled={loading}
-                  className="flex items-center gap-2 px-4 py-2 bg-[var(--main-color)] hover:bg-[var(--main-color-dark)] text-white rounded-lg transition-colors disabled:opacity-50"
+                  className="flex cursor-pointer items-center gap-2 px-4 py-2 bg-[var(--main-color)] hover:bg-[var(--main-color-dark)] text-white rounded-lg transition-colors disabled:opacity-50"
                 >
                   {loading ? (
                     <Loader2 className="animate-spin" size={16} />

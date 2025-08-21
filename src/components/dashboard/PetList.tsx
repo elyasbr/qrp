@@ -206,6 +206,10 @@ export default function PetList() {
                                     {/* Pet Details */}
                                     <div className="space-y-2 mb-4">
                                         <div className="flex justify-between text-sm">
+                                            <span className="text-gray-500">شماره بیمه:</span>
+                                            <span className="text-gray-900">{pet.insuranceNumber || "تعیین نشده"}</span>
+                                        </div>
+                                        <div className="flex justify-between text-sm">
                                             <span className="text-gray-500">اسم:</span>
                                             <span className="text-gray-900">{pet.namePet}</span>
                                         </div>
@@ -345,6 +349,7 @@ export default function PetList() {
                                     <div className="bg-white rounded-lg ring-1 ring-gray-200 p-4">
                                         <h3 className="text-md font-bold text-[var(--main-color)] mb-3">مشخصات حیوان خانگی</h3>
                                         <div className="grid grid-cols-2 gap-y-2 text-sm">
+                                            <span className="text-gray-500">شماره بیمه</span><span className="text-gray-900">{viewingPet.insuranceNumber || "تعیین نشده"}</span>
                                             <span className="text-gray-500">نام پت</span><span className="text-gray-900">{viewingPet.namePet}</span>
                                             <span className="text-gray-500">نوع پت</span><span className="text-gray-900">{viewingPet.typePet}</span>
                                             <span className="text-gray-500">جنسیت</span><span className="text-gray-900">{viewingPet.sex === "MEN" ? "نر" : viewingPet.sex === "WOMEN" ? "ماده" : "نامشخص"}</span>
@@ -494,6 +499,7 @@ export default function PetList() {
                     onClose={handleQRModalClose}
                     petId={selectedPetForQR.petId || ""}
                     petName={selectedPetForQR.namePet}
+                    insuranceNumber={selectedPetForQR.insuranceNumber}
                 />
             )}
 

@@ -12,6 +12,7 @@ export interface Pet {
   birthDate: string;
   birthCertificateNumberPet: string;
   microChipCode: string;
+  insuranceNumber?: string;
   colorPet: "RED" | "BLUE" | "GREEN" | "YELLOW" | "BLACK" | "WHITE" | "ORANGE" | "PURPLE" | "PINK" | "BROWN" | "GRAY" | "CYAN" | "MAGENTA" | "UNKNOWN";
   distinctiveFeature: string;
   weightPet: number;
