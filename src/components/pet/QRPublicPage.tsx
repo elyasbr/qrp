@@ -56,26 +56,26 @@ export default function QRPublicPage({ pet, isLoading, error }: QRPublicPageProp
 
   return (
     <div className="min-h-screen bg-[#f8f9fb] font-Morabba">
-      {/* Header */}
-      {/* <div className="bg-white shadow-sm border-b border-gray-200">
-        <div className="max-w-6xl mx-auto px-4 py-6"> */}
-      {/* <div className="flex items-center justify-center md:justify-start mb-4">
-            <Link
-              href="/"
-              className="flex items-center gap-2 bg-[var(--main-color)] text-white px-4 py-2 rounded-lg hover:bg-[var(--main-color-dark)] transition-colors duration-200 shadow-md"
-            >
-              <Home size={20} />
-              <span className="font-medium">بازگشت به خانه</span>
-            </Link>
-          </div> */}
-      {/* <div className="text-center">
-        <h1 className="text-3xl font-bold text-[var(--main-color)] mb-2">
-          اطلاعات مربوط به پت
-        </h1>
-        <p className="text-gray-600">ایران راد - سامانه هوشمند پت خانگی</p> */}
-      {/* </div>
+      {/* Header with Pet Image */}
+      <div className="bg-white shadow-sm border-b border-gray-200">
+        <div className="max-w-6xl mx-auto px-4 py-6">
+          <div className="text-center mb-6">
+            <div className="flex justify-center mb-4">
+              <div className="w-32 h-32 rounded-full overflow-hidden border-4 border-[var(--main-color)]/20 shadow-lg">
+                <img 
+                  src="/images/pet.jpg" 
+                  alt={pet.namePet}
+                  className="w-full h-full object-cover"
+                />
+              </div>
+            </div>
+            <h1 className="text-3xl font-bold text-[var(--main-color)] mb-2">
+              اطلاعات مربوط به {pet.namePet}
+            </h1>
+            <p className="text-gray-600">ایران راد - سامانه هوشمند پت خانگی</p>
+          </div>
         </div>
-      </div> */}
+      </div>
 
       {/* Main Content */}
       <div className="max-w-6xl mx-auto px-4 py-8">

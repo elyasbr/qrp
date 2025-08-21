@@ -319,7 +319,13 @@ export default function PetList() {
                             {/* Header */}
                             <div className="sticky top-0 bg-white/90 z-10 flex items-center justify-between px-6 py-4 border-b">
                                 <div className="flex items-center gap-3">
-                                    <div className="h-12 w-12 rounded-xl bg-[var(--main-color)]/10 flex items-center justify-center text-2xl">🐾</div>
+                                    <div className="h-16 w-16 rounded-full overflow-hidden border-2 border-[var(--main-color)]/20 shadow-lg">
+                                        <img 
+                                            src="/images/pet.jpg" 
+                                            alt={viewingPet.namePet}
+                                            className="w-full h-full object-cover"
+                                        />
+                                    </div>
                                     <div>
                                         <h2 className="text-lg font-bold text-gray-900">{viewingPet.namePet}</h2>
                                         <p className="text-xs text-gray-500">{viewingPet.typePet}</p>
