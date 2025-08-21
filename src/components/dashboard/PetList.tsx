@@ -180,12 +180,13 @@ export default function PetList() {
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                         {filteredPets.map((pet, index) => (
                             <div key={index} className="bg-white rounded-lg shadow-sm overflow-hidden hover:shadow-md transition-shadow">
-                                {/* Pet Image Placeholder */}
-                                <div className="h-48 bg-gradient-to-br from-blue-100 to-purple-100 flex items-center justify-center relative">
-                                    <div className="text-center">
-                                        <div className="text-4xl mb-2"><PawPrint /></div>
-                                        <div className="text-sm text-gray-600">{pet.typePet}</div>
-                                    </div>
+                                {/* Pet Image */}
+                                <div className="h-48 bg-gradient-to-br from-blue-100 to-purple-100 flex items-center justify-center relative overflow-hidden">
+                                    <img 
+                                        src="/images/pet.jpg" 
+                                        alt={pet.namePet}
+                                        className="w-full h-full object-cover"
+                                    />
                                     {/* QR Code Indicator */}
                                     <div className="absolute top-2 right-2">
                                         <div className="bg-white/80 backdrop-blur-sm rounded-full p-1">
