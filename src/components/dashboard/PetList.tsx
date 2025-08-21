@@ -182,8 +182,8 @@ export default function PetList() {
                             <div key={index} className="bg-white rounded-lg shadow-sm overflow-hidden hover:shadow-md transition-shadow">
                                 {/* Pet Image */}
                                 <div className="h-48 bg-gradient-to-br from-blue-100 to-purple-100 flex items-center justify-center relative overflow-hidden">
-                                    <img 
-                                        src="/images/pet.jpg" 
+                                    <img
+                                        src="/images/pet.jpg"
                                         alt={pet.namePet}
                                         className="w-full h-full object-cover"
                                     />
@@ -318,19 +318,6 @@ export default function PetList() {
                         <div className="bg-white/90 rounded-2xl shadow-xl ring-1 ring-gray-200 flex flex-col max-h-[90vh] overflow-hidden">
                             {/* Header */}
                             <div className="sticky top-0 bg-white/90 z-10 flex items-center justify-between px-6 py-4 border-b">
-                                <div className="flex items-center gap-3">
-                                    <div className="h-16 w-16 rounded-full overflow-hidden border-2 border-[var(--main-color)]/20 shadow-lg">
-                                        <img 
-                                            src="/images/pet.jpg" 
-                                            alt={viewingPet.namePet}
-                                            className="w-full h-full object-cover"
-                                        />
-                                    </div>
-                                    <div>
-                                        <h2 className="text-lg font-bold text-gray-900">{viewingPet.namePet}</h2>
-                                        <p className="text-xs text-gray-500">{viewingPet.typePet}</p>
-                                    </div>
-                                </div>
                                 <div className="flex items-center gap-2">
                                     <button onClick={() => setViewingPet(null)} className="text-gray-400 hover:text-[var(--main-color)] transition-colors" aria-label="Close">
                                         ✕
@@ -356,6 +343,16 @@ export default function PetList() {
                                     <div className="bg-white rounded-lg ring-1 ring-gray-200 p-4">
                                         <h3 className="text-md font-bold text-[var(--main-color)] mb-3">مشخصات حیوان خانگی</h3>
                                         <div className="grid grid-cols-2 gap-y-2 text-sm">
+                                            <span className="text-gray-500">تصویر پت</span>
+                                            <div className="flex justify-start mb-4">
+                                                <div className="w-32 h-32 rounded-xl overflow-hidden border-4 border-[var(--main-color)]/20 shadow-lg">
+                                                    <img
+                                                        src="/images/pet.jpg"
+                                                        alt={viewingPet.namePet}
+                                                        className="w-full h-full object-cover"
+                                                    />
+                                                </div>
+                                            </div>
                                             <span className="text-gray-500">شماره بیمه</span><span className="text-gray-900">{viewingPet.insuranceNumber || "تعیین نشده"}</span>
                                             <span className="text-gray-500">نام پت</span><span className="text-gray-900">{viewingPet.namePet}</span>
                                             <span className="text-gray-500">نوع پت</span><span className="text-gray-900">{viewingPet.typePet}</span>

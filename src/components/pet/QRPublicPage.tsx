@@ -57,25 +57,6 @@ export default function QRPublicPage({ pet, isLoading, error }: QRPublicPageProp
   return (
     <div className="min-h-screen bg-[#f8f9fb] font-Morabba">
       {/* Header with Pet Image */}
-      <div className="bg-white shadow-sm border-b border-gray-200">
-        <div className="max-w-6xl mx-auto px-4 py-6">
-          <div className="text-center mb-6">
-            <div className="flex justify-center mb-4">
-              <div className="w-32 h-32 rounded-full overflow-hidden border-4 border-[var(--main-color)]/20 shadow-lg">
-                <img 
-                  src="/images/pet.jpg" 
-                  alt={pet.namePet}
-                  className="w-full h-full object-cover"
-                />
-              </div>
-            </div>
-            <h1 className="text-3xl font-bold text-[var(--main-color)] mb-2">
-              اطلاعات مربوط به {pet.namePet}
-            </h1>
-            <p className="text-gray-600">ایران راد - سامانه هوشمند پت خانگی</p>
-          </div>
-        </div>
-      </div>
 
       {/* Main Content */}
       <div className="max-w-6xl mx-auto px-4 py-8">
@@ -88,6 +69,16 @@ export default function QRPublicPage({ pet, isLoading, error }: QRPublicPageProp
             <div className="bg-white rounded-lg ring-1 ring-gray-200 p-4">
               <h3 className="text-md font-bold text-[var(--main-color)] mb-3">مشخصات حیوان خانگی</h3>
               <div className="grid grid-cols-2 gap-y-2 text-sm">
+                <span className="text-gray-500">تصویر پت</span>
+                <div className="flex justify-start mb-4">
+                  <div className="w-32 h-32 rounded-xl overflow-hidden border-4 border-[var(--main-color)]/20 shadow-lg">
+                    <img
+                      src="/images/pet.jpg"
+                      alt={pet.namePet}
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                </div>
                 <span className="text-gray-500">شماره بیمه</span><span className="text-gray-900">{pet.insuranceNumber || "تعیین نشده"}</span>
                 <span className="text-gray-500">نام پت</span><span className="text-gray-900">{pet.namePet}</span>
                 <span className="text-gray-500">نوع پت</span><span className="text-gray-900">{pet.typePet}</span>
