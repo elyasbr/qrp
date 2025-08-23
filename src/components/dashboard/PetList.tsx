@@ -318,7 +318,7 @@ export default function PetList() {
                         <div className="bg-white/90 rounded-2xl shadow-xl ring-1 ring-gray-200 flex flex-col max-h-[90vh] overflow-hidden">
                             {/* Header */}
                             <div className="sticky top-0 bg-white/90 z-10 flex items-center justify-between px-6 py-4 border-b">
-                                <div className="flex justify-end gap-2">
+                                <div className="w-full flex justify-end gap-2">
                                     <button onClick={() => setViewingPet(null)} className="text-gray-400 hover:text-[var(--main-color)] transition-colors" aria-label="Close">
                                         ✕
                                     </button>
