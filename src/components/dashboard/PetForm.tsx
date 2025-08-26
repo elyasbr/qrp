@@ -81,13 +81,15 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
   const [loading, setLoading] = useState(false);
   const { showError, showSuccess } = useSnackbar();
   const [formSearch, setFormSearch] = useState("");
-  const [selectedImage, setSelectedImage] = useState<File | null>(null);
+  const [selectedIdentificationImage, setSelectedIdentificationImage] = useState<File | null>(null);
+  const [selectedPetImage, setSelectedPetImage] = useState<File | null>(null);
   const [selectedVideo, setSelectedVideo] = useState<File | null>(null);
   const [selectedCertificatePDF, setSelectedCertificatePDF] = useState<File | null>(null);
   const [selectedInsurancePDF, setSelectedInsurancePDF] = useState<File | null>(null);
   
   // File preview URLs
-  const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [identificationImagePreview, setIdentificationImagePreview] = useState<string | null>(null);
+  const [petImagePreview, setPetImagePreview] = useState<string | null>(null);
   const [videoPreview, setVideoPreview] = useState<string | null>(null);
 
   // Format file size utility function
@@ -100,11 +102,12 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
   };
 
   // Handle file selection with preview
-  const handleFileSelect = (file: File | null, type: 'image' | 'video' | 'pdf', setter: (file: File | null) => void) => {
+  const handleFileSelect = (file: File | null, type: 'identificationImage' | 'petImage' | 'video' | 'pdf', setter: (file: File | null) => void, previewSetter?: (preview: string | null) => void) => {
     if (file) {
       // File size validation
       const maxSizes = {
-        image: 5 * 1024 * 1024, // 5MB
+        identificationImage: 5 * 1024 * 1024, // 5MB
+        petImage: 5 * 1024 * 1024, // 5MB
         video: 20 * 1024 * 1024, // 20MB
         pdf: 10 * 1024 * 1024 // 10MB
       };
@@ -117,13 +120,14 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
       
       // File type validation
       const validTypes = {
-        image: ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'],
+        identificationImage: ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'],
+        petImage: ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'],
         video: ['video/mp4', 'video/avi', 'video/mov', 'video/wmv', 'video/flv'],
         pdf: ['application/pdf']
       };
       
       if (!validTypes[type].includes(file.type)) {
-        showError(`نوع فایل نامعتبر است. لطفاً فایل ${type === 'image' ? 'تصویر' : type === 'video' ? 'ویدیو' : 'PDF'} انتخاب کنید`);
+        showError(`نوع فایل نامعتبر است. لطفاً فایل ${type === 'identificationImage' || type === 'petImage' ? 'تصویر' : type === 'video' ? 'ویدیو' : 'PDF'} انتخاب کنید`);
         return;
       }
     }
@@ -131,9 +135,9 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
     setter(file);
     
     if (file) {
-      if (type === 'image') {
+      if (type === 'identificationImage' || type === 'petImage') {
         const reader = new FileReader();
-        reader.onload = (e) => setImagePreview(e.target?.result as string);
+        reader.onload = (e) => previewSetter?.(e.target?.result as string);
         reader.readAsDataURL(file);
       } else if (type === 'video') {
         const reader = new FileReader();
@@ -141,8 +145,11 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
         reader.readAsDataURL(file);
       }
     } else {
-      if (type === 'image') setImagePreview(null);
-      if (type === 'video') setVideoPreview(null);
+      if (type === 'identificationImage' || type === 'petImage') {
+        previewSetter?.(null);
+      } else if (type === 'video') {
+        setVideoPreview(null);
+      }
     }
   };
 
@@ -352,13 +359,25 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
       };
 
       // Upload files if selected
-      if (selectedImage) {
+      if (selectedIdentificationImage) {
         try {
-          const imgRes = await uploadFile(selectedImage, false); // Public image
+          const imgRes = await uploadFile(selectedIdentificationImage, false); // Public image
+          submitData.identificationImageUrl = imgRes.url;
+        } catch (err) {
+          console.error("Identification image upload failed", err);
+          showError("آپلود عکس شناسایی ناموفق بود");
+          setLoading(false);
+          return;
+        }
+      }
+
+      if (selectedPetImage) {
+        try {
+          const imgRes = await uploadFile(selectedPetImage, false); // Public image
           submitData.imageUrl = imgRes.url;
         } catch (err) {
-          console.error("Image upload failed", err);
-          showError("آپلود تصویر ناموفق بود");
+          console.error("Pet image upload failed", err);
+          showError("آپلود عکس پت ناموفق بود");
           setLoading(false);
           return;
         }
@@ -482,7 +501,7 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">عکس شناسایی پت</label>
                     
-                    {!selectedImage ? (
+                    {!selectedIdentificationImage ? (
                       <label className="flex items-center justify-between gap-3 w-full border-2 border-dashed border-gray-300 hover:border-[var(--main-color)] rounded-xl p-3 cursor-pointer transition-colors">
                         <div className="flex items-center gap-3">
                           <span className="inline-flex h-10 w-10 items-center justify-center rounded-lg bg-[var(--main-color)]/10 text-[var(--main-color)] text-lg">
@@ -496,7 +515,7 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
                         <input
                           type="file"
                           accept="image/*"
-                          onChange={(e) => handleFileSelect(e.target.files?.[0] || null, 'image', setSelectedImage)}
+                          onChange={(e) => handleFileSelect(e.target.files?.[0] || null, 'identificationImage', setSelectedIdentificationImage, setIdentificationImagePreview)}
                           className="hidden"
                         />
                       </label>
@@ -508,23 +527,23 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
                               📷
                             </span>
                             <div className="text-sm">
-                              <div className="font-semibold text-gray-900">{selectedImage.name}</div>
-                              <div className="text-xs text-gray-500">{formatFileSize(selectedImage.size)}</div>
+                              <div className="font-semibold text-gray-900">{selectedIdentificationImage.name}</div>
+                              <div className="text-xs text-gray-500">{formatFileSize(selectedIdentificationImage.size)}</div>
                             </div>
                           </div>
                           <button
                             type="button"
-                            onClick={() => handleFileSelect(null, 'image', setSelectedImage)}
+                            onClick={() => handleFileSelect(null, 'identificationImage', setSelectedIdentificationImage, setIdentificationImagePreview)}
                             className="text-red-500 hover:text-red-700 transition-colors p-1"
                           >
                             <X size={16} />
                           </button>
                         </div>
                         
-                        {imagePreview && (
+                        {identificationImagePreview && (
                           <div className="mt-3">
                             <img
-                              src={imagePreview}
+                              src={identificationImagePreview}
                               alt="Preview"
                               className="w-full h-32 object-cover rounded-lg border shadow-sm"
                             />
@@ -1236,9 +1255,9 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
 
                 {/* Image */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">عکس شناسایی پت</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">عکس های پت</label>
                   
-                  {!selectedImage ? (
+                  {!selectedPetImage ? (
                     <label className="flex items-center justify-between gap-3 w-full border-2 border-dashed border-gray-300 hover:border-[var(--main-color)] rounded-xl p-3 cursor-pointer transition-colors">
                       <div className="flex items-center gap-3">
                         <span className="inline-flex h-10 w-10 items-center justify-center rounded-lg bg-[var(--main-color)]/10 text-[var(--main-color)] text-lg">
@@ -1252,7 +1271,7 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
                       <input
                         type="file"
                         accept="image/*"
-                        onChange={(e) => handleFileSelect(e.target.files?.[0] || null, 'image', setSelectedImage)}
+                        onChange={(e) => handleFileSelect(e.target.files?.[0] || null, 'petImage', setSelectedPetImage, setPetImagePreview)}
                         className="hidden"
                       />
                     </label>
@@ -1264,23 +1283,23 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
                             📷
                           </span>
                           <div className="text-sm">
-                            <div className="font-semibold text-gray-900">{selectedImage.name}</div>
-                            <div className="text-xs text-gray-500">{formatFileSize(selectedImage.size)}</div>
+                            <div className="font-semibold text-gray-900">{selectedPetImage.name}</div>
+                            <div className="text-xs text-gray-500">{formatFileSize(selectedPetImage.size)}</div>
                           </div>
                         </div>
                         <button
                           type="button"
-                          onClick={() => handleFileSelect(null, 'image', setSelectedImage)}
+                          onClick={() => handleFileSelect(null, 'petImage', setSelectedPetImage, setPetImagePreview)}
                           className="text-red-500 hover:text-red-700 transition-colors p-1"
                         >
                           <X size={16} />
                         </button>
                       </div>
                       
-                      {imagePreview && (
+                      {petImagePreview && (
                         <div className="mt-3">
                           <img
-                            src={imagePreview}
+                            src={petImagePreview}
                             alt="Preview"
                             className="w-full h-32 object-cover rounded-lg border shadow-sm"
                           />
