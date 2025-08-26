@@ -85,6 +85,66 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
   const [selectedVideo, setSelectedVideo] = useState<File | null>(null);
   const [selectedCertificatePDF, setSelectedCertificatePDF] = useState<File | null>(null);
   const [selectedInsurancePDF, setSelectedInsurancePDF] = useState<File | null>(null);
+  
+  // File preview URLs
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [videoPreview, setVideoPreview] = useState<string | null>(null);
+
+  // Format file size utility function
+  const formatFileSize = (bytes: number): string => {
+    if (bytes === 0) return '0 Bytes';
+    const k = 1024;
+    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+  };
+
+  // Handle file selection with preview
+  const handleFileSelect = (file: File | null, type: 'image' | 'video' | 'pdf', setter: (file: File | null) => void) => {
+    if (file) {
+      // File size validation
+      const maxSizes = {
+        image: 5 * 1024 * 1024, // 5MB
+        video: 20 * 1024 * 1024, // 20MB
+        pdf: 10 * 1024 * 1024 // 10MB
+      };
+      
+      if (file.size > maxSizes[type]) {
+        const maxSizeMB = maxSizes[type] / (1024 * 1024);
+        showError(`حجم فایل بیش از ${maxSizeMB}MB است`);
+        return;
+      }
+      
+      // File type validation
+      const validTypes = {
+        image: ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'],
+        video: ['video/mp4', 'video/avi', 'video/mov', 'video/wmv', 'video/flv'],
+        pdf: ['application/pdf']
+      };
+      
+      if (!validTypes[type].includes(file.type)) {
+        showError(`نوع فایل نامعتبر است. لطفاً فایل ${type === 'image' ? 'تصویر' : type === 'video' ? 'ویدیو' : 'PDF'} انتخاب کنید`);
+        return;
+      }
+    }
+    
+    setter(file);
+    
+    if (file) {
+      if (type === 'image') {
+        const reader = new FileReader();
+        reader.onload = (e) => setImagePreview(e.target?.result as string);
+        reader.readAsDataURL(file);
+      } else if (type === 'video') {
+        const reader = new FileReader();
+        reader.onload = (e) => setVideoPreview(e.target?.result as string);
+        reader.readAsDataURL(file);
+      }
+    } else {
+      if (type === 'image') setImagePreview(null);
+      if (type === 'video') setVideoPreview(null);
+    }
+  };
 
   // Normalize digits to ASCII for backend compatibility
   const toEnglishDigits = (input: string): string => {
@@ -294,7 +354,7 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
       // Upload files if selected
       if (selectedImage) {
         try {
-          const imgRes = await uploadFile(selectedImage);
+          const imgRes = await uploadFile(selectedImage, false); // Public image
           submitData.imageUrl = imgRes.url;
         } catch (err) {
           console.error("Image upload failed", err);
@@ -306,7 +366,7 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
 
       if (selectedVideo) {
         try {
-          const vidRes = await uploadFile(selectedVideo);
+          const vidRes = await uploadFile(selectedVideo, false); // Public video
           submitData.videoUrl = vidRes.url;
         } catch (err) {
           console.error("Video upload failed", err);
@@ -318,7 +378,7 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
 
       if (selectedCertificatePDF) {
         try {
-          const certRes = await uploadFile(selectedCertificatePDF);
+          const certRes = await uploadFile(selectedCertificatePDF, true); // Private PDF
           submitData.certificatePDF = certRes.url;
         } catch (err) {
           console.error("Certificate PDF upload failed", err);
@@ -330,7 +390,7 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
 
       if (selectedInsurancePDF) {
         try {
-          const insRes = await uploadFile(selectedInsurancePDF);
+          const insRes = await uploadFile(selectedInsurancePDF, true); // Private PDF
           submitData.insurancePDF = insRes.url;
         } catch (err) {
           console.error("Insurance PDF upload failed", err);
@@ -421,21 +481,57 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
                 <div className="space-y-4">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">عکس شناسایی پت</label>
-                    <label className="flex items-center justify-between gap-3 w-full border-2 border-dashed border-gray-300 hover:border-[var(--main-color)] rounded-xl p-3 cursor-pointer transition-colors">
-                      <div className="flex items-center gap-3">
-                        <span className="inline-flex h-10 w-10 items-center justify-center rounded-lg bg-[var(--main-color)]/10 text-[var(--main-color)]">📄</span>
-                        <div className="text-sm text-gray-600">
-                          <div className="font-semibold">انتخاب عکس</div>
-                          <div className="text-xs text-gray-500">حداکثر حجم پیشنهادی 5MB</div>
+                    
+                    {!selectedImage ? (
+                      <label className="flex items-center justify-between gap-3 w-full border-2 border-dashed border-gray-300 hover:border-[var(--main-color)] rounded-xl p-3 cursor-pointer transition-colors">
+                        <div className="flex items-center gap-3">
+                          <span className="inline-flex h-10 w-10 items-center justify-center rounded-lg bg-[var(--main-color)]/10 text-[var(--main-color)] text-lg">
+                            📷
+                          </span>
+                          <div className="text-sm text-gray-600">
+                            <div className="font-semibold">انتخاب عکس</div>
+                            <div className="text-xs text-gray-500">حداکثر حجم پیشنهادی 5MB</div>
+                          </div>
                         </div>
+                        <input
+                          type="file"
+                          accept="image/*"
+                          onChange={(e) => handleFileSelect(e.target.files?.[0] || null, 'image', setSelectedImage)}
+                          className="hidden"
+                        />
+                      </label>
+                    ) : (
+                      <div className="border-2 border-[var(--main-color)]/20 rounded-xl p-3 bg-[var(--main-color)]/5">
+                        <div className="flex items-center justify-between mb-3">
+                          <div className="flex items-center gap-3">
+                            <span className="inline-flex h-10 w-10 items-center justify-center rounded-lg bg-[var(--main-color)]/10 text-[var(--main-color)] text-lg">
+                              📷
+                            </span>
+                            <div className="text-sm">
+                              <div className="font-semibold text-gray-900">{selectedImage.name}</div>
+                              <div className="text-xs text-gray-500">{formatFileSize(selectedImage.size)}</div>
+                            </div>
+                          </div>
+                          <button
+                            type="button"
+                            onClick={() => handleFileSelect(null, 'image', setSelectedImage)}
+                            className="text-red-500 hover:text-red-700 transition-colors p-1"
+                          >
+                            <X size={16} />
+                          </button>
+                        </div>
+                        
+                        {imagePreview && (
+                          <div className="mt-3">
+                            <img
+                              src={imagePreview}
+                              alt="Preview"
+                              className="w-full h-32 object-cover rounded-lg border shadow-sm"
+                            />
+                          </div>
+                        )}
                       </div>
-                      <input
-                        type="file"
-                        accept="image/*"
-                        onChange={(e) => setSelectedImage(e.target.files?.[0] || null)}
-                        className="hidden"
-                      />
-                    </label>
+                    )}
                   </div>
 
                   <div>
@@ -1035,82 +1131,221 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
               <h3 className="text-lg font-semibold text-[var(--main-color)] mb-4">لینک و اسناد دیجیتال</h3>
               <div className="grid grid-cols-1 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">فایلPDFشناسنامه</label>
-                  <label className="flex items-center justify-between gap-3 w-full border-2 border-dashed border-gray-300 hover:border-[var(--main-color)] rounded-xl p-3 cursor-pointer transition-colors">
-                    <div className="flex items-center gap-3">
-                      <span className="inline-flex h-10 w-10 items-center justify-center rounded-lg bg-[var(--main-color)]/10 text-[var(--main-color)]">📄</span>
-                      <div className="text-sm text-gray-600">
-                        <div className="font-semibold">انتخاب فایل PDF</div>
-                        <div className="text-xs text-gray-500">فقط PDF</div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">فایل PDF شناسنامه</label>
+                  
+                  {!selectedCertificatePDF ? (
+                    <label className="flex items-center justify-between gap-3 w-full border-2 border-dashed border-gray-300 hover:border-[var(--main-color)] rounded-xl p-3 cursor-pointer transition-colors">
+                      <div className="flex items-center gap-3">
+                        <span className="inline-flex h-10 w-10 items-center justify-center rounded-lg bg-[var(--main-color)]/10 text-[var(--main-color)] text-lg">
+                          📄
+                        </span>
+                        <div className="text-sm text-gray-600">
+                          <div className="font-semibold">انتخاب فایل PDF</div>
+                          <div className="text-xs text-gray-500">فقط PDF - حداکثر 10MB</div>
+                        </div>
+                      </div>
+                      <input
+                        type="file"
+                        accept="application/pdf"
+                        onChange={(e) => handleFileSelect(e.target.files?.[0] || null, 'pdf', setSelectedCertificatePDF)}
+                        className="hidden"
+                      />
+                    </label>
+                  ) : (
+                    <div className="border-2 border-[var(--main-color)]/20 rounded-xl p-3 bg-[var(--main-color)]/5">
+                      <div className="flex items-center justify-between mb-3">
+                        <div className="flex items-center gap-3">
+                          <span className="inline-flex h-10 w-10 items-center justify-center rounded-lg bg-[var(--main-color)]/10 text-[var(--main-color)] text-lg">
+                            📄
+                          </span>
+                          <div className="text-sm">
+                            <div className="font-semibold text-gray-900">{selectedCertificatePDF.name}</div>
+                            <div className="text-xs text-gray-500">{formatFileSize(selectedCertificatePDF.size)}</div>
+                          </div>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => handleFileSelect(null, 'pdf', setSelectedCertificatePDF)}
+                          className="text-red-500 hover:text-red-700 transition-colors p-1"
+                        >
+                          <X size={16} />
+                        </button>
+                      </div>
+                      
+                      <div className="mt-3">
+                        <div className="flex items-center gap-2 p-3 bg-gray-100 rounded-lg">
+                          <span className="text-lg">📄</span>
+                          <span className="text-sm text-gray-600">فایل PDF شناسنامه انتخاب شده</span>
+                        </div>
                       </div>
                     </div>
-                    <input
-                      type="file"
-                      accept="application/pdf"
-                      onChange={(e) => setSelectedCertificatePDF(e.target.files?.[0] || null)}
-                      className="hidden"
-                    />
-                  </label>
+                  )}
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">فایلPDFبیمه نامه</label>
-                  <label className="flex items-center justify-between gap-3 w-full border-2 border-dashed border-gray-300 hover:border-[var(--main-color)] rounded-xl p-3 cursor-pointer transition-colors">
-                    <div className="flex items-center gap-3">
-                      <span className="inline-flex h-10 w-10 items-center justify-center rounded-lg bg-[var(--main-color)]/10 text-[var(--main-color)]">📄</span>
-                      <div className="text-sm text-gray-600">
-                        <div className="font-semibold">انتخاب فایل PDF</div>
-                        <div className="text-xs text-gray-500">فقط PDF</div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">فایل PDF بیمه نامه</label>
+                  
+                  {!selectedInsurancePDF ? (
+                    <label className="flex items-center justify-between gap-3 w-full border-2 border-dashed border-gray-300 hover:border-[var(--main-color)] rounded-xl p-3 cursor-pointer transition-colors">
+                      <div className="flex items-center gap-3">
+                        <span className="inline-flex h-10 w-10 items-center justify-center rounded-lg bg-[var(--main-color)]/10 text-[var(--main-color)] text-lg">
+                          📄
+                        </span>
+                        <div className="text-sm text-gray-600">
+                          <div className="font-semibold">انتخاب فایل PDF</div>
+                          <div className="text-xs text-gray-500">فقط PDF - حداکثر 10MB</div>
+                        </div>
+                      </div>
+                      <input
+                        type="file"
+                        accept="application/pdf"
+                        onChange={(e) => handleFileSelect(e.target.files?.[0] || null, 'pdf', setSelectedInsurancePDF)}
+                        className="hidden"
+                      />
+                    </label>
+                  ) : (
+                    <div className="border-2 border-[var(--main-color)]/20 rounded-xl p-3 bg-[var(--main-color)]/5">
+                      <div className="flex items-center justify-between mb-3">
+                        <div className="flex items-center gap-3">
+                          <span className="inline-flex h-10 w-10 items-center justify-center rounded-lg bg-[var(--main-color)]/10 text-[var(--main-color)] text-lg">
+                            📄
+                          </span>
+                          <div className="text-sm">
+                            <div className="font-semibold text-gray-900">{selectedInsurancePDF.name}</div>
+                            <div className="text-xs text-gray-500">{formatFileSize(selectedInsurancePDF.size)}</div>
+                          </div>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => handleFileSelect(null, 'pdf', setSelectedInsurancePDF)}
+                          className="text-red-500 hover:text-red-700 transition-colors p-1"
+                        >
+                          <X size={16} />
+                        </button>
+                      </div>
+                      
+                      <div className="mt-3">
+                        <div className="flex items-center gap-2 p-3 bg-gray-100 rounded-lg">
+                          <span className="text-lg">📄</span>
+                          <span className="text-sm text-gray-600">فایل PDF بیمه نامه انتخاب شده</span>
+                        </div>
                       </div>
                     </div>
-                    <input
-                      type="file"
-                      accept="application/pdf"
-                      onChange={(e) => setSelectedInsurancePDF(e.target.files?.[0] || null)}
-                      className="hidden"
-                    />
-                  </label>
+                  )}
                 </div>
 
                 {/* Image */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">عکس شناسایی پت</label>
-                  <label className="flex items-center justify-between gap-3 w-full border-2 border-dashed border-gray-300 hover:border-[var(--main-color)] rounded-xl p-3 cursor-pointer transition-colors">
-                    <div className="flex items-center gap-3">
-                      <span className="inline-flex h-10 w-10 items-center justify-center rounded-lg bg-[var(--main-color)]/10 text-[var(--main-color)]">📄</span>
-                      <div className="text-sm text-gray-600">
-                        <div className="font-semibold">انتخاب عکس</div>
-                        <div className="text-xs text-gray-500">حداکثر حجم پیشنهادی 5MB</div>
+                  
+                  {!selectedImage ? (
+                    <label className="flex items-center justify-between gap-3 w-full border-2 border-dashed border-gray-300 hover:border-[var(--main-color)] rounded-xl p-3 cursor-pointer transition-colors">
+                      <div className="flex items-center gap-3">
+                        <span className="inline-flex h-10 w-10 items-center justify-center rounded-lg bg-[var(--main-color)]/10 text-[var(--main-color)] text-lg">
+                          📷
+                        </span>
+                        <div className="text-sm text-gray-600">
+                          <div className="font-semibold">انتخاب عکس</div>
+                          <div className="text-xs text-gray-500">حداکثر حجم پیشنهادی 5MB</div>
+                        </div>
                       </div>
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={(e) => handleFileSelect(e.target.files?.[0] || null, 'image', setSelectedImage)}
+                        className="hidden"
+                      />
+                    </label>
+                  ) : (
+                    <div className="border-2 border-[var(--main-color)]/20 rounded-xl p-3 bg-[var(--main-color)]/5">
+                      <div className="flex items-center justify-between mb-3">
+                        <div className="flex items-center gap-3">
+                          <span className="inline-flex h-10 w-10 items-center justify-center rounded-lg bg-[var(--main-color)]/10 text-[var(--main-color)] text-lg">
+                            📷
+                          </span>
+                          <div className="text-sm">
+                            <div className="font-semibold text-gray-900">{selectedImage.name}</div>
+                            <div className="text-xs text-gray-500">{formatFileSize(selectedImage.size)}</div>
+                          </div>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => handleFileSelect(null, 'image', setSelectedImage)}
+                          className="text-red-500 hover:text-red-700 transition-colors p-1"
+                        >
+                          <X size={16} />
+                        </button>
+                      </div>
+                      
+                      {imagePreview && (
+                        <div className="mt-3">
+                          <img
+                            src={imagePreview}
+                            alt="Preview"
+                            className="w-full h-32 object-cover rounded-lg border shadow-sm"
+                          />
+                        </div>
+                      )}
                     </div>
-                    <input
-                      type="file"
-                      accept="image/*"
-                      onChange={(e) => setSelectedImage(e.target.files?.[0] || null)}
-                      className="hidden"
-                    />
-                  </label>
+                  )}
                 </div>
 
                 {/* Video */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">ویدئو (ها) پت</label>
-                  <label className="flex items-center justify-between gap-3 w-full border-2 border-dashed border-gray-300 hover:border-[var(--main-color)] rounded-xl p-3 cursor-pointer transition-colors">
-                    <div className="flex items-center gap-3">
-                      <span className="inline-flex h-10 w-10 items-center justify-center rounded-lg bg-[var(--main-color)]/10 text-[var(--main-color)]">🎬</span>
-                      <div className="text-sm text-gray-600">
-                        <div className="font-semibold">انتخاب ویدیو</div>
-                        <div className="text-xs text-gray-500">حداکثر حجم پیشنهادی 20MB</div>
+                  
+                  {!selectedVideo ? (
+                    <label className="flex items-center justify-between gap-3 w-full border-2 border-dashed border-gray-300 hover:border-[var(--main-color)] rounded-xl p-3 cursor-pointer transition-colors">
+                      <div className="flex items-center gap-3">
+                        <span className="inline-flex h-10 w-10 items-center justify-center rounded-lg bg-[var(--main-color)]/10 text-[var(--main-color)] text-lg">
+                          🎬
+                        </span>
+                        <div className="text-sm text-gray-600">
+                          <div className="font-semibold">انتخاب ویدیو</div>
+                          <div className="text-xs text-gray-500">حداکثر حجم پیشنهادی 20MB</div>
+                        </div>
                       </div>
+                      <input
+                        type="file"
+                        accept="video/*"
+                        onChange={(e) => handleFileSelect(e.target.files?.[0] || null, 'video', setSelectedVideo)}
+                        className="hidden"
+                      />
+                    </label>
+                  ) : (
+                    <div className="border-2 border-[var(--main-color)]/20 rounded-xl p-3 bg-[var(--main-color)]/5">
+                      <div className="flex items-center justify-between mb-3">
+                        <div className="flex items-center gap-3">
+                          <span className="inline-flex h-10 w-10 items-center justify-center rounded-lg bg-[var(--main-color)]/10 text-[var(--main-color)] text-lg">
+                            🎬
+                          </span>
+                          <div className="text-sm">
+                            <div className="font-semibold text-gray-900">{selectedVideo.name}</div>
+                            <div className="text-xs text-gray-500">{formatFileSize(selectedVideo.size)}</div>
+                          </div>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => handleFileSelect(null, 'video', setSelectedVideo)}
+                          className="text-red-500 hover:text-red-700 transition-colors p-1"
+                        >
+                          <X size={16} />
+                        </button>
+                      </div>
+                      
+                      {videoPreview && (
+                        <div className="mt-3">
+                          <video
+                            src={videoPreview}
+                            className="w-full h-32 object-cover rounded-lg border shadow-sm"
+                            controls
+                          />
+                        </div>
+                      )}
                     </div>
-                    <input
-                      type="file"
-                      accept="video/*"
-                      onChange={(e) => setSelectedVideo(e.target.files?.[0] || null)}
-                      className="hidden"
-                    />
-                  </label>
+                  )}
                 </div>
+
               </div>
             </div>
 
