@@ -82,15 +82,15 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
   const { showError, showSuccess } = useSnackbar();
   const [formSearch, setFormSearch] = useState("");
   const [selectedIdentificationImage, setSelectedIdentificationImage] = useState<File | null>(null);
-  const [selectedPetImage, setSelectedPetImage] = useState<File | null>(null);
-  const [selectedVideo, setSelectedVideo] = useState<File | null>(null);
+  const [selectedPetImages, setSelectedPetImages] = useState<File[]>([]);
+  const [selectedVideos, setSelectedVideos] = useState<File[]>([]);
   const [selectedCertificatePDF, setSelectedCertificatePDF] = useState<File | null>(null);
   const [selectedInsurancePDF, setSelectedInsurancePDF] = useState<File | null>(null);
   
   // File preview URLs
   const [identificationImagePreview, setIdentificationImagePreview] = useState<string | null>(null);
-  const [petImagePreview, setPetImagePreview] = useState<string | null>(null);
-  const [videoPreview, setVideoPreview] = useState<string | null>(null);
+  const [petImagePreviews, setPetImagePreviews] = useState<string[]>([]);
+  const [videoPreviews, setVideoPreviews] = useState<string[]>([]);
 
   // Format file size utility function
   const formatFileSize = (bytes: number): string => {
@@ -141,15 +141,85 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
         reader.readAsDataURL(file);
       } else if (type === 'video') {
         const reader = new FileReader();
-        reader.onload = (e) => setVideoPreview(e.target?.result as string);
+        reader.onload = (e) => setVideoPreviews([e.target?.result as string]);
         reader.readAsDataURL(file);
       }
     } else {
       if (type === 'identificationImage' || type === 'petImage') {
         previewSetter?.(null);
       } else if (type === 'video') {
-        setVideoPreview(null);
+        setVideoPreviews([]);
       }
+    }
+  };
+
+  // Handle multiple file selection for gallery
+  const handleGalleryFileSelect = (files: FileList | null, type: 'petImage' | 'video') => {
+    if (!files || files.length === 0) return;
+
+    const maxSizes = {
+      petImage: 5 * 1024 * 1024, // 5MB
+      video: 20 * 1024 * 1024, // 20MB
+    };
+
+    const validTypes = {
+      petImage: ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'],
+      video: ['video/mp4', 'video/avi', 'video/mov', 'video/wmv', 'video/flv'],
+    };
+
+    const newFiles: File[] = [];
+    const newPreviews: string[] = [];
+
+    for (let i = 0; i < files.length; i++) {
+      const file = files[i];
+      
+      // File size validation
+      if (file.size > maxSizes[type]) {
+        const maxSizeMB = maxSizes[type] / (1024 * 1024);
+        showError(`فایل ${file.name} بیش از ${maxSizeMB}MB است`);
+        continue;
+      }
+      
+      // File type validation
+      if (!validTypes[type].includes(file.type)) {
+        showError(`فایل ${file.name} نوع نامعتبر است`);
+        continue;
+      }
+
+      newFiles.push(file);
+    }
+
+    if (type === 'petImage') {
+      setSelectedPetImages(prev => [...prev, ...newFiles]);
+      // Generate previews for new files
+      newFiles.forEach(file => {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          setPetImagePreviews(prev => [...prev, e.target?.result as string]);
+        };
+        reader.readAsDataURL(file);
+      });
+    } else if (type === 'video') {
+      setSelectedVideos(prev => [...prev, ...newFiles]);
+      // Generate previews for new files
+      newFiles.forEach(file => {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          setVideoPreviews(prev => [...prev, e.target?.result as string]);
+        };
+        reader.readAsDataURL(file);
+      });
+    }
+  };
+
+  // Remove file from gallery
+  const removeFileFromGallery = (index: number, type: 'petImage' | 'video') => {
+    if (type === 'petImage') {
+      setSelectedPetImages(prev => prev.filter((_, i) => i !== index));
+      setPetImagePreviews(prev => prev.filter((_, i) => i !== index));
+    } else if (type === 'video') {
+      setSelectedVideos(prev => prev.filter((_, i) => i !== index));
+      setVideoPreviews(prev => prev.filter((_, i) => i !== index));
     }
   };
 
@@ -371,25 +441,35 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
         }
       }
 
-      if (selectedPetImage) {
+      // Upload multiple pet images
+      if (selectedPetImages.length > 0) {
         try {
-          const imgRes = await uploadFile(selectedPetImage, false); // Public image
-          submitData.imageUrl = imgRes.url;
+          const imageUrls = [];
+          for (const image of selectedPetImages) {
+            const imgRes = await uploadFile(image, false); // Public image
+            imageUrls.push(imgRes.url);
+          }
+          submitData.imageUrls = imageUrls; // Array of image URLs
         } catch (err) {
-          console.error("Pet image upload failed", err);
-          showError("آپلود عکس پت ناموفق بود");
+          console.error("Pet images upload failed", err);
+          showError("آپلود عکس‌های پت ناموفق بود");
           setLoading(false);
           return;
         }
       }
 
-      if (selectedVideo) {
+      // Upload multiple videos
+      if (selectedVideos.length > 0) {
         try {
-          const vidRes = await uploadFile(selectedVideo, false); // Public video
-          submitData.videoUrl = vidRes.url;
+          const videoUrls = [];
+          for (const video of selectedVideos) {
+            const vidRes = await uploadFile(video, false); // Public video
+            videoUrls.push(vidRes.url);
+          }
+          submitData.videoUrls = videoUrls; // Array of video URLs
         } catch (err) {
-          console.error("Video upload failed", err);
-          showError("آپلود ویدیو ناموفق بود");
+          console.error("Videos upload failed", err);
+          showError("آپلود ویدیوها ناموفق بود");
           setLoading(false);
           return;
         }
@@ -1253,114 +1333,124 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
                   )}
                 </div>
 
-                {/* Image */}
+                {/* Pet Images Gallery */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">عکس های پت</label>
                   
-                  {!selectedPetImage ? (
-                    <label className="flex items-center justify-between gap-3 w-full border-2 border-dashed border-gray-300 hover:border-[var(--main-color)] rounded-xl p-3 cursor-pointer transition-colors">
-                      <div className="flex items-center gap-3">
-                        <span className="inline-flex h-10 w-10 items-center justify-center rounded-lg bg-[var(--main-color)]/10 text-[var(--main-color)] text-lg">
-                          📷
-                        </span>
-                        <div className="text-sm text-gray-600">
-                          <div className="font-semibold">انتخاب عکس</div>
-                          <div className="text-xs text-gray-500">حداکثر حجم پیشنهادی 5MB</div>
-                        </div>
+                  {/* Upload Button */}
+                  <label className="flex items-center justify-between gap-3 w-full border-2 border-dashed border-gray-300 hover:border-[var(--main-color)] rounded-xl p-3 cursor-pointer transition-colors mb-4">
+                    <div className="flex items-center gap-3">
+                      <span className="inline-flex h-10 w-10 items-center justify-center rounded-lg bg-[var(--main-color)]/10 text-[var(--main-color)] text-lg">
+                        📷
+                      </span>
+                      <div className="text-sm text-gray-600">
+                        <div className="font-semibold">انتخاب عکس‌ها</div>
+                        <div className="text-xs text-gray-500">می‌توانید چندین عکس انتخاب کنید - حداکثر حجم هر عکس 5MB</div>
                       </div>
-                      <input
-                        type="file"
-                        accept="image/*"
-                        onChange={(e) => handleFileSelect(e.target.files?.[0] || null, 'petImage', setSelectedPetImage, setPetImagePreview)}
-                        className="hidden"
-                      />
-                    </label>
-                  ) : (
-                    <div className="border-2 border-[var(--main-color)]/20 rounded-xl p-3 bg-[var(--main-color)]/5">
-                      <div className="flex items-center justify-between mb-3">
-                        <div className="flex items-center gap-3">
-                          <span className="inline-flex h-10 w-10 items-center justify-center rounded-lg bg-[var(--main-color)]/10 text-[var(--main-color)] text-lg">
-                            📷
-                          </span>
-                          <div className="text-sm">
-                            <div className="font-semibold text-gray-900">{selectedPetImage.name}</div>
-                            <div className="text-xs text-gray-500">{formatFileSize(selectedPetImage.size)}</div>
+                    </div>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      multiple
+                      onChange={(e) => handleGalleryFileSelect(e.target.files, 'petImage')}
+                      className="hidden"
+                    />
+                  </label>
+
+                  {/* Gallery Display */}
+                  {selectedPetImages.length > 0 && (
+                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                      {selectedPetImages.map((file, index) => (
+                        <div key={index} className="relative border-2 border-[var(--main-color)]/20 rounded-xl p-3 bg-[var(--main-color)]/5">
+                          <div className="flex items-center justify-between mb-2">
+                            <div className="text-xs text-gray-600 truncate flex-1">
+                              {file.name}
+                            </div>
+                            <button
+                              type="button"
+                              onClick={() => removeFileFromGallery(index, 'petImage')}
+                              className="text-red-500 hover:text-red-700 transition-colors p-1 ml-2"
+                            >
+                              <X size={14} />
+                            </button>
+                          </div>
+                          
+                          {petImagePreviews[index] && (
+                            <div className="aspect-square">
+                              <img
+                                src={petImagePreviews[index]}
+                                alt={`Preview ${index + 1}`}
+                                className="w-full h-full object-cover rounded-lg border shadow-sm"
+                              />
+                            </div>
+                          )}
+                          
+                          <div className="text-xs text-gray-500 mt-2">
+                            {formatFileSize(file.size)}
                           </div>
                         </div>
-                        <button
-                          type="button"
-                          onClick={() => handleFileSelect(null, 'petImage', setSelectedPetImage, setPetImagePreview)}
-                          className="text-red-500 hover:text-red-700 transition-colors p-1"
-                        >
-                          <X size={16} />
-                        </button>
-                      </div>
-                      
-                      {petImagePreview && (
-                        <div className="mt-3">
-                          <img
-                            src={petImagePreview}
-                            alt="Preview"
-                            className="w-full h-32 object-cover rounded-lg border shadow-sm"
-                          />
-                        </div>
-                      )}
+                      ))}
                     </div>
                   )}
                 </div>
 
-                {/* Video */}
+                {/* Videos Gallery */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">ویدئو (ها) پت</label>
                   
-                  {!selectedVideo ? (
-                    <label className="flex items-center justify-between gap-3 w-full border-2 border-dashed border-gray-300 hover:border-[var(--main-color)] rounded-xl p-3 cursor-pointer transition-colors">
-                      <div className="flex items-center gap-3">
-                        <span className="inline-flex h-10 w-10 items-center justify-center rounded-lg bg-[var(--main-color)]/10 text-[var(--main-color)] text-lg">
-                          🎬
-                        </span>
-                        <div className="text-sm text-gray-600">
-                          <div className="font-semibold">انتخاب ویدیو</div>
-                          <div className="text-xs text-gray-500">حداکثر حجم پیشنهادی 20MB</div>
-                        </div>
+                  {/* Upload Button */}
+                  <label className="flex items-center justify-between gap-3 w-full border-2 border-dashed border-gray-300 hover:border-[var(--main-color)] rounded-xl p-3 cursor-pointer transition-colors mb-4">
+                    <div className="flex items-center gap-3">
+                      <span className="inline-flex h-10 w-10 items-center justify-center rounded-lg bg-[var(--main-color)]/10 text-[var(--main-color)] text-lg">
+                        🎬
+                      </span>
+                      <div className="text-sm text-gray-600">
+                        <div className="font-semibold">انتخاب ویدیوها</div>
+                        <div className="text-xs text-gray-500">می‌توانید چندین ویدیو انتخاب کنید - حداکثر حجم هر ویدیو 20MB</div>
                       </div>
-                      <input
-                        type="file"
-                        accept="video/*"
-                        onChange={(e) => handleFileSelect(e.target.files?.[0] || null, 'video', setSelectedVideo)}
-                        className="hidden"
-                      />
-                    </label>
-                  ) : (
-                    <div className="border-2 border-[var(--main-color)]/20 rounded-xl p-3 bg-[var(--main-color)]/5">
-                      <div className="flex items-center justify-between mb-3">
-                        <div className="flex items-center gap-3">
-                          <span className="inline-flex h-10 w-10 items-center justify-center rounded-lg bg-[var(--main-color)]/10 text-[var(--main-color)] text-lg">
-                            🎬
-                          </span>
-                          <div className="text-sm">
-                            <div className="font-semibold text-gray-900">{selectedVideo.name}</div>
-                            <div className="text-xs text-gray-500">{formatFileSize(selectedVideo.size)}</div>
+                    </div>
+                    <input
+                      type="file"
+                      accept="video/*"
+                      multiple
+                      onChange={(e) => handleGalleryFileSelect(e.target.files, 'video')}
+                      className="hidden"
+                    />
+                  </label>
+
+                  {/* Gallery Display */}
+                  {selectedVideos.length > 0 && (
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      {selectedVideos.map((file, index) => (
+                        <div key={index} className="relative border-2 border-[var(--main-color)]/20 rounded-xl p-3 bg-[var(--main-color)]/5">
+                          <div className="flex items-center justify-between mb-2">
+                            <div className="text-xs text-gray-600 truncate flex-1">
+                              {file.name}
+                            </div>
+                            <button
+                              type="button"
+                              onClick={() => removeFileFromGallery(index, 'video')}
+                              className="text-red-500 hover:text-red-700 transition-colors p-1 ml-2"
+                            >
+                              <X size={14} />
+                            </button>
+                          </div>
+                          
+                          {videoPreviews[index] && (
+                            <div className="aspect-video">
+                              <video
+                                src={videoPreviews[index]}
+                                className="w-full h-full object-cover rounded-lg border shadow-sm"
+                                controls
+                              />
+                            </div>
+                          )}
+                          
+                          <div className="text-xs text-gray-500 mt-2">
+                            {formatFileSize(file.size)}
                           </div>
                         </div>
-                        <button
-                          type="button"
-                          onClick={() => handleFileSelect(null, 'video', setSelectedVideo)}
-                          className="text-red-500 hover:text-red-700 transition-colors p-1"
-                        >
-                          <X size={16} />
-                        </button>
-                      </div>
-                      
-                      {videoPreview && (
-                        <div className="mt-3">
-                          <video
-                            src={videoPreview}
-                            className="w-full h-32 object-cover rounded-lg border shadow-sm"
-                            controls
-                          />
-                        </div>
-                      )}
+                      ))}
                     </div>
                   )}
                 </div>
