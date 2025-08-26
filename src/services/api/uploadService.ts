@@ -1,11 +1,11 @@
 /**
  * File Upload Service
  * 
- * This service handles file uploads to the API with proper authentication.
+ * This service handles file uploads to the external provider with proper authentication.
  * 
  * API Endpoints:
- * - POST /api/v1/file-manager/first-upload - Upload a file
- * - GET /api/v1/file-manager/preview/{fileId} - Get file preview
+ * - POST https://provider.exmodules.org/api/v1/file-manager/first-upload - Upload a file
+ * - GET https://provider.exmodules.org/api/v1/file-manager/preview/{fileId} - Get file preview
  * 
  * Authentication:
  * - All requests include Bearer token from localStorage
@@ -49,7 +49,7 @@ export const uploadFile = async (file: File, isPrivate: boolean = false): Promis
   formData.append('isPrivate', isPrivate.toString());
 
   try {
-    const response = await api.post<UploadResponse>('/file-manager/first-upload', formData, {
+    const response = await api.post<UploadResponse>('https://provider.exmodules.org/api/v1/file-manager/first-upload', formData, {
       headers: { 
         'Content-Type': 'multipart/form-data',
       },
@@ -71,7 +71,7 @@ export const getFilePreview = async (fileId: string): Promise<FilePreviewRespons
   }
 
   try {
-    const response = await api.get<FilePreviewResponse>(`/file-manager/preview/${fileId}`);
+    const response = await api.get<FilePreviewResponse>(`https://provider.exmodules.org/api/v1/file-manager/preview/${fileId}`);
     return response.data;
   } catch (error: any) {
     console.error('File preview error:', error);
