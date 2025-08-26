@@ -17,6 +17,7 @@
  */
 
 import api from './api';
+import { getToken } from './auth';
 
 export interface UploadResponse {
   url: string;
@@ -32,7 +33,9 @@ export interface FilePreviewResponse {
   mimeType: string;
 }
 
-export const uploadFile = async (file: File, isPrivate: boolean = false): Promise<UploadResponse> => {
+export const uploadFile = async (file: File, isPrivate: boolean = false, retryCount: number = 0): Promise<UploadResponse> => {
+  const maxRetries = 2;
+  
   // Validate file
   if (!file) {
     throw new Error('File is required');
@@ -44,24 +47,106 @@ export const uploadFile = async (file: File, isPrivate: boolean = false): Promis
     throw new Error('File size exceeds 10MB limit');
   }
 
+  // Get authentication token
+  const token = getToken();
+  if (!token) {
+    throw new Error('Authentication token not found. Please login again.');
+  }
+
   const formData = new FormData();
   formData.append('file', file);
   formData.append('isPrivate', isPrivate.toString());
+
+  // Log detailed request information
+  console.log(`🚀 Starting file upload (attempt ${retryCount + 1}/${maxRetries + 1}) with details:`, {
+    fileName: file.name,
+    fileSize: file.size,
+    fileType: file.type,
+    isPrivate,
+    hasToken: !!token,
+    tokenLength: token.length,
+    tokenPreview: token.substring(0, 20) + '...',
+    uploadUrl: 'https://provider.exmodules.org/api/v1/file-manager/first-upload',
+    timestamp: new Date().toISOString()
+  });
 
   try {
     const response = await api.post<UploadResponse>('https://provider.exmodules.org/api/v1/file-manager/first-upload', formData, {
       headers: { 
         'Content-Type': 'multipart/form-data',
+        'Authorization': `Bearer ${token}`,
+      },
+      timeout: 60000, // 60 seconds timeout for file uploads
+      onUploadProgress: (progressEvent) => {
+        if (progressEvent.total) {
+          const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);
+          console.log(`📤 Upload progress: ${percentCompleted}% (${progressEvent.loaded}/${progressEvent.total} bytes)`);
+        }
       },
     });
 
+    console.log('✅ Upload successful:', {
+      response: response.data,
+      status: response.status,
+      headers: response.headers,
+      timestamp: new Date().toISOString()
+    });
+    
     return response.data;
   } catch (error: any) {
-    console.error('File upload error:', error);
+    console.error(`❌ File upload error (attempt ${retryCount + 1}):`, {
+      error,
+      errorCode: error.code,
+      errorMessage: error.message,
+      errorResponse: error.response,
+      errorRequest: error.request,
+      timestamp: new Date().toISOString()
+    });
+    
+    // Handle different types of errors
+    if (error.code === 'ERR_CANCELED' || error.message?.includes('canceled')) {
+      console.log('🛑 Upload request was canceled by user or network');
+      throw new Error('Upload was canceled');
+    }
+    
+    if (error.code === 'ECONNABORTED' || error.message?.includes('timeout')) {
+      console.log('⏰ Upload request timed out');
+      if (retryCount < maxRetries) {
+        console.log(`🔄 Retrying upload (${retryCount + 1}/${maxRetries})...`);
+        // Wait a bit before retrying
+        await new Promise(resolve => setTimeout(resolve, 1000 * (retryCount + 1)));
+        return uploadFile(file, isPrivate, retryCount + 1);
+      }
+      throw new Error('Upload timed out after multiple attempts. Please try again.');
+    }
+    
+    if (error.response?.status === 401) {
+      console.log('🔒 Upload failed: Unauthorized - token may be invalid');
+      throw new Error('Authentication failed. Please login again.');
+    }
+    
+    if (error.response?.status === 413) {
+      console.log('📏 Upload failed: File too large');
+      throw new Error('File is too large. Please choose a smaller file.');
+    }
+    
     if (error.response?.data?.message) {
       throw new Error(error.response.data.message);
     }
-    throw new Error('Failed to upload file');
+    
+    // Network errors - retry if possible
+    if ((error.code === 'ERR_NETWORK' || error.message?.includes('Network Error')) && retryCount < maxRetries) {
+      console.log(`🔄 Network error, retrying upload (${retryCount + 1}/${maxRetries})...`);
+      // Wait a bit before retrying
+      await new Promise(resolve => setTimeout(resolve, 1000 * (retryCount + 1)));
+      return uploadFile(file, isPrivate, retryCount + 1);
+    }
+    
+    if (error.code === 'ERR_NETWORK' || error.message?.includes('Network Error')) {
+      throw new Error('Network error. Please check your internet connection and try again.');
+    }
+    
+    throw new Error('Failed to upload file. Please try again.');
   }
 };
 
@@ -70,11 +155,27 @@ export const getFilePreview = async (fileId: string): Promise<FilePreviewRespons
     throw new Error('File ID is required');
   }
 
+  // Get authentication token
+  const token = getToken();
+  if (!token) {
+    throw new Error('Authentication token not found. Please login again.');
+  }
+
   try {
-    const response = await api.get<FilePreviewResponse>(`https://provider.exmodules.org/api/v1/file-manager/preview/${fileId}`);
+    const response = await api.get<FilePreviewResponse>(`https://provider.exmodules.org/api/v1/file-manager/preview/${fileId}`, {
+      headers: {
+        'Authorization': `Bearer ${token}`,
+      },
+      timeout: 30000, // 30 seconds timeout
+    });
     return response.data;
   } catch (error: any) {
     console.error('File preview error:', error);
+    
+    if (error.response?.status === 401) {
+      throw new Error('Authentication failed. Please login again.');
+    }
+    
     if (error.response?.data?.message) {
       throw new Error(error.response.data.message);
     }

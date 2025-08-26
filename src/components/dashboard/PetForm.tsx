@@ -364,6 +364,12 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // Prevent multiple submissions
+    if (loading) {
+      return;
+    }
+    
     setLoading(true);
 
     try {
@@ -431,11 +437,40 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
       // Upload files if selected
       if (selectedIdentificationImage) {
         try {
+          console.log("Starting identification image upload...");
           const imgRes = await uploadFile(selectedIdentificationImage, false); // Public image
+          console.log("Identification image upload successful:", imgRes);
           submitData.identificationImageUrl = imgRes.url;
         } catch (err) {
           console.error("Identification image upload failed", err);
-          showError("آپلود عکس شناسایی ناموفق بود");
+          if (err instanceof Error) {
+            if (err.message === 'Upload was canceled') {
+              console.log("Upload was canceled by user");
+              setLoading(false);
+              return;
+            }
+            if (err.message.includes('Authentication failed')) {
+              showError("خطا در احراز هویت. لطفاً دوباره وارد شوید");
+              setLoading(false);
+              return;
+            }
+            if (err.message.includes('timed out')) {
+              showError("آپلود فایل زمان بر بود. لطفاً دوباره تلاش کنید");
+              setLoading(false);
+              return;
+            }
+            if (err.message.includes('File too large')) {
+              showError("حجم فایل بیش از حد مجاز است");
+              setLoading(false);
+              return;
+            }
+            if (err.message.includes('Network error')) {
+              showError("خطا در شبکه. لطفاً اتصال اینترنت خود را بررسی کنید");
+              setLoading(false);
+              return;
+            }
+          }
+          showError("آپلود عکس شناسایی ناموفق بود: " + (err instanceof Error ? err.message : 'خطای نامشخص'));
           setLoading(false);
           return;
         }
@@ -444,15 +479,45 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
       // Upload multiple pet images
       if (selectedPetImages.length > 0) {
         try {
+          console.log("Starting pet images upload...");
           const imageUrls = [];
           for (const image of selectedPetImages) {
+            console.log(`Uploading pet image: ${image.name}`);
             const imgRes = await uploadFile(image, false); // Public image
             imageUrls.push(imgRes.url);
           }
+          console.log("All pet images uploaded successfully:", imageUrls);
           submitData.imageUrls = imageUrls; // Array of image URLs
         } catch (err) {
           console.error("Pet images upload failed", err);
-          showError("آپلود عکس‌های پت ناموفق بود");
+          if (err instanceof Error) {
+            if (err.message === 'Upload was canceled') {
+              console.log("Pet images upload was canceled by user");
+              setLoading(false);
+              return;
+            }
+            if (err.message.includes('Authentication failed')) {
+              showError("خطا در احراز هویت. لطفاً دوباره وارد شوید");
+              setLoading(false);
+              return;
+            }
+            if (err.message.includes('timed out')) {
+              showError("آپلود عکس‌ها زمان بر بود. لطفاً دوباره تلاش کنید");
+              setLoading(false);
+              return;
+            }
+            if (err.message.includes('File too large')) {
+              showError("حجم یکی از عکس‌ها بیش از حد مجاز است");
+              setLoading(false);
+              return;
+            }
+            if (err.message.includes('Network error')) {
+              showError("خطا در شبکه. لطفاً اتصال اینترنت خود را بررسی کنید");
+              setLoading(false);
+              return;
+            }
+          }
+          showError("آپلود عکس‌های پت ناموفق بود: " + (err instanceof Error ? err.message : 'خطای نامشخص'));
           setLoading(false);
           return;
         }
@@ -461,15 +526,45 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
       // Upload multiple videos
       if (selectedVideos.length > 0) {
         try {
+          console.log("Starting videos upload...");
           const videoUrls = [];
           for (const video of selectedVideos) {
+            console.log(`Uploading video: ${video.name}`);
             const vidRes = await uploadFile(video, false); // Public video
             videoUrls.push(vidRes.url);
           }
+          console.log("All videos uploaded successfully:", videoUrls);
           submitData.videoUrls = videoUrls; // Array of video URLs
         } catch (err) {
           console.error("Videos upload failed", err);
-          showError("آپلود ویدیوها ناموفق بود");
+          if (err instanceof Error) {
+            if (err.message === 'Upload was canceled') {
+              console.log("Videos upload was canceled by user");
+              setLoading(false);
+              return;
+            }
+            if (err.message.includes('Authentication failed')) {
+              showError("خطا در احراز هویت. لطفاً دوباره وارد شوید");
+              setLoading(false);
+              return;
+            }
+            if (err.message.includes('timed out')) {
+              showError("آپلود ویدیوها زمان بر بود. لطفاً دوباره تلاش کنید");
+              setLoading(false);
+              return;
+            }
+            if (err.message.includes('File too large')) {
+              showError("حجم یکی از ویدیوها بیش از حد مجاز است");
+              setLoading(false);
+              return;
+            }
+            if (err.message.includes('Network error')) {
+              showError("خطا در شبکه. لطفاً اتصال اینترنت خود را بررسی کنید");
+              setLoading(false);
+              return;
+            }
+          }
+          showError("آپلود ویدیوها ناموفق بود: " + (err instanceof Error ? err.message : 'خطای نامشخص'));
           setLoading(false);
           return;
         }
@@ -477,11 +572,35 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
 
       if (selectedCertificatePDF) {
         try {
+          console.log("Starting certificate PDF upload...");
           const certRes = await uploadFile(selectedCertificatePDF, true); // Private PDF
+          console.log("Certificate PDF upload successful:", certRes);
           submitData.certificatePDF = certRes.url;
         } catch (err) {
           console.error("Certificate PDF upload failed", err);
-          showError("آپلود فایل PDF شناسنامه ناموفق بود");
+          if (err instanceof Error) {
+            if (err.message.includes('Authentication failed')) {
+              showError("خطا در احراز هویت. لطفاً دوباره وارد شوید");
+              setLoading(false);
+              return;
+            }
+            if (err.message.includes('timed out')) {
+              showError("آپلود فایل PDF زمان بر بود. لطفاً دوباره تلاش کنید");
+              setLoading(false);
+              return;
+            }
+            if (err.message.includes('File too large')) {
+              showError("حجم فایل PDF بیش از حد مجاز است");
+              setLoading(false);
+              return;
+            }
+            if (err.message.includes('Network error')) {
+              showError("خطا در شبکه. لطفاً اتصال اینترنت خود را بررسی کنید");
+              setLoading(false);
+              return;
+            }
+          }
+          showError("آپلود فایل PDF شناسنامه ناموفق بود: " + (err instanceof Error ? err.message : 'خطای نامشخص'));
           setLoading(false);
           return;
         }
@@ -489,11 +608,35 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
 
       if (selectedInsurancePDF) {
         try {
+          console.log("Starting insurance PDF upload...");
           const insRes = await uploadFile(selectedInsurancePDF, true); // Private PDF
+          console.log("Insurance PDF upload successful:", insRes);
           submitData.insurancePDF = insRes.url;
         } catch (err) {
           console.error("Insurance PDF upload failed", err);
-          showError("آپلود فایل PDF بیمه نامه ناموفق بود");
+          if (err instanceof Error) {
+            if (err.message.includes('Authentication failed')) {
+              showError("خطا در احراز هویت. لطفاً دوباره وارد شوید");
+              setLoading(false);
+              return;
+            }
+            if (err.message.includes('timed out')) {
+              showError("آپلود فایل PDF بیمه نامه زمان بر بود. لطفاً دوباره تلاش کنید");
+              setLoading(false);
+              return;
+            }
+            if (err.message.includes('File too large')) {
+              showError("حجم فایل PDF بیمه نامه بیش از حد مجاز است");
+              setLoading(false);
+              return;
+            }
+            if (err.message.includes('Network error')) {
+              showError("خطا در شبکه. لطفاً اتصال اینترنت خود را بررسی کنید");
+              setLoading(false);
+              return;
+            }
+          }
+          showError("آپلود فایل PDF بیمه نامه ناموفق بود: " + (err instanceof Error ? err.message : 'خطای نامشخص'));
           setLoading(false);
           return;
         }

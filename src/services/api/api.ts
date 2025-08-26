@@ -41,7 +41,7 @@ const tokenManager = new TokenManager();
 
 const api = axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_BASE_URL || 'https://auth.exmodules.org/api/v1/',
-  timeout: 10000,
+  timeout: 30000, // Increased timeout to 30 seconds
   headers: {
     'Content-Type': 'application/json',
   },
