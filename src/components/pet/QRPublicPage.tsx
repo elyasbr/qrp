@@ -74,9 +74,9 @@ export default function QRPublicPage({ pet, isLoading, error }: QRPublicPageProp
                 <span className="text-gray-500">تصویر پت</span>
                 <div className="flex justify-start mb-4">
                   <div className="w-32 h-32 rounded-xl overflow-hidden border-4 border-[var(--main-color)]/20 shadow-lg">
-                    {files.photoPet ? (
+                    {pet.photoPet ? (
                       <img
-                        src={files.photoPet.url}
+                        src={`https://provider.exmodules.org/api/v1/file-manager/preview/${pet.photoPet}`}
                         alt={pet.namePet}
                         className="w-full h-full object-cover"
                       />
@@ -191,7 +191,7 @@ export default function QRPublicPage({ pet, isLoading, error }: QRPublicPageProp
             {/* Section 6: Digital Documents */}
             <div className="bg-white rounded-lg ring-1 ring-gray-200 p-4">
               <h3 className="text-md font-bold text-[var(--main-color)] mb-3">اسناد دیجیتال</h3>
-              
+
               {filesLoading && (
                 <div className="text-center py-4">
                   <div className="inline-block animate-spin rounded-full h-6 w-6 border-b-2 border-[var(--main-color)]"></div>
