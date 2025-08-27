@@ -37,19 +37,13 @@ function PetViewModal({ pet, onClose }: { pet: Pet; onClose: () => void }) {
                   <span className="text-gray-500">تصویر پت</span>
                   <div className="flex justify-start mb-4">
                     <div className="w-32 h-32 rounded-xl overflow-hidden border-4 border-[var(--main-color)]/20 shadow-lg">
-                      {files.photoPet ? (
-                        <img
-                          src={files.photoPet.url}
-                          alt={pet.namePet}
-                          className="w-full h-full object-cover"
-                        />
-                      ) : (
-                        <img
-                          src="/images/pet.jpg"
-                          alt={pet.namePet}
-                          className="w-full h-full object-cover"
-                        />
-                      )}
+
+                      <img
+                        src={`https://provider.exmodules.org/api/v1/file-manager/preview/${pet.photoPet}`}
+                        alt={pet.namePet}
+                        className="w-full h-full object-cover"
+                      />
+
                     </div>
                   </div>
                   <span className="text-gray-500">شماره بیمه</span><span className="text-gray-900">{pet.insuranceNumber || "تعیین نشده"}</span>
@@ -150,7 +144,7 @@ function PetViewModal({ pet, onClose }: { pet: Pet; onClose: () => void }) {
               {/* Digital Documents */}
               <div className="bg-white rounded-lg ring-1 ring-gray-200 p-4">
                 <h3 className="text-md font-bold text-[var(--main-color)] mb-3">اسناد دیجیتال</h3>
-                
+
                 {filesLoading && (
                   <div className="text-center py-4">
                     <div className="inline-block animate-spin rounded-full h-6 w-6 border-b-2 border-[var(--main-color)]"></div>
@@ -164,117 +158,109 @@ function PetViewModal({ pet, onClose }: { pet: Pet; onClose: () => void }) {
                   </div>
                 )}
 
-                {!filesLoading && !filesError && (
-                  <div className="space-y-4">
-                    {/* PDF Documents */}
-                    <div className="space-y-2">
-                      {files.certificatePdf && (
-                        <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                          <div className="flex items-center gap-3">
-                            <FileText className="text-[var(--main-color)]" size={20} />
-                            <div>
-                              <p className="font-medium text-gray-900">شناسنامه پت</p>
-                              <p className="text-sm text-gray-500">{files.certificatePdf.fileName}</p>
-                            </div>
-                          </div>
-                          <a
-                            href={files.certificatePdf.url}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="flex items-center gap-1 text-[var(--main-color)] hover:text-[var(--main-color-dark)] transition-colors"
-                          >
-                            <Download size={16} />
-                            <span className="text-sm">دانلود</span>
-                          </a>
-                        </div>
-                      )}
 
-                      {files.insurancePdf && (
-                        <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                          <div className="flex items-center gap-3">
-                            <FileText className="text-[var(--main-color)]" size={20} />
-                            <div>
-                              <p className="font-medium text-gray-900">بیمه نامه</p>
-                              <p className="text-sm text-gray-500">{files.insurancePdf.fileName}</p>
-                            </div>
+                <div className="space-y-4">
+                  {/* PDF Documents */}
+                  <div className="space-y-2">
+                    {pet?.certificatePdfPet && (
+                      <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                        <div className="flex items-center gap-3">
+                          <FileText className="text-[var(--main-color)]" size={20} />
+                          <div>
+                            <p className="font-medium text-gray-900">شناسنامه پت</p>
+                            <p className="text-sm text-gray-500">{pet?.certificatePdfPet}</p>
                           </div>
-                          <a
-                            href={files.insurancePdf.url}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="flex items-center gap-1 text-[var(--main-color)] hover:text-[var(--main-color-dark)] transition-colors"
-                          >
-                            <Download size={16} />
-                            <span className="text-sm">دانلود</span>
-                          </a>
                         </div>
-                      )}
-                    </div>
-
-                    {/* Gallery Photos */}
-                    {files.galleryPhoto.length > 0 && (
-                      <div>
-                        <h4 className="font-medium text-gray-900 mb-3 flex items-center gap-2">
-                          <ImageIcon className="text-[var(--main-color)]" size={18} />
-                          گالری عکس‌ها
-                        </h4>
-                        <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-                          {files.galleryPhoto.map((photo, index) => (
-                            <div key={index} className="relative group">
-                              <img
-                                src={photo.url}
-                                alt={`عکس ${index + 1}`}
-                                className="w-full h-24 object-cover rounded-lg border shadow-sm"
-                              />
-                              <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors rounded-lg flex items-center justify-center">
-                                <a
-                                  href={photo.url}
-                                  target="_blank"
-                                  rel="noopener noreferrer"
-                                  className="opacity-0 group-hover:opacity-100 transition-opacity bg-white/90 rounded-full p-2"
-                                >
-                                  <ImageIcon size={16} className="text-gray-700" />
-                                </a>
-                              </div>
-                            </div>
-                          ))}
-                        </div>
+                        <a
+                          href={`https://provider.exmodules.org/api/v1/file-manager/preview/${pet?.certificatePdfPet}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="flex items-center gap-1 text-[var(--main-color)] hover:text-[var(--main-color-dark)] transition-colors"
+                        >
+                          <Download size={16} />
+                          <span className="text-sm">دانلود</span>
+                        </a>
                       </div>
                     )}
 
-                    {/* Gallery Videos */}
-                    {files.galleryVideo.length > 0 && (
-                      <div>
-                        <h4 className="font-medium text-gray-900 mb-3 flex items-center gap-2">
-                          <Video className="text-[var(--main-color)]" size={18} />
-                          گالری ویدیوها
-                        </h4>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                          {files.galleryVideo.map((video, index) => (
-                            <div key={index} className="relative group">
-                              <video
-                                src={video.url}
-                                className="w-full h-32 object-cover rounded-lg border shadow-sm"
-                                controls
-                              />
-                              <div className="absolute top-2 right-2 bg-black/70 text-white text-xs px-2 py-1 rounded">
-                                {video.fileName}
-                              </div>
-                            </div>
-                          ))}
+                    {files.insurancePdf && (
+                      <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                        <div className="flex items-center gap-3">
+                          <FileText className="text-[var(--main-color)]" size={20} />
+                          <div>
+                            <p className="font-medium text-gray-900">بیمه نامه</p>
+                            <p className="text-sm text-gray-500">{files.insurancePdf.fileName}</p>
+                          </div>
                         </div>
-                      </div>
-                    )}
-
-                    {/* No files message */}
-                    {!files.certificatePdf && !files.insurancePdf && files.galleryPhoto.length === 0 && files.galleryVideo.length === 0 && (
-                      <div className="text-center py-6 text-gray-500">
-                        <FileText size={32} className="mx-auto mb-2 text-gray-300" />
-                        <p>هیچ سند دیجیتالی موجود نیست</p>
+                        <a
+                          href={files.insurancePdf.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="flex items-center gap-1 text-[var(--main-color)] hover:text-[var(--main-color-dark)] transition-colors"
+                        >
+                          <Download size={16} />
+                          <span className="text-sm">دانلود</span>
+                        </a>
                       </div>
                     )}
                   </div>
-                )}
+
+                  {/* Gallery Photos */}
+                  {(pet?.galleriesPhoto?.length || 0) > 0 && (
+                    <div>
+                      <h4 className="font-medium text-gray-900 mb-3 flex items-center gap-2">
+                        <ImageIcon className="text-[var(--main-color)]" size={18} />
+                        گالری عکس‌ها
+                      </h4>
+                      <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                        {pet?.galleriesPhoto?.map((photo, index) => {
+                          return (<div key={index} className="relative group">
+                            <img src={`https://provider.exmodules.org/api/v1/file-manager/preview/${photo}`} alt={`عکس ${index + 1}`} className="w-full h-24 object-cover rounded-lg border shadow-sm" />
+                            <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors rounded-lg flex items-center justify-center">
+                              <a href={photo} target="_blank" rel="noopener noreferrer" className="opacity-0 group-hover:opacity-100 transition-opacity bg-white/90 rounded-full p-2">
+                                <ImageIcon size={16} className="text-gray-700" />
+                              </a>
+                            </div>
+                          </div>);
+                        })}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Gallery Videos */}
+                  {(pet?.galleriesVideo?.length ?? 0) > 0 && (
+                    <div>
+                      <h4 className="font-medium text-gray-900 mb-3 flex items-center gap-2">
+                        <Video className="text-[var(--main-color)]" size={18} />
+                        گالری ویدیوها
+                      </h4>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                        {pet?.galleriesVideo?.map((video, index) => (
+                          <div key={index} className="relative group">
+                            <video
+
+                              src={`https://provider.exmodules.org/api/v1/file-manager/preview/${video}`}
+                              className="w-full h-32 object-cover rounded-lg border shadow-sm"
+                              controls
+                            />
+                            <div className="absolute top-2 right-2 bg-black/70 text-white text-xs px-2 py-1 rounded">
+                              {video}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* No files message */}
+                  {!files.certificatePdf && !files.insurancePdf && files.galleryPhoto.length === 0 && files.galleryVideo.length === 0 && (
+                    <div className="text-center py-6 text-gray-500">
+                      <FileText size={32} className="mx-auto mb-2 text-gray-300" />
+                      <p>هیچ سند دیجیتالی موجود نیست</p>
+                    </div>
+                  )}
+                </div>
+
               </div>
             </div>
           </div>
@@ -289,273 +275,273 @@ function PetViewModal({ pet, onClose }: { pet: Pet; onClose: () => void }) {
 }
 
 export default function PetList() {
-    const [pets, setPets] = useState<Pet[]>([]);
-    const [loading, setLoading] = useState(true);
-    const [searchTerm, setSearchTerm] = useState("");
-    const [showForm, setShowForm] = useState(false);
-    const [editingPet, setEditingPet] = useState<Pet | null>(null);
-    const [viewingPet, setViewingPet] = useState<Pet | null>(null);
-    const loadingRef = useRef(false);
-    const [deleteModalOpen, setDeleteModalOpen] = useState(false);
-    const [petToDelete, setPetToDelete] = useState<Pet | null>(null);
-    const [qrModalOpen, setQrModalOpen] = useState(false);
-    const [selectedPetForQR, setSelectedPetForQR] = useState<Pet | null>(null);
+  const [pets, setPets] = useState<Pet[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [showForm, setShowForm] = useState(false);
+  const [editingPet, setEditingPet] = useState<Pet | null>(null);
+  const [viewingPet, setViewingPet] = useState<Pet | null>(null);
+  const loadingRef = useRef(false);
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [petToDelete, setPetToDelete] = useState<Pet | null>(null);
+  const [qrModalOpen, setQrModalOpen] = useState(false);
+  const [selectedPetForQR, setSelectedPetForQR] = useState<Pet | null>(null);
 
-    const { showError, showSuccess, snackbar, hideSnackbar } = useSnackbar();
+  const { showError, showSuccess, snackbar, hideSnackbar } = useSnackbar();
 
-    // Load pets on component mount
-    useEffect(() => {
-        loadPets();
-    }, []);
+  // Load pets on component mount
+  useEffect(() => {
+    loadPets();
+  }, []);
 
-    const loadPets = async () => {
-        if (loadingRef.current) return;
-        loadingRef.current = true;
-        try {
-            setLoading(true);
-            const petsData = await getAllPets();
-            setPets(petsData);
-        } catch (error: any) {
-            showError("خطا در بارگذاری لیست پت ");
-        } finally {
-            setLoading(false);
-            loadingRef.current = false;
-        }
-    };
-
-    const handleDelete = async (petId: string) => {
-        setDeleteModalOpen(false);
-        setPetToDelete(null);
-        try {
-            await deletePet(petId);
-            showSuccess("پت با موفقیت حذف شد");
-            loadPets(); // Reload the list
-        } catch (error: any) {
-            showError("خطا در حذف پت: " + error.message);
-        }
-    };
-
-    const handleEdit = (pet: Pet) => {
-        setEditingPet(pet);
-        setShowForm(true);
-    };
-
-    const handleView = async (pet: Pet) => {
-        try {
-            const latestPet = await getPetById(pet.petId || "");
-            setViewingPet(latestPet);
-        } catch (error: any) {
-            showError("خطا در دریافت اطلاعات پت: " + (error.message || "خطای نامشخص"));
-        }
-    };
-
-    const handleFormClose = () => {
-        setShowForm(false);
-        setEditingPet(null);
-        setViewingPet(null);
-    };
-
-    const handleQRCode = (pet: Pet) => {
-        setSelectedPetForQR(pet);
-        setQrModalOpen(true);
-        showSuccess(`QR Code برای ${pet.namePet} آماده شد`);
-    };
-
-    const handleQRModalClose = () => {
-        setQrModalOpen(false);
-        setSelectedPetForQR(null);
-    };
-
-    const handleFormSuccess = () => {
-        showSuccess(editingPet ? "پت با موفقیت ویرایش شد" : "پت با موفقیت اضافه شد");
-        handleFormClose();
-        loadPets();
-    };
-
-    // Filter and search pets
-    const filteredPets = pets.filter(pet => {
-        const matchesSearch = pet.namePet.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            pet.typePet.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            pet.colorPet.toLowerCase().includes(searchTerm.toLowerCase());
-
-        return matchesSearch;
-    });
-
-    if (loading) {
-        return (
-            <div className="flex items-center justify-center min-h-screen">
-                <div className="flex flex-col items-center gap-3">
-                    <div className="relative h-16 w-16">
-                        <div className="absolute inset-0 rounded-full border-4 border-[var(--main-color)]/20"></div>
-                        <div className="absolute inset-0 rounded-full border-4 border-transparent border-t-[var(--main-color)] animate-spin"></div>
-                    </div>
-                    <div className="text-[var(--main-color)] font-semibold">در حال بارگذاری...</div>
-                </div>
-            </div>
-        );
+  const loadPets = async () => {
+    if (loadingRef.current) return;
+    loadingRef.current = true;
+    try {
+      setLoading(true);
+      const petsData = await getAllPets();
+      setPets(petsData);
+    } catch (error: any) {
+      showError("خطا در بارگذاری لیست پت ");
+    } finally {
+      setLoading(false);
+      loadingRef.current = false;
     }
+  };
 
+  const handleDelete = async (petId: string) => {
+    setDeleteModalOpen(false);
+    setPetToDelete(null);
+    try {
+      await deletePet(petId);
+      showSuccess("پت با موفقیت حذف شد");
+      loadPets(); // Reload the list
+    } catch (error: any) {
+      showError("خطا در حذف پت: " + error.message);
+    }
+  };
+
+  const handleEdit = (pet: Pet) => {
+    setEditingPet(pet);
+    setShowForm(true);
+  };
+
+  const handleView = async (pet: Pet) => {
+    try {
+      const latestPet = await getPetById(pet.petId || "");
+      setViewingPet(latestPet);
+    } catch (error: any) {
+      showError("خطا در دریافت اطلاعات پت: " + (error.message || "خطای نامشخص"));
+    }
+  };
+
+  const handleFormClose = () => {
+    setShowForm(false);
+    setEditingPet(null);
+    setViewingPet(null);
+  };
+
+  const handleQRCode = (pet: Pet) => {
+    setSelectedPetForQR(pet);
+    setQrModalOpen(true);
+    showSuccess(`QR Code برای ${pet.namePet} آماده شد`);
+  };
+
+  const handleQRModalClose = () => {
+    setQrModalOpen(false);
+    setSelectedPetForQR(null);
+  };
+
+  const handleFormSuccess = () => {
+    showSuccess(editingPet ? "پت با موفقیت ویرایش شد" : "پت با موفقیت اضافه شد");
+    handleFormClose();
+    loadPets();
+  };
+
+  // Filter and search pets
+  const filteredPets = pets.filter(pet => {
+    const matchesSearch = pet.namePet.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      pet.typePet.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      pet.colorPet.toLowerCase().includes(searchTerm.toLowerCase());
+
+    return matchesSearch;
+  });
+
+  if (loading) {
     return (
-        <>
-            <div className="p-6 bg-gray-50 min-h-screen mt-14 lg:mt-0">
-                {/* Header */}
-                <div className="mb-6">
-                    <h1 className="text-2xl font-bold text-[var(--main-color)] mb-2">لیست پت</h1>
-                    <p className="text-gray-600">مدیریت و مشاهده پت ثبت شده</p>
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="flex flex-col items-center gap-3">
+          <div className="relative h-16 w-16">
+            <div className="absolute inset-0 rounded-full border-4 border-[var(--main-color)]/20"></div>
+            <div className="absolute inset-0 rounded-full border-4 border-transparent border-t-[var(--main-color)] animate-spin"></div>
+          </div>
+          <div className="text-[var(--main-color)] font-semibold">در حال بارگذاری...</div>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <>
+      <div className="p-6 bg-gray-50 min-h-screen mt-14 lg:mt-0">
+        {/* Header */}
+        <div className="mb-6">
+          <h1 className="text-2xl font-bold text-[var(--main-color)] mb-2">لیست پت</h1>
+          <p className="text-gray-600">مدیریت و مشاهده پت ثبت شده</p>
+        </div>
+
+        {/* Controls */}
+        <div className="bg-white rounded-lg shadow-sm p-4 mb-6">
+          <div className="flex flex-col lg:flex-row gap-4 items-center justify-between">
+            {/* Search */}
+            <div className="hidden lg:flex flex-1 max-w-md">
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
+                <input
+                  type="text"
+                  placeholder="جستجو در پت..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--main-color)] focus:border-transparent"
+                />
+              </div>
+            </div>
+
+            {/* Add Button */}
+            <button
+              onClick={() => setShowForm(true)}
+              className="flex items-center gap-2 bg-[var(--main-color)] hover:bg-[var(--main-color-dark)] text-white px-4 py-2 rounded-lg transition-colors"
+            >
+              <Plus size={20} />
+              افزودن پت جدید
+            </button>
+          </div>
+        </div>
+
+        {/* Pets Grid */}
+        {filteredPets.length === 0 ? (
+          <div className="bg-white rounded-lg shadow-sm p-8 text-center">
+            <div className="text-gray-400 mb-4">
+              <svg className="mx-auto h-12 w-12" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
+              </svg>
+            </div>
+            <h3 className="text-lg font-medium text-gray-900 mb-2">هیچ پت یافت نشد</h3>
+            <p className="text-gray-500 mb-4">
+              {searchTerm
+                ? "لطفاً جستجو را تغییر دهید یا پت جدیدی اضافه کنید"
+                : "برای شروع، پت جدیدی اضافه کنید"
+              }
+            </p>
+            {!searchTerm && (
+              <button
+                onClick={() => setShowForm(true)}
+                className="bg-[var(--main-color)] hover:bg-[var(--main-color-dark)] text-white px-4 py-2 rounded-lg transition-colors"
+              >
+                افزودن پت جدید
+              </button>
+            )}
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            {filteredPets.map((pet, index) => (
+              <div key={index} className="bg-white rounded-lg shadow-sm overflow-hidden hover:shadow-md transition-shadow">
+                {/* Pet Image */}
+                <div className="h-48 bg-gradient-to-br from-blue-100 to-purple-100 flex items-center justify-center relative overflow-hidden">
+                  <img
+                    src={`https://provider.exmodules.org/api/v1/file-manager/preview/${pet.photoPet}`}
+                    alt={pet.namePet}
+                    className="w-full h-full object-cover"
+                  />
+                  {/* QR Code Indicator */}
+                  <div className="absolute top-2 right-2">
+                    <div className="bg-white/80 backdrop-blur-sm rounded-full p-1">
+                      <QrCode size={16} className="text-[var(--main-color)]" />
+                    </div>
+                  </div>
                 </div>
 
-                {/* Controls */}
-                <div className="bg-white rounded-lg shadow-sm p-4 mb-6">
-                    <div className="flex flex-col lg:flex-row gap-4 items-center justify-between">
-                        {/* Search */}
-                        <div className="hidden lg:flex flex-1 max-w-md">
-                            <div className="relative">
-                                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
-                                <input
-                                    type="text"
-                                    placeholder="جستجو در پت..."
-                                    value={searchTerm}
-                                    onChange={(e) => setSearchTerm(e.target.value)}
-                                    className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--main-color)] focus:border-transparent"
-                                />
-                            </div>
-                        </div>
-
-                        {/* Add Button */}
-                        <button
-                            onClick={() => setShowForm(true)}
-                            className="flex items-center gap-2 bg-[var(--main-color)] hover:bg-[var(--main-color-dark)] text-white px-4 py-2 rounded-lg transition-colors"
-                        >
-                            <Plus size={20} />
-                            افزودن پت جدید
-                        </button>
+                {/* Pet Info */}
+                <div className="p-4">
+                  <div className="flex items-start justify-between mb-3">
+                    <div>
+                      <h3 className="font-semibold text-gray-900 text-lg mb-1">{pet.namePet}</h3>
+                      <span className="text-sm text-gray-600">{pet.typePet}</span>
                     </div>
+                  </div>
+
+                  {/* Pet Details */}
+                  <div className="space-y-2 mb-4">
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-500">شماره بیمه:</span>
+                      <span className="text-gray-900">{pet.insuranceNumber || "تعیین نشده"}</span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-500">اسم:</span>
+                      <span className="text-gray-900">{pet.namePet}</span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-500">جنسیت:</span>
+                      <span className="text-gray-900">
+                        {pet.sex === "MEN" ? "نر" : pet.sex === "WOMEN" ? "ماده" : "نامشخص"}
+                      </span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-500">کد میکروچیپ:</span>
+                      <span className="text-gray-900">{pet.microChipCode}</span>
+                    </div>
+                    {pet.birthDate && (
+                      <div className="flex justify-between text-sm">
+                        <span className="text-gray-500">تاریخ تولد:</span>
+                        <span className="text-gray-900">{new Date(pet.birthDate).toLocaleDateString('fa-IR')}</span>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Action Buttons */}
+                  <div className="grid grid-cols-2 gap-2 mb-2">
+                    <button
+                      onClick={() => handleView(pet)}
+                      className="flex cursor-pointer items-center justify-center gap-1 bg-[var(--main-color)]/10 hover:bg-[var(--main-color)]/20 text-[var(--main-color)] px-3 py-2 rounded-lg text-sm transition-colors"
+                    >
+                      <Eye size={16} />
+                      مشاهده
+                    </button>
+                    <button
+                      onClick={() => handleEdit(pet)}
+                      className="flex cursor-pointer items-center justify-center gap-1 bg-[var(--main-color)]/10 hover:bg-[var(--main-color)]/20 text-[var(--main-color)] px-3 py-2 rounded-lg text-sm transition-colors"
+                    >
+                      <Edit size={16} />
+                      ویرایش
+                    </button>
+                  </div>
+                  <div className="grid grid-cols-2 gap-2">
+                    <button
+                      onClick={() => handleQRCode(pet)}
+                      className="flex cursor-pointer items-center justify-center gap-1 bg-[var(--main-color)] text-white hover:bg-[var(--main-color-dark)] px-3 py-2 rounded-lg text-sm transition-colors"
+                    >
+                      <QrCode size={16} />
+                      QR Code
+                    </button>
+                    <button
+                      onClick={() => {
+                        setPetToDelete(pet);
+                        setDeleteModalOpen(true);
+                      }}
+                      className="flex cursor-pointer items-center justify-center gap-1 bg-red-50 hover:bg-red-100 text-red-600 px-3 py-2 rounded-lg text-sm transition-colors"
+                    >
+                      <Trash2 size={16} />
+                      حذف
+                    </button>
+                  </div>
                 </div>
+              </div>
+            ))}
+          </div>
+        )}
 
-                {/* Pets Grid */}
-                {filteredPets.length === 0 ? (
-                    <div className="bg-white rounded-lg shadow-sm p-8 text-center">
-                        <div className="text-gray-400 mb-4">
-                            <svg className="mx-auto h-12 w-12" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
-                            </svg>
-                        </div>
-                        <h3 className="text-lg font-medium text-gray-900 mb-2">هیچ پت یافت نشد</h3>
-                        <p className="text-gray-500 mb-4">
-                            {searchTerm
-                                ? "لطفاً جستجو را تغییر دهید یا پت جدیدی اضافه کنید"
-                                : "برای شروع، پت جدیدی اضافه کنید"
-                            }
-                        </p>
-                        {!searchTerm && (
-                            <button
-                                onClick={() => setShowForm(true)}
-                                className="bg-[var(--main-color)] hover:bg-[var(--main-color-dark)] text-white px-4 py-2 rounded-lg transition-colors"
-                            >
-                                افزودن پت جدید
-                            </button>
-                        )}
-                    </div>
-                ) : (
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                        {filteredPets.map((pet, index) => (
-                            <div key={index} className="bg-white rounded-lg shadow-sm overflow-hidden hover:shadow-md transition-shadow">
-                                {/* Pet Image */}
-                                <div className="h-48 bg-gradient-to-br from-blue-100 to-purple-100 flex items-center justify-center relative overflow-hidden">
-                                    <img
-                                        src="/images/pet.jpg"
-                                        alt={pet.namePet}
-                                        className="w-full h-full object-cover"
-                                    />
-                                    {/* QR Code Indicator */}
-                                    <div className="absolute top-2 right-2">
-                                        <div className="bg-white/80 backdrop-blur-sm rounded-full p-1">
-                                            <QrCode size={16} className="text-[var(--main-color)]" />
-                                        </div>
-                                    </div>
-                                </div>
-
-                                {/* Pet Info */}
-                                <div className="p-4">
-                                    <div className="flex items-start justify-between mb-3">
-                                        <div>
-                                            <h3 className="font-semibold text-gray-900 text-lg mb-1">{pet.namePet}</h3>
-                                            <span className="text-sm text-gray-600">{pet.typePet}</span>
-                                        </div>
-                                    </div>
-
-                                    {/* Pet Details */}
-                                    <div className="space-y-2 mb-4">
-                                        <div className="flex justify-between text-sm">
-                                            <span className="text-gray-500">شماره بیمه:</span>
-                                            <span className="text-gray-900">{pet.insuranceNumber || "تعیین نشده"}</span>
-                                        </div>
-                                        <div className="flex justify-between text-sm">
-                                            <span className="text-gray-500">اسم:</span>
-                                            <span className="text-gray-900">{pet.namePet}</span>
-                                        </div>
-                                        <div className="flex justify-between text-sm">
-                                            <span className="text-gray-500">جنسیت:</span>
-                                            <span className="text-gray-900">
-                                                {pet.sex === "MEN" ? "نر" : pet.sex === "WOMEN" ? "ماده" : "نامشخص"}
-                                            </span>
-                                        </div>
-                                        <div className="flex justify-between text-sm">
-                                            <span className="text-gray-500">کد میکروچیپ:</span>
-                                            <span className="text-gray-900">{pet.microChipCode}</span>
-                                        </div>
-                                        {pet.birthDate && (
-                                            <div className="flex justify-between text-sm">
-                                                <span className="text-gray-500">تاریخ تولد:</span>
-                                                <span className="text-gray-900">{new Date(pet.birthDate).toLocaleDateString('fa-IR')}</span>
-                                            </div>
-                                        )}
-                                    </div>
-
-                                    {/* Action Buttons */}
-                                    <div className="grid grid-cols-2 gap-2 mb-2">
-                                        <button
-                                            onClick={() => handleView(pet)}
-                                            className="flex cursor-pointer items-center justify-center gap-1 bg-[var(--main-color)]/10 hover:bg-[var(--main-color)]/20 text-[var(--main-color)] px-3 py-2 rounded-lg text-sm transition-colors"
-                                        >
-                                            <Eye size={16} />
-                                            مشاهده
-                                        </button>
-                                        <button
-                                            onClick={() => handleEdit(pet)}
-                                            className="flex cursor-pointer items-center justify-center gap-1 bg-[var(--main-color)]/10 hover:bg-[var(--main-color)]/20 text-[var(--main-color)] px-3 py-2 rounded-lg text-sm transition-colors"
-                                        >
-                                            <Edit size={16} />
-                                            ویرایش
-                                        </button>
-                                    </div>
-                                    <div className="grid grid-cols-2 gap-2">
-                                        <button
-                                            onClick={() => handleQRCode(pet)}
-                                            className="flex cursor-pointer items-center justify-center gap-1 bg-[var(--main-color)] text-white hover:bg-[var(--main-color-dark)] px-3 py-2 rounded-lg text-sm transition-colors"
-                                        >
-                                            <QrCode size={16} />
-                                            QR Code
-                                        </button>
-                                        <button
-                                            onClick={() => {
-                                                setPetToDelete(pet);
-                                                setDeleteModalOpen(true);
-                                            }}
-                                            className="flex cursor-pointer items-center justify-center gap-1 bg-red-50 hover:bg-red-100 text-red-600 px-3 py-2 rounded-lg text-sm transition-colors"
-                                        >
-                                            <Trash2 size={16} />
-                                            حذف
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                        ))}
-                    </div>
-                )}
-
-                {/* Stats */}
-                {/* <div className="mt-6 bg-white rounded-lg shadow-sm p-4">
+        {/* Stats */}
+        {/* <div className="mt-6 bg-white rounded-lg shadow-sm p-4">
                     <div className="grid grid-cols-2 md:grid-cols-5 gap-4 text-center">
                         <div>
                             <div className="text-2xl font-bold text-[var(--main-color)]">{pets.length}</div>
@@ -579,69 +565,69 @@ export default function PetList() {
                         </div>
                     </div>
                 </div> */}
+      </div>
+
+      {/* Pet Form Modal */}
+      {showForm && (
+        <PetForm
+          pet={editingPet}
+          onClose={handleFormClose}
+          onSuccess={handleFormSuccess}
+        />
+      )}
+
+      {/* Pet View Modal */}
+      {viewingPet && (
+        <PetViewModal pet={viewingPet} onClose={() => setViewingPet(null)} />
+      )}
+
+      {/* Custom Delete Confirmation Modal */}
+      {deleteModalOpen && petToDelete && (
+        <div className="fixed inset-0 bg-white/5 backdrop-blur-sm flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg shadow-lg p-6 max-w-sm w-full">
+            <h2 className="text-lg font-bold mb-4 text-gray-900">تایید حذف پت</h2>
+            <p className="mb-6 text-gray-700">آیا مطمئن هستید که می‌خواهید پت <span className="font-bold">{petToDelete.namePet}</span> را حذف کنید؟ این عملیات قابل بازگشت نیست.</p>
+            <div className="flex justify-end gap-3">
+              <button
+                onClick={() => {
+                  setDeleteModalOpen(false);
+                  setPetToDelete(null);
+                }}
+                className="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg transition-colors"
+              >
+                انصراف
+              </button>
+              <button
+                onClick={() => handleDelete(petToDelete.petId || "")}
+                className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors"
+              >
+                حذف
+              </button>
             </div>
+          </div>
+        </div>
+      )}
 
-            {/* Pet Form Modal */}
-            {showForm && (
-                <PetForm
-                    pet={editingPet}
-                    onClose={handleFormClose}
-                    onSuccess={handleFormSuccess}
-                />
-            )}
+      {/* QR Code Modal */}
+      {qrModalOpen && selectedPetForQR && (
+        <QRCodeModal
+          isOpen={qrModalOpen}
+          onClose={handleQRModalClose}
+          petId={selectedPetForQR.petId || ""}
+          petName={selectedPetForQR.namePet}
+          insuranceNumber={selectedPetForQR.insuranceNumber}
+        />
+      )}
 
-            {/* Pet View Modal */}
-            {viewingPet && (
-                <PetViewModal pet={viewingPet} onClose={() => setViewingPet(null)} />
-            )}
-
-            {/* Custom Delete Confirmation Modal */}
-            {deleteModalOpen && petToDelete && (
-                <div className="fixed inset-0 bg-white/5 backdrop-blur-sm flex items-center justify-center z-50">
-                    <div className="bg-white rounded-lg shadow-lg p-6 max-w-sm w-full">
-                        <h2 className="text-lg font-bold mb-4 text-gray-900">تایید حذف پت</h2>
-                        <p className="mb-6 text-gray-700">آیا مطمئن هستید که می‌خواهید پت <span className="font-bold">{petToDelete.namePet}</span> را حذف کنید؟ این عملیات قابل بازگشت نیست.</p>
-                        <div className="flex justify-end gap-3">
-                            <button
-                                onClick={() => {
-                                    setDeleteModalOpen(false);
-                                    setPetToDelete(null);
-                                }}
-                                className="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg transition-colors"
-                            >
-                                انصراف
-                            </button>
-                            <button
-                                onClick={() => handleDelete(petToDelete.petId || "")}
-                                className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors"
-                            >
-                                حذف
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            )}
-
-            {/* QR Code Modal */}
-            {qrModalOpen && selectedPetForQR && (
-                <QRCodeModal
-                    isOpen={qrModalOpen}
-                    onClose={handleQRModalClose}
-                    petId={selectedPetForQR.petId || ""}
-                    petName={selectedPetForQR.namePet}
-                    insuranceNumber={selectedPetForQR.insuranceNumber}
-                />
-            )}
-
-            {/* Snackbar */}
-            <Snackbar
-                message={snackbar.message}
-                type={snackbar.type}
-                duration={snackbar.duration}
-                isOpen={snackbar.isOpen}
-                onClose={hideSnackbar}
-                position="top-center"
-            />
-        </>
-    );
+      {/* Snackbar */}
+      <Snackbar
+        message={snackbar.message}
+        type={snackbar.type}
+        duration={snackbar.duration}
+        isOpen={snackbar.isOpen}
+        onClose={hideSnackbar}
+        position="top-center"
+      />
+    </>
+  );
 }
