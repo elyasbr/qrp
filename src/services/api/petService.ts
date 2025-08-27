@@ -67,7 +67,7 @@ export interface Pet {
   videoUrl?: string;
   // New fields for file IDs
   photoPet?: string;
-  insurancePdf?: string;
+  insurancePdfPet?: string;
   certificatePdfPet?: string;
   galleriesPhoto?: string[];
   galleriesVideo?: string[];
