@@ -1,7 +1,8 @@
 "use client";
 import { useState, useEffect, useRef } from "react";
-import { Plus, Edit, Trash2, Eye, Search, Filter, MoreVertical, PawPrint, QrCode } from "lucide-react";
+import { Plus, Edit, Trash2, Eye, Search, Filter, MoreVertical, PawPrint, QrCode, Download, Play, Image as ImageIcon, Video, FileText, Shield } from "lucide-react";
 import { Pet, getAllPets, deletePet, getPetById } from "@/services/api/petService";
+import { getFilePreview } from "@/services/api/uploadService";
 import { useSnackbar } from "@/hooks/useSnackbar";
 import Snackbar from "@/components/common/Snackbar";
 import PetForm from "./PetForm";
@@ -20,6 +21,13 @@ export default function PetList() {
     const [petToDelete, setPetToDelete] = useState<Pet | null>(null);
     const [qrModalOpen, setQrModalOpen] = useState(false);
     const [selectedPetForQR, setSelectedPetForQR] = useState<Pet | null>(null);
+    const [mediaFiles, setMediaFiles] = useState<{
+      photoPet?: { url: string; fileId: string };
+      galleryPhoto?: Array<{ url: string; fileId: string }>;
+      galleryVideo?: Array<{ url: string; fileId: string }>;
+      certificatePdf?: { url: string; fileId: string };
+      insurancePdf?: { url: string; fileId: string };
+    }>({});
 
     const { showError, showSuccess, snackbar, hideSnackbar } = useSnackbar();
 
@@ -60,10 +68,99 @@ export default function PetList() {
         setShowForm(true);
     };
 
+    const fetchMediaFiles = async (petData: Pet) => {
+        const mediaData: any = {};
+
+        try {
+            // Fetch main pet photo
+            if (petData.photoPet) {
+                try {
+                    const photoPreview = await getFilePreview(petData.photoPet);
+                    mediaData.photoPet = {
+                        url: photoPreview.url,
+                        fileId: petData.photoPet
+                    };
+                } catch (error) {
+                    console.error('Failed to fetch pet photo:', error);
+                }
+            }
+
+            // Fetch gallery photos
+            if (petData.galleryPhoto && petData.galleryPhoto.length > 0) {
+                const photoPromises = petData.galleryPhoto.map(async (fileId: string) => {
+                    try {
+                        const preview = await getFilePreview(fileId);
+                        return {
+                            url: preview.url,
+                            fileId: fileId
+                        };
+                    } catch (error) {
+                        console.error(`Failed to fetch gallery photo ${fileId}:`, error);
+                        return null;
+                    }
+                });
+
+                const photoResults = await Promise.all(photoPromises);
+                mediaData.galleryPhoto = photoResults.filter(result => result !== null);
+            }
+
+            // Fetch gallery videos
+            if (petData.galleryVideo && petData.galleryVideo.length > 0) {
+                const videoPromises = petData.galleryVideo.map(async (fileId: string) => {
+                    try {
+                        const preview = await getFilePreview(fileId);
+                        return {
+                            url: preview.url,
+                            fileId: fileId
+                        };
+                    } catch (error) {
+                        console.error(`Failed to fetch gallery video ${fileId}:`, error);
+                        return null;
+                    }
+                });
+
+                const videoResults = await Promise.all(videoPromises);
+                mediaData.galleryVideo = videoResults.filter(result => result !== null);
+            }
+
+            // Fetch certificate PDF
+            if (petData.certificatePdf) {
+                try {
+                    const certPreview = await getFilePreview(petData.certificatePdf);
+                    mediaData.certificatePdf = {
+                        url: certPreview.url,
+                        fileId: petData.certificatePdf
+                    };
+                } catch (error) {
+                    console.error('Failed to fetch certificate PDF:', error);
+                }
+            }
+
+            // Fetch insurance PDF
+            if (petData.insurancePdf) {
+                try {
+                    const insPreview = await getFilePreview(petData.insurancePdf);
+                    mediaData.insurancePdf = {
+                        url: insPreview.url,
+                        fileId: petData.insurancePdf
+                    };
+                } catch (error) {
+                    console.error('Failed to fetch insurance PDF:', error);
+                }
+            }
+
+            setMediaFiles(mediaData);
+        } catch (error) {
+            console.error('Error fetching media files:', error);
+        }
+    };
+
     const handleView = async (pet: Pet) => {
         try {
             const latestPet = await getPetById(pet.petId || "");
             setViewingPet(latestPet);
+            // Fetch media files for the pet
+            await fetchMediaFiles(latestPet);
         } catch (error: any) {
             showError("خطا در دریافت اطلاعات پت: " + (error.message || "خطای نامشخص"));
         }
@@ -347,7 +444,7 @@ export default function PetList() {
                                             <div className="flex justify-start mb-4">
                                                 <div className="w-32 h-32 rounded-xl overflow-hidden border-4 border-[var(--main-color)]/20 shadow-lg">
                                                     <img
-                                                        src="/images/pet.jpg"
+                                                        src={mediaFiles.photoPet?.url || "/images/pet.jpg"}
                                                         alt={viewingPet.namePet}
                                                         className="w-full h-full object-cover"
                                                     />
@@ -448,14 +545,111 @@ export default function PetList() {
                                         </div>
                                     </div>
 
-                                    {/* Digital Links */}
+                                    {/* Digital Documents */}
                                     <div className="bg-white rounded-lg ring-1 ring-gray-200 p-4">
-                                        <h3 className="text-md font-bold text-[var(--main-color)] mb-3">لینک و اسناد دیجیتال</h3>
-                                        <div className="grid grid-cols-2 gap-y-2 text-sm">
-                                            {viewingPet.certificatePDF && (<><span className="text-gray-500">PDF شناسنامه</span><a className="text-[var(--main-color)] underline" href={viewingPet.certificatePDF} target="_blank" rel="noreferrer">مشاهده</a></>)}
-                                            {viewingPet.insurancePDF && (<><span className="text-gray-500">PDF بیمه نامه</span><a className="text-[var(--main-color)] underline" href={viewingPet.insurancePDF} target="_blank" rel="noreferrer">مشاهده</a></>)}
-                                            {viewingPet.imageUrl && (<><span className="text-gray-500">عکس پت</span><a className="text-[var(--main-color)] underline" href={viewingPet.imageUrl} target="_blank" rel="noreferrer">مشاهده</a></>)}
-                                            {viewingPet.videoUrl && (<><span className="text-gray-500">ویدئو پت</span><a className="text-[var(--main-color)] underline" href={viewingPet.videoUrl} target="_blank" rel="noreferrer">مشاهده</a></>)}
+                                        <h3 className="text-md font-bold text-[var(--main-color)] mb-3">اسناد دیجیتال</h3>
+                                        
+                                        {/* Gallery Photos */}
+                                        {mediaFiles.galleryPhoto && mediaFiles.galleryPhoto.length > 0 && (
+                                            <div className="mb-6">
+                                                <h4 className="text-sm font-semibold text-gray-700 mb-3 flex items-center gap-2">
+                                                    <ImageIcon size={16} />
+                                                    گالری عکس‌های پت
+                                                </h4>
+                                                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
+                                                    {mediaFiles.galleryPhoto.map((photo, index) => (
+                                                        <div key={index} className="relative group">
+                                                            <img
+                                                                src={photo.url}
+                                                                alt={`عکس پت ${index + 1}`}
+                                                                className="w-full h-24 object-cover rounded-lg border shadow-sm group-hover:shadow-md transition-shadow"
+                                                            />
+                                                            <a
+                                                                href={photo.url}
+                                                                target="_blank"
+                                                                rel="noreferrer"
+                                                                className="absolute inset-0 flex items-center justify-center bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity rounded-lg"
+                                                            >
+                                                                <Eye size={20} className="text-white" />
+                                                            </a>
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            </div>
+                                        )}
+
+                                        {/* Gallery Videos */}
+                                        {mediaFiles.galleryVideo && mediaFiles.galleryVideo.length > 0 && (
+                                            <div className="mb-6">
+                                                <h4 className="text-sm font-semibold text-gray-700 mb-3 flex items-center gap-2">
+                                                    <Video size={16} />
+                                                    گالری ویدیوهای پت
+                                                </h4>
+                                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                                    {mediaFiles.galleryVideo.map((video, index) => (
+                                                        <div key={index} className="relative">
+                                                            <video
+                                                                src={video.url}
+                                                                className="w-full h-48 object-cover rounded-lg border shadow-sm"
+                                                                controls
+                                                            />
+                                                            <a
+                                                                href={video.url}
+                                                                target="_blank"
+                                                                rel="noreferrer"
+                                                                className="absolute top-2 right-2 bg-black/50 text-white p-1 rounded-full hover:bg-black/70 transition-colors"
+                                                            >
+                                                                <Eye size={16} />
+                                                            </a>
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            </div>
+                                        )}
+
+                                        {/* PDF Documents */}
+                                        <div className="space-y-3">
+                                            {mediaFiles.certificatePdf && (
+                                                <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                                                    <div className="flex items-center gap-3">
+                                                        <FileText size={20} className="text-[var(--main-color)]" />
+                                                        <div>
+                                                            <div className="font-semibold text-gray-900">شناسنامه پت</div>
+                                                            <div className="text-sm text-gray-500">فایل PDF</div>
+                                                        </div>
+                                                    </div>
+                                                    <a
+                                                        href={mediaFiles.certificatePdf.url}
+                                                        target="_blank"
+                                                        rel="noreferrer"
+                                                        className="flex items-center gap-2 bg-[var(--main-color)] text-white px-3 py-2 rounded-lg hover:bg-[var(--main-color-dark)] transition-colors"
+                                                    >
+                                                        <Download size={16} />
+                                                        دانلود
+                                                    </a>
+                                                </div>
+                                            )}
+
+                                            {mediaFiles.insurancePdf && (
+                                                <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                                                    <div className="flex items-center gap-3">
+                                                        <Shield size={20} className="text-[var(--main-color)]" />
+                                                        <div>
+                                                            <div className="font-semibold text-gray-900">بیمه نامه پت</div>
+                                                            <div className="text-sm text-gray-500">فایل PDF</div>
+                                                        </div>
+                                                    </div>
+                                                    <a
+                                                        href={mediaFiles.insurancePdf.url}
+                                                        target="_blank"
+                                                        rel="noreferrer"
+                                                        className="flex items-center gap-2 bg-[var(--main-color)] text-white px-3 py-2 rounded-lg hover:bg-[var(--main-color-dark)] transition-colors"
+                                                    >
+                                                        <Download size={16} />
+                                                        دانلود
+                                                    </a>
+                                                </div>
+                                            )}
                                         </div>
                                     </div>
                                 </div>
