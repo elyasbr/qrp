@@ -66,6 +66,12 @@ export interface Pet {
   trainingAdvice: string;
   imageUrl?: string;
   videoUrl?: string;
+  // New fields for file IDs
+  photoPet?: string;
+  insurancePdf?: string;
+  certificatePdf?: string;
+  galleryPhoto?: string[];
+  galleryVideo?: string[];
 }
 
 // Pagination request interface

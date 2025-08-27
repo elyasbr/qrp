@@ -87,6 +87,38 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
   const [selectedCertificatePDF, setSelectedCertificatePDF] = useState<File | null>(null);
   const [selectedInsurancePDF, setSelectedInsurancePDF] = useState<File | null>(null);
   
+  /**
+   * Helper function to upload multiple files and collect file IDs
+   * 
+   * This function handles the upload of multiple files and returns an array of file IDs
+   * that can be sent to the backend for the updatePet service.
+   * 
+   * The backend expects:
+   * - photoPet: string (single file ID for main pet photo)
+   * - insurancePdf: string (single file ID for insurance PDF)
+   * - certificatePdf: string (single file ID for certificate PDF)
+   * - galleryPhoto: string[] (array of file IDs for pet photos)
+   * - galleryVideo: string[] (array of file IDs for pet videos)
+   */
+  const uploadMultipleFiles = async (files: File[], isPrivate: boolean = false, fileType: string): Promise<string[]> => {
+    const fileIds: string[] = [];
+    
+    for (let i = 0; i < files.length; i++) {
+      const file = files[i];
+      try {
+        console.log(`Uploading ${fileType} ${i + 1}/${files.length}: ${file.name}`);
+        const uploadResult = await uploadFile(file, isPrivate);
+        fileIds.push(uploadResult.fileId);
+        console.log(`✅ ${fileType} ${i + 1} uploaded successfully:`, uploadResult.fileId);
+      } catch (error) {
+        console.error(`❌ Failed to upload ${fileType} ${i + 1}:`, error);
+        throw error; // Re-throw to stop the process
+      }
+    }
+    
+    return fileIds;
+  };
+  
   // File preview URLs
   const [identificationImagePreview, setIdentificationImagePreview] = useState<string | null>(null);
   const [petImagePreviews, setPetImagePreviews] = useState<string[]>([]);
@@ -440,7 +472,7 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
           console.log("Starting identification image upload...");
           const imgRes = await uploadFile(selectedIdentificationImage, false); // Public image
           console.log("Identification image upload successful:", imgRes);
-          submitData.identificationImageUrl = imgRes.url;
+          submitData.photoPet = imgRes.fileId; // Use fileId instead of URL
         } catch (err) {
           console.error("Identification image upload failed", err);
           if (err instanceof Error) {
@@ -480,14 +512,9 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
       if (selectedPetImages.length > 0) {
         try {
           console.log("Starting pet images upload...");
-          const imageUrls = [];
-          for (const image of selectedPetImages) {
-            console.log(`Uploading pet image: ${image.name}`);
-            const imgRes = await uploadFile(image, false); // Public image
-            imageUrls.push(imgRes.url);
-          }
-          console.log("All pet images uploaded successfully:", imageUrls);
-          submitData.imageUrls = imageUrls; // Array of image URLs
+          const imageFileIds = await uploadMultipleFiles(selectedPetImages, false, "pet image");
+          console.log("All pet images uploaded successfully:", imageFileIds);
+          submitData.galleryPhoto = imageFileIds; // Array of file IDs
         } catch (err) {
           console.error("Pet images upload failed", err);
           if (err instanceof Error) {
@@ -527,14 +554,9 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
       if (selectedVideos.length > 0) {
         try {
           console.log("Starting videos upload...");
-          const videoUrls = [];
-          for (const video of selectedVideos) {
-            console.log(`Uploading video: ${video.name}`);
-            const vidRes = await uploadFile(video, false); // Public video
-            videoUrls.push(vidRes.url);
-          }
-          console.log("All videos uploaded successfully:", videoUrls);
-          submitData.videoUrls = videoUrls; // Array of video URLs
+          const videoFileIds = await uploadMultipleFiles(selectedVideos, false, "video");
+          console.log("All videos uploaded successfully:", videoFileIds);
+          submitData.galleryVideo = videoFileIds; // Array of file IDs
         } catch (err) {
           console.error("Videos upload failed", err);
           if (err instanceof Error) {
@@ -575,7 +597,7 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
           console.log("Starting certificate PDF upload...");
           const certRes = await uploadFile(selectedCertificatePDF, true); // Private PDF
           console.log("Certificate PDF upload successful:", certRes);
-          submitData.certificatePDF = certRes.url;
+          submitData.certificatePdf = certRes.fileId; // Use fileId instead of URL
         } catch (err) {
           console.error("Certificate PDF upload failed", err);
           if (err instanceof Error) {
@@ -611,7 +633,7 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
           console.log("Starting insurance PDF upload...");
           const insRes = await uploadFile(selectedInsurancePDF, true); // Private PDF
           console.log("Insurance PDF upload successful:", insRes);
-          submitData.insurancePDF = insRes.url;
+          submitData.insurancePdf = insRes.fileId; // Use fileId instead of URL
         } catch (err) {
           console.error("Insurance PDF upload failed", err);
           if (err instanceof Error) {
@@ -661,12 +683,17 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
         }
       }
 
+      // Log the final data being sent
+      console.log("Final submit data:", submitData);
+
       if (pet) {
         // Update existing pet
+        console.log("Updating pet with ID:", pet.petId);
         await updatePet(pet.petId || "", submitData as Pet);
         showSuccess("پت با موفقیت ویرایش شد");
       } else {
         // Create new pet
+        console.log("Creating new pet");
         await createPet(submitData as Pet);
         showSuccess("پت با موفقیت اضافه شد");
       }

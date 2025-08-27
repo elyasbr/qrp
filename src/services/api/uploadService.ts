@@ -71,7 +71,15 @@ export const uploadFile = async (file: File, isPrivate: boolean = false, retryCo
   });
 
   try {
-    const response = await api.post<UploadResponse>('https://provider.exmodules.org/api/v1/file-manager/first-upload', formData, {
+    const response = await api.post<{
+      statusCode: number;
+      result: {
+        uploadId: string;
+        fileId: string;
+        createdAt: string;
+      };
+      timestamp: string;
+    }>('https://provider.exmodules.org/api/v1/file-manager/first-upload', formData, {
       headers: { 
         'Content-Type': 'multipart/form-data',
         'Authorization': `Bearer ${token}`,
@@ -92,7 +100,16 @@ export const uploadFile = async (file: File, isPrivate: boolean = false, retryCo
       timestamp: new Date().toISOString()
     });
     
-    return response.data;
+    // Log the specific file ID we're extracting
+    console.log('📁 Extracted file ID:', response.data.result.fileId);
+    console.log('📁 Generated preview URL:', `https://provider.exmodules.org/api/v1/file-manager/preview/${response.data.result.fileId}`);
+    
+    // Return the fileId from the server response
+    return {
+      url: `https://provider.exmodules.org/api/v1/file-manager/preview/${response.data.result.fileId}`,
+      fileId: response.data.result.fileId,
+      message: 'Upload successful'
+    };
   } catch (error: any) {
     console.error(`❌ File upload error (attempt ${retryCount + 1}):`, {
       error,

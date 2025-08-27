@@ -14,11 +14,6 @@ export default function Dashboard() {
             مرجع جامع ثبت اطلاعات، مدیریت، سلامت و دریافت مشاوره تخصصی غذایی و درمانی. هم اکنون وارد حساب کاربری خود شوید یا ثبت نام کنید.
           </p>
         </div>
-
-        {/* Upload Test Component - Temporary for debugging */}
-        <div className="w-full max-w-4xl">
-          <UploadTest />
-        </div>
     </main>
   );
 }
