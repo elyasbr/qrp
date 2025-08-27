@@ -59,7 +59,6 @@ export interface Pet {
   sensitivities: string;
   connectOtherPets: boolean;
   connectWithBaby: boolean;
-  certificatePDF: string;
   insurancePDF: string;
   nutritionalCounseling: string;
   expertVeterinaryCounseling: string;
@@ -69,9 +68,9 @@ export interface Pet {
   // New fields for file IDs
   photoPet?: string;
   insurancePdf?: string;
-  certificatePdf?: string;
-  galleryPhoto?: string[];
-  galleryVideo?: string[];
+  certificatePdfPet?: string;
+  galleriesPhoto?: string[];
+  galleriesVideo?: string[];
 }
 
 // Pagination request interface
