@@ -1,131 +1,177 @@
 "use client";
-import { useState, useEffect } from 'react';
-import { getPetByIdPublic } from '@/services/api/petService';
+import { useState, useEffect } from "react";
+import { getPetByIdPublic, Pet } from "@/services/api/petService";
 import { getFilePreview } from '@/services/api/uploadService';
 
-import { Pet } from '@/services/api/petService';
+interface UsePetPublicReturn {
+  pet: Pet | null;
+  isLoading: boolean;
+  error: string | null;
+  refetch: () => void;
+}
 
-export const usePetPublic = (petId: string) => {
+export function usePetPublic(petId: string | undefined): UsePetPublicReturn {
   const [pet, setPet] = useState<Pet | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [mediaFiles, setMediaFiles] = useState<{
-    photoPet?: { url: string; fileId: string };
-    galleryPhoto?: Array<{ url: string; fileId: string }>;
-    galleryVideo?: Array<{ url: string; fileId: string }>;
-    certificatePdf?: { url: string; fileId: string };
-    insurancePdf?: { url: string; fileId: string };
-  }>({});
 
-  useEffect(() => {
-    const fetchPet = async () => {
-      if (!petId) return;
-      
-      setIsLoading(true);
-      setError(null);
-      
-      try {
-        const petData = await getPetByIdPublic(petId);
-        setPet(petData);
-        
-        // Fetch media files if they exist
-        await fetchMediaFiles(petData);
-      } catch (err: any) {
-        setError(err.message || 'خطا در بارگذاری اطلاعات پت');
-      } finally {
-        setIsLoading(false);
-      }
-    };
+  const fetchPet = async () => {
+    
+    if (!petId) {
+      setError("شناسه پت نامعتبر است");
+      return;
+    }
 
-    fetchPet();
-  }, [petId]);
-
-  const fetchMediaFiles = async (petData: any) => {
-    const mediaData: any = {};
+    setIsLoading(true);
+    setError(null);
 
     try {
-      // Fetch main pet photo
-      if (petData.photoPet) {
-        try {
-          const photoPreview = await getFilePreview(petData.photoPet);
-          mediaData.photoPet = {
-            url: photoPreview.url,
-            fileId: petData.photoPet
-          };
-        } catch (error) {
-          console.error('Failed to fetch pet photo:', error);
-        }
-      }
-
-      // Fetch gallery photos
-      if (petData.galleryPhoto && petData.galleryPhoto.length > 0) {
-        const photoPromises = petData.galleryPhoto.map(async (fileId: string) => {
-          try {
-            const preview = await getFilePreview(fileId);
-            return {
-              url: preview.url,
-              fileId: fileId
-            };
-          } catch (error) {
-            console.error(`Failed to fetch gallery photo ${fileId}:`, error);
-            return null;
-          }
-        });
-
-        const photoResults = await Promise.all(photoPromises);
-        mediaData.galleryPhoto = photoResults.filter(result => result !== null);
-      }
-
-      // Fetch gallery videos
-      if (petData.galleryVideo && petData.galleryVideo.length > 0) {
-        const videoPromises = petData.galleryVideo.map(async (fileId: string) => {
-          try {
-            const preview = await getFilePreview(fileId);
-            return {
-              url: preview.url,
-              fileId: fileId
-            };
-          } catch (error) {
-            console.error(`Failed to fetch gallery video ${fileId}:`, error);
-            return null;
-          }
-        });
-
-        const videoResults = await Promise.all(videoPromises);
-        mediaData.galleryVideo = videoResults.filter(result => result !== null);
-      }
-
-      // Fetch certificate PDF
-      if (petData.certificatePdf) {
-        try {
-          const certPreview = await getFilePreview(petData.certificatePdf);
-          mediaData.certificatePdf = {
-            url: certPreview.url,
-            fileId: petData.certificatePdf
-          };
-        } catch (error) {
-          console.error('Failed to fetch certificate PDF:', error);
-        }
-      }
-
-      // Fetch insurance PDF
-      if (petData.insurancePdf) {
-        try {
-          const insPreview = await getFilePreview(petData.insurancePdf);
-          mediaData.insurancePdf = {
-            url: insPreview.url,
-            fileId: petData.insurancePdf
-          };
-        } catch (error) {
-          console.error('Failed to fetch insurance PDF:', error);
-        }
-      }
-
-      setMediaFiles(mediaData);
-    } catch (error) {
-      console.error('Error fetching media files:', error);
+      const petData = await getPetByIdPublic(petId);
+      setPet(petData);
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : "خطا در بارگذاری اطلاعات پت";
+      setError(errorMessage);
+      setPet(null);
+    } finally {
+      setIsLoading(false);
     }
   };
 
-  return { pet, isLoading, error, mediaFiles };
+  useEffect(() => {
+    fetchPet();
+  }, [petId]);
+
+  const refetch = () => {
+    fetchPet();
+  };
+
+  return { pet, isLoading, error, refetch };
+}
+
+export interface FilePreview {
+  url: string;
+  fileId: string;
+  fileName: string;
+  fileSize: number;
+  mimeType: string;
+}
+
+export interface PetFiles {
+  photoPet?: FilePreview;
+  insurancePdf?: FilePreview;
+  certificatePdf?: FilePreview;
+  galleryPhoto: FilePreview[];
+  galleryVideo: FilePreview[];
+}
+
+export const usePetFiles = (pet: any) => {
+  const [files, setFiles] = useState<PetFiles>({
+    galleryPhoto: [],
+    galleryVideo: []
+  });
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!pet) {
+      setFiles({ galleryPhoto: [], galleryVideo: [] });
+      return;
+    }
+
+    const fetchFiles = async () => {
+      setLoading(true);
+      setError(null);
+      
+      try {
+        const newFiles: PetFiles = {
+          galleryPhoto: [],
+          galleryVideo: []
+        };
+
+        // Fetch main pet photo
+        if (pet.photoPet) {
+          try {
+            console.log('Fetching main pet photo:', pet.photoPet);
+            const photoPreview = await getFilePreview(pet.photoPet);
+            newFiles.photoPet = photoPreview;
+            console.log('Main pet photo loaded:', photoPreview);
+          } catch (err) {
+            console.error('Failed to fetch main pet photo:', err);
+          }
+        }
+
+        // Fetch insurance PDF
+        if (pet.insurancePdf) {
+          try {
+            console.log('Fetching insurance PDF:', pet.insurancePdf);
+            const insurancePreview = await getFilePreview(pet.insurancePdf);
+            newFiles.insurancePdf = insurancePreview;
+            console.log('Insurance PDF loaded:', insurancePreview);
+          } catch (err) {
+            console.error('Failed to fetch insurance PDF:', err);
+          }
+        }
+
+        // Fetch certificate PDF
+        if (pet.certificatePdf) {
+          try {
+            console.log('Fetching certificate PDF:', pet.certificatePdf);
+            const certificatePreview = await getFilePreview(pet.certificatePdf);
+            newFiles.certificatePdf = certificatePreview;
+            console.log('Certificate PDF loaded:', certificatePreview);
+          } catch (err) {
+            console.error('Failed to fetch certificate PDF:', err);
+          }
+        }
+
+        // Fetch gallery photos
+        if (pet.galleryPhoto && Array.isArray(pet.galleryPhoto) && pet.galleryPhoto.length > 0) {
+          console.log('Fetching gallery photos:', pet.galleryPhoto);
+          const photoPromises = pet.galleryPhoto.map(async (fileId: string) => {
+            try {
+              const preview = await getFilePreview(fileId);
+              console.log('Gallery photo loaded:', preview);
+              return preview;
+            } catch (err) {
+              console.error('Failed to fetch gallery photo:', fileId, err);
+              return null;
+            }
+          });
+          
+          const photoResults = await Promise.all(photoPromises);
+          newFiles.galleryPhoto = photoResults.filter(Boolean) as FilePreview[];
+        }
+
+        // Fetch gallery videos
+        if (pet.galleryVideo && Array.isArray(pet.galleryVideo) && pet.galleryVideo.length > 0) {
+          console.log('Fetching gallery videos:', pet.galleryVideo);
+          const videoPromises = pet.galleryVideo.map(async (fileId: string) => {
+            try {
+              const preview = await getFilePreview(fileId);
+              console.log('Gallery video loaded:', preview);
+              return preview;
+            } catch (err) {
+              console.error('Failed to fetch gallery video:', fileId, err);
+              return null;
+            }
+          });
+          
+          const videoResults = await Promise.all(videoPromises);
+          newFiles.galleryVideo = videoResults.filter(Boolean) as FilePreview[];
+        }
+
+        setFiles(newFiles);
+        console.log('All files loaded successfully:', newFiles);
+      } catch (err) {
+        console.error('Error fetching files:', err);
+        setError('خطا در بارگذاری فایل‌ها');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchFiles();
+  }, [pet]);
+
+  return { files, loading, error };
 };

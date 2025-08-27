@@ -1,13 +1,292 @@
 "use client";
 import { useState, useEffect, useRef } from "react";
-import { Plus, Edit, Trash2, Eye, Search, Filter, MoreVertical, PawPrint, QrCode, Download, Play, Image as ImageIcon, Video, FileText, Shield } from "lucide-react";
+import { Plus, Edit, Trash2, Eye, Search, Filter, MoreVertical, PawPrint, QrCode, FileText, Video, Image as ImageIcon, Download } from "lucide-react";
 import { Pet, getAllPets, deletePet, getPetById } from "@/services/api/petService";
-import { getFilePreview } from "@/services/api/uploadService";
 import { useSnackbar } from "@/hooks/useSnackbar";
 import Snackbar from "@/components/common/Snackbar";
 import PetForm from "./PetForm";
 import QRCodeModal from "@/components/common/QRCodeModal";
 import { formatPersianDate } from "@/utils/dateUtils";
+import { usePetFiles } from "@/hooks/usePetPublic";
+
+// PetViewModal Component
+function PetViewModal({ pet, onClose }: { pet: Pet; onClose: () => void }) {
+  const { files, loading: filesLoading, error: filesError } = usePetFiles(pet);
+
+  return (
+    <div className="fixed inset-0 bg-black/20 backdrop-blur-sm flex items-center justify-center p-4 z-50" onClick={onClose}>
+      <div className="relative w-full max-w-3xl" onClick={(e) => e.stopPropagation()}>
+        <div className="absolute inset-0 -z-10 blur-2xl rounded-3xl bg-gradient-to-tr from-[var(--main-color)]/20 to-purple-400/20" />
+        <div className="bg-white/90 rounded-2xl shadow-xl ring-1 ring-gray-200 flex flex-col max-h-[90vh] overflow-hidden">
+          {/* Header */}
+          <div className="sticky top-0 bg-white/90 z-10 flex items-center justify-between px-6 py-4 border-b">
+            <div className="w-full flex justify-end gap-2">
+              <button onClick={onClose} className="text-gray-400 hover:text-[var(--main-color)] transition-colors" aria-label="Close">
+                ✕
+              </button>
+            </div>
+          </div>
+
+          {/* Body */}
+          <div className="px-6 py-5 overflow-y-auto flex-1">
+            <div className="space-y-6">
+              {/* Pet Characteristics */}
+              <div className="bg-white rounded-lg ring-1 ring-gray-200 p-4">
+                <h3 className="text-md font-bold text-[var(--main-color)] mb-3">مشخصات حیوان خانگی</h3>
+                <div className="grid grid-cols-2 gap-y-2 text-sm">
+                  <span className="text-gray-500">تصویر پت</span>
+                  <div className="flex justify-start mb-4">
+                    <div className="w-32 h-32 rounded-xl overflow-hidden border-4 border-[var(--main-color)]/20 shadow-lg">
+                      {files.photoPet ? (
+                        <img
+                          src={files.photoPet.url}
+                          alt={pet.namePet}
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
+                        <img
+                          src="/images/pet.jpg"
+                          alt={pet.namePet}
+                          className="w-full h-full object-cover"
+                        />
+                      )}
+                    </div>
+                  </div>
+                  <span className="text-gray-500">شماره بیمه</span><span className="text-gray-900">{pet.insuranceNumber || "تعیین نشده"}</span>
+                  <span className="text-gray-500">نام پت</span><span className="text-gray-900">{pet.namePet}</span>
+                  <span className="text-gray-500">نوع پت</span><span className="text-gray-900">{pet.typePet}</span>
+                  <span className="text-gray-500">جنسیت</span><span className="text-gray-900">{pet.sex === "MEN" ? "نر" : pet.sex === "WOMEN" ? "ماده" : "نامشخص"}</span>
+                  <span className="text-gray-500">تاریخ تولد</span><span className="text-gray-900">{pet.birthDate ? formatPersianDate(pet.birthDate) : ""}</span>
+                  <span className="text-gray-500">شماره شناسنامه</span><span className="text-gray-900">{pet.birthCertificateNumberPet}</span>
+                  <span className="text-gray-500">کد میکروچیپ</span><span className="text-gray-900">{pet.microChipCode}</span>
+                  <span className="text-gray-500">رنگ پت</span><span className="text-gray-900">{pet.colorPet}</span>
+                  <span className="text-gray-500">وزن</span><span className="text-gray-900">{pet.weightPet} کیلوگرم</span>
+                  <span className="text-gray-500">قد</span><span className="text-gray-900">{pet.heightPet} سانتی‌متر</span>
+                  <span className="text-gray-500">دامپزشک صادر کننده</span><span className="text-gray-900">{pet.issuingVeterinarian}</span>
+                  <span className="text-gray-500">نظام دامپزشکی</span><span className="text-gray-900">{pet.issuingMedicalSystem}</span>
+                </div>
+                {pet.distinctiveFeature && (
+                  <div className="mt-3 text-sm">
+                    <div className="text-gray-700 font-semibold mb-1">ویژگی بارز ظاهری</div>
+                    <div className="text-gray-700">{pet.distinctiveFeature}</div>
+                  </div>
+                )}
+              </div>
+
+              {/* Owner Information */}
+              <div className="bg-white rounded-lg ring-1 ring-gray-200 p-4">
+                <h3 className="text-md font-bold text-[var(--main-color)] mb-3">مشخصات سرپرست پت</h3>
+                <div className="grid grid-cols-2 gap-y-2 text-sm">
+                  <span className="text-gray-500">نام و نام خانوادگی</span><span className="text-gray-900">{pet.nameHead}</span>
+                  <span className="text-gray-500">کد ملی</span><span className="text-gray-900">{pet.nationalCodeHead}</span>
+                  <span className="text-gray-500">موبایل (۱)</span><span className="text-gray-900">{pet.mobile1Head}</span>
+                  <span className="text-gray-500">موبایل (۲)</span><span className="text-gray-900">{pet.mobile2Head}</span>
+                  <span className="text-gray-500">تلفن ثابت</span><span className="text-gray-900">{pet.telHead}</span>
+                  <span className="text-gray-500">استان</span><span className="text-gray-900">{pet.stateHead}</span>
+                  <span className="text-gray-500">شهر</span><span className="text-gray-900">{pet.cityHead}</span>
+                  <span className="text-gray-500">کد پستی</span><span className="text-gray-900">{pet.postalCodeHead}</span>
+                  <span className="text-gray-500">ایمیل</span><span className="text-gray-900">{pet.emailHead}</span>
+                  <span className="text-gray-500">آدرس</span><span className="text-gray-900">{pet.addressHead}</span>
+                </div>
+                <div className="mt-3 grid grid-cols-2 gap-y-2 text-sm">
+                  {pet.telegramHead && (<><span className="text-gray-500">تلگرام</span><span className="text-gray-900">{pet.telegramHead}</span></>)}
+                  {pet.whatsAppHead && (<><span className="text-gray-500">واتساپ</span><span className="text-gray-900">{pet.whatsAppHead}</span></>)}
+                  {pet.instagramHead && (<><span className="text-gray-500">اینستاگرام</span><span className="text-gray-900">{pet.instagramHead}</span></>)}
+                  {pet.youtubeHead && (<><span className="text-gray-500">یوتیوب</span><span className="text-gray-900">{pet.youtubeHead}</span></>)}
+                  {pet.linkedinHead && (<><span className="text-gray-500">لینکدین</span><span className="text-gray-900">{pet.linkedinHead}</span></>)}
+                </div>
+              </div>
+
+              {/* Health Information */}
+              <div className="bg-white rounded-lg ring-1 ring-gray-200 p-4">
+                <h3 className="text-md font-bold text-[var(--main-color)] mb-3">ویژگی و اطلاعات سلامتی</h3>
+                <div className="grid grid-cols-2 gap-y-2 text-sm">
+                  <span className="text-gray-500">دامپزشک عمومی</span><span className="text-gray-900">{pet.generalVeterinarian}</span>
+                  <span className="text-gray-500">آدرس دامپزشک عمومی</span><span className="text-gray-900">{pet.addressGeneralVeterinarian}</span>
+                  <span className="text-gray-500">تلفن دامپزشک عمومی</span><span className="text-gray-900">{pet.phoneNumberGeneralVeterinarian}</span>
+                  <span className="text-gray-500">دامپزشک متخصص</span><span className="text-gray-900">{pet.specialistVeterinarian}</span>
+                  <span className="text-gray-500">آدرس دامپزشک متخصص</span><span className="text-gray-900">{pet.addressSpecialistVeterinarian}</span>
+                  <span className="text-gray-500">تلفن دامپزشک متخصص</span><span className="text-gray-900">{pet.phoneNumberSpecialistVeterinarian}</span>
+                  <span className="text-gray-500">پت عقیم است</span><span className="text-gray-900">{pet.isSterile ? "بله" : "خیر"}</span>
+                  <span className="text-gray-500">واکسن Rabiel</span><span className="text-gray-900">{pet.vaccineRabiel ? "دارد" : "ندارد"}</span>
+                  <span className="text-gray-500">واکسن LDHPPi</span><span className="text-gray-900">{pet.vaccineLDHPPi ? "دارد" : "ندارد"}</span>
+                  <span className="text-gray-500">واکسن R.C.P</span><span className="text-gray-900">{pet.vaccineRCP ? "دارد" : "ندارد"}</span>
+                  <span className="text-gray-500">نوع تغذیه</span><span className="text-gray-900">{pet.typeFeeding}</span>
+                  <span className="text-gray-500">تعداد وعده های غذایی</span><span className="text-gray-900">{pet.numberMeal}</span>
+                </div>
+                <div className="mt-3 space-y-2 text-sm">
+                  {pet.diet && (<div><span className="font-semibold text-gray-700">رژیم غذایی:</span> <span className="text-gray-700">{pet.diet}</span></div>)}
+                  {pet.prohibitedFoodItems && (<div><span className="font-semibold text-gray-700">موارد ممنوع تغذیه:</span> <span className="text-gray-700">{pet.prohibitedFoodItems}</span></div>)}
+                  {pet.regularlyUsedMedications && (<div><span className="font-semibold text-gray-700">داروهای مصرفی دائم:</span> <span className="text-gray-700">{pet.regularlyUsedMedications}</span></div>)}
+                  {pet.prohibitedDrugs && (<div><span className="font-semibold text-gray-700">داروهای ممنوعه:</span> <span className="text-gray-700">{pet.prohibitedDrugs}</span></div>)}
+                  {pet.favoriteEncouragement && (<div><span className="font-semibold text-gray-700">تشویقی مورد علاقه:</span> <span className="text-gray-700">{pet.favoriteEncouragement}</span></div>)}
+                </div>
+              </div>
+
+              {/* Behavioral Information */}
+              <div className="bg-white rounded-lg ring-1 ring-gray-200 p-4">
+                <h3 className="text-md font-bold text-[var(--main-color)] mb-3">اطلاعات و ویژگی‌های رفتاری شخصیتی</h3>
+                <div className="space-y-2 text-sm">
+                  {pet.behavioralHabits && (<div><span className="font-semibold text-gray-700">عادت های رفتاری:</span> <span className="text-gray-700">{pet.behavioralHabits}</span></div>)}
+                  {pet.susceptibility && (<div><span className="font-semibold text-gray-700">مهارت و استعدادها:</span> <span className="text-gray-700">{pet.susceptibility}</span></div>)}
+                  {pet.sensitivities && (<div><span className="font-semibold text-gray-700">حساسیت ها:</span> <span className="text-gray-700">{pet.sensitivities}</span></div>)}
+                </div>
+                <div className="mt-3 grid grid-cols-2 gap-y-2 text-sm">
+                  <span className="text-gray-500">با پت دیگری اقامت دارد؟</span><span className="text-gray-900">{pet.connectOtherPets ? "بله" : "خیر"}</span>
+                  <span className="text-gray-500">با کودکان ارتباط دارد؟</span><span className="text-gray-900">{pet.connectWithBaby ? "بله" : "خیر"}</span>
+                </div>
+              </div>
+
+              {/* Consultations */}
+              <div className="bg-white rounded-lg ring-1 ring-gray-200 p-4">
+                <h3 className="text-md font-bold text-[var(--main-color)] mb-3">مشاوره ها</h3>
+                <div className="space-y-2 text-sm">
+                  {pet.nutritionalCounseling && (<div><span className="font-semibold text-gray-700">مشاوره متخصص تغذیه:</span> <span className="text-gray-700">{pet.nutritionalCounseling}</span></div>)}
+                  {pet.expertVeterinaryCounseling && (<div><span className="font-semibold text-gray-700">مشاوره دامپزشک متخصص:</span> <span className="text-gray-700">{pet.expertVeterinaryCounseling}</span></div>)}
+                  {pet.trainingAdvice && (<div><span className="font-semibold text-gray-700">مشاوره تربیت پت:</span> <span className="text-gray-700">{pet.trainingAdvice}</span></div>)}
+                </div>
+              </div>
+
+              {/* Digital Documents */}
+              <div className="bg-white rounded-lg ring-1 ring-gray-200 p-4">
+                <h3 className="text-md font-bold text-[var(--main-color)] mb-3">اسناد دیجیتال</h3>
+                
+                {filesLoading && (
+                  <div className="text-center py-4">
+                    <div className="inline-block animate-spin rounded-full h-6 w-6 border-b-2 border-[var(--main-color)]"></div>
+                    <p className="text-sm text-gray-500 mt-2">در حال بارگذاری فایل‌ها...</p>
+                  </div>
+                )}
+
+                {filesError && (
+                  <div className="text-center py-4">
+                    <p className="text-sm text-red-500">{filesError}</p>
+                  </div>
+                )}
+
+                {!filesLoading && !filesError && (
+                  <div className="space-y-4">
+                    {/* PDF Documents */}
+                    <div className="space-y-2">
+                      {files.certificatePdf && (
+                        <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                          <div className="flex items-center gap-3">
+                            <FileText className="text-[var(--main-color)]" size={20} />
+                            <div>
+                              <p className="font-medium text-gray-900">شناسنامه پت</p>
+                              <p className="text-sm text-gray-500">{files.certificatePdf.fileName}</p>
+                            </div>
+                          </div>
+                          <a
+                            href={files.certificatePdf.url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="flex items-center gap-1 text-[var(--main-color)] hover:text-[var(--main-color-dark)] transition-colors"
+                          >
+                            <Download size={16} />
+                            <span className="text-sm">دانلود</span>
+                          </a>
+                        </div>
+                      )}
+
+                      {files.insurancePdf && (
+                        <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                          <div className="flex items-center gap-3">
+                            <FileText className="text-[var(--main-color)]" size={20} />
+                            <div>
+                              <p className="font-medium text-gray-900">بیمه نامه</p>
+                              <p className="text-sm text-gray-500">{files.insurancePdf.fileName}</p>
+                            </div>
+                          </div>
+                          <a
+                            href={files.insurancePdf.url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="flex items-center gap-1 text-[var(--main-color)] hover:text-[var(--main-color-dark)] transition-colors"
+                          >
+                            <Download size={16} />
+                            <span className="text-sm">دانلود</span>
+                          </a>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Gallery Photos */}
+                    {files.galleryPhoto.length > 0 && (
+                      <div>
+                        <h4 className="font-medium text-gray-900 mb-3 flex items-center gap-2">
+                          <ImageIcon className="text-[var(--main-color)]" size={18} />
+                          گالری عکس‌ها
+                        </h4>
+                        <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                          {files.galleryPhoto.map((photo, index) => (
+                            <div key={index} className="relative group">
+                              <img
+                                src={photo.url}
+                                alt={`عکس ${index + 1}`}
+                                className="w-full h-24 object-cover rounded-lg border shadow-sm"
+                              />
+                              <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors rounded-lg flex items-center justify-center">
+                                <a
+                                  href={photo.url}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="opacity-0 group-hover:opacity-100 transition-opacity bg-white/90 rounded-full p-2"
+                                >
+                                  <ImageIcon size={16} className="text-gray-700" />
+                                </a>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Gallery Videos */}
+                    {files.galleryVideo.length > 0 && (
+                      <div>
+                        <h4 className="font-medium text-gray-900 mb-3 flex items-center gap-2">
+                          <Video className="text-[var(--main-color)]" size={18} />
+                          گالری ویدیوها
+                        </h4>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                          {files.galleryVideo.map((video, index) => (
+                            <div key={index} className="relative group">
+                              <video
+                                src={video.url}
+                                className="w-full h-32 object-cover rounded-lg border shadow-sm"
+                                controls
+                              />
+                              <div className="absolute top-2 right-2 bg-black/70 text-white text-xs px-2 py-1 rounded">
+                                {video.fileName}
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* No files message */}
+                    {!files.certificatePdf && !files.insurancePdf && files.galleryPhoto.length === 0 && files.galleryVideo.length === 0 && (
+                      <div className="text-center py-6 text-gray-500">
+                        <FileText size={32} className="mx-auto mb-2 text-gray-300" />
+                        <p>هیچ سند دیجیتالی موجود نیست</p>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+          {/* Footer Close */}
+          <div className="sticky bottom-0 px-6 py-4 border-t flex justify-end bg-white/90 z-10">
+            <button onClick={onClose} className="px-4 py-2 bg-[var(--main-color)] hover:bg-[var(--main-color-dark)] text-white rounded-lg transition-colors">بستن</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
 
 export default function PetList() {
     const [pets, setPets] = useState<Pet[]>([]);
@@ -21,13 +300,6 @@ export default function PetList() {
     const [petToDelete, setPetToDelete] = useState<Pet | null>(null);
     const [qrModalOpen, setQrModalOpen] = useState(false);
     const [selectedPetForQR, setSelectedPetForQR] = useState<Pet | null>(null);
-    const [mediaFiles, setMediaFiles] = useState<{
-      photoPet?: { url: string; fileId: string };
-      galleryPhoto?: Array<{ url: string; fileId: string }>;
-      galleryVideo?: Array<{ url: string; fileId: string }>;
-      certificatePdf?: { url: string; fileId: string };
-      insurancePdf?: { url: string; fileId: string };
-    }>({});
 
     const { showError, showSuccess, snackbar, hideSnackbar } = useSnackbar();
 
@@ -68,99 +340,10 @@ export default function PetList() {
         setShowForm(true);
     };
 
-    const fetchMediaFiles = async (petData: Pet) => {
-        const mediaData: any = {};
-
-        try {
-            // Fetch main pet photo
-            if (petData.photoPet) {
-                try {
-                    const photoPreview = await getFilePreview(petData.photoPet);
-                    mediaData.photoPet = {
-                        url: photoPreview.url,
-                        fileId: petData.photoPet
-                    };
-                } catch (error) {
-                    console.error('Failed to fetch pet photo:', error);
-                }
-            }
-
-            // Fetch gallery photos
-            if (petData.galleryPhoto && petData.galleryPhoto.length > 0) {
-                const photoPromises = petData.galleryPhoto.map(async (fileId: string) => {
-                    try {
-                        const preview = await getFilePreview(fileId);
-                        return {
-                            url: preview.url,
-                            fileId: fileId
-                        };
-                    } catch (error) {
-                        console.error(`Failed to fetch gallery photo ${fileId}:`, error);
-                        return null;
-                    }
-                });
-
-                const photoResults = await Promise.all(photoPromises);
-                mediaData.galleryPhoto = photoResults.filter(result => result !== null);
-            }
-
-            // Fetch gallery videos
-            if (petData.galleryVideo && petData.galleryVideo.length > 0) {
-                const videoPromises = petData.galleryVideo.map(async (fileId: string) => {
-                    try {
-                        const preview = await getFilePreview(fileId);
-                        return {
-                            url: preview.url,
-                            fileId: fileId
-                        };
-                    } catch (error) {
-                        console.error(`Failed to fetch gallery video ${fileId}:`, error);
-                        return null;
-                    }
-                });
-
-                const videoResults = await Promise.all(videoPromises);
-                mediaData.galleryVideo = videoResults.filter(result => result !== null);
-            }
-
-            // Fetch certificate PDF
-            if (petData.certificatePdf) {
-                try {
-                    const certPreview = await getFilePreview(petData.certificatePdf);
-                    mediaData.certificatePdf = {
-                        url: certPreview.url,
-                        fileId: petData.certificatePdf
-                    };
-                } catch (error) {
-                    console.error('Failed to fetch certificate PDF:', error);
-                }
-            }
-
-            // Fetch insurance PDF
-            if (petData.insurancePdf) {
-                try {
-                    const insPreview = await getFilePreview(petData.insurancePdf);
-                    mediaData.insurancePdf = {
-                        url: insPreview.url,
-                        fileId: petData.insurancePdf
-                    };
-                } catch (error) {
-                    console.error('Failed to fetch insurance PDF:', error);
-                }
-            }
-
-            setMediaFiles(mediaData);
-        } catch (error) {
-            console.error('Error fetching media files:', error);
-        }
-    };
-
     const handleView = async (pet: Pet) => {
         try {
             const latestPet = await getPetById(pet.petId || "");
             setViewingPet(latestPet);
-            // Fetch media files for the pet
-            await fetchMediaFiles(latestPet);
         } catch (error: any) {
             showError("خطا در دریافت اطلاعات پت: " + (error.message || "خطای نامشخص"));
         }
@@ -409,258 +592,7 @@ export default function PetList() {
 
             {/* Pet View Modal */}
             {viewingPet && (
-                <div className="fixed inset-0 bg-black/20 backdrop-blur-sm flex items-center justify-center p-4 z-50" onClick={() => setViewingPet(null)}>
-                    <div className="relative w-full max-w-3xl" onClick={(e) => e.stopPropagation()}>
-                        <div className="absolute inset-0 -z-10 blur-2xl rounded-3xl bg-gradient-to-tr from-[var(--main-color)]/20 to-purple-400/20" />
-                        <div className="bg-white/90 rounded-2xl shadow-xl ring-1 ring-gray-200 flex flex-col max-h-[90vh] overflow-hidden">
-                            {/* Header */}
-                            <div className="sticky top-0 bg-white/90 z-10 flex items-center justify-between px-6 py-4 border-b">
-                                <div className="w-full flex justify-end gap-2">
-                                    <button onClick={() => setViewingPet(null)} className="text-gray-400 hover:text-[var(--main-color)] transition-colors" aria-label="Close">
-                                        ✕
-                                    </button>
-                                </div>
-                            </div>
-
-                            {/* Body */}
-                            <div className="px-6 py-5 overflow-y-auto flex-1">
-                                {/* Media preview if exists */}
-                                {(viewingPet.imageUrl || viewingPet.videoUrl) && (
-                                    <div className="mb-5 overflow-hidden rounded-xl ring-1 ring-gray-200">
-                                        {viewingPet.videoUrl ? (
-                                            <video src={viewingPet.videoUrl} className="w-full h-auto" controls />
-                                        ) : (
-                                            <img src={viewingPet.imageUrl as any} alt={viewingPet.namePet} className="w-full h-auto" />
-                                        )}
-                                    </div>
-                                )}
-
-                                <div className="space-y-6">
-                                    {/* Pet Characteristics */}
-                                    <div className="bg-white rounded-lg ring-1 ring-gray-200 p-4">
-                                        <h3 className="text-md font-bold text-[var(--main-color)] mb-3">مشخصات حیوان خانگی</h3>
-                                        <div className="grid grid-cols-2 gap-y-2 text-sm">
-                                            <span className="text-gray-500">تصویر پت</span>
-                                            <div className="flex justify-start mb-4">
-                                                <div className="w-32 h-32 rounded-xl overflow-hidden border-4 border-[var(--main-color)]/20 shadow-lg">
-                                                    <img
-                                                        src={mediaFiles.photoPet?.url || "/images/pet.jpg"}
-                                                        alt={viewingPet.namePet}
-                                                        className="w-full h-full object-cover"
-                                                    />
-                                                </div>
-                                            </div>
-                                            <span className="text-gray-500">شماره بیمه</span><span className="text-gray-900">{viewingPet.insuranceNumber || "تعیین نشده"}</span>
-                                            <span className="text-gray-500">نام پت</span><span className="text-gray-900">{viewingPet.namePet}</span>
-                                            <span className="text-gray-500">نوع پت</span><span className="text-gray-900">{viewingPet.typePet}</span>
-                                            <span className="text-gray-500">جنسیت</span><span className="text-gray-900">{viewingPet.sex === "MEN" ? "نر" : viewingPet.sex === "WOMEN" ? "ماده" : "نامشخص"}</span>
-                                            <span className="text-gray-500">تاریخ تولد</span><span className="text-gray-900">{viewingPet.birthDate ? formatPersianDate(viewingPet.birthDate) : ""}</span>
-                                            <span className="text-gray-500">شماره شناسنامه</span><span className="text-gray-900">{viewingPet.birthCertificateNumberPet}</span>
-                                            <span className="text-gray-500">کد میکروچیپ</span><span className="text-gray-900">{viewingPet.microChipCode}</span>
-                                            <span className="text-gray-500">رنگ پت</span><span className="text-gray-900">{viewingPet.colorPet}</span>
-                                            <span className="text-gray-500">وزن</span><span className="text-gray-900">{viewingPet.weightPet} کیلوگرم</span>
-                                            <span className="text-gray-500">قد</span><span className="text-gray-900">{viewingPet.heightPet} سانتی‌متر</span>
-                                            <span className="text-gray-500">دامپزشک صادر کننده</span><span className="text-gray-900">{viewingPet.issuingVeterinarian}</span>
-                                            <span className="text-gray-500">نظام دامپزشکی</span><span className="text-gray-900">{viewingPet.issuingMedicalSystem}</span>
-                                        </div>
-                                        {viewingPet.distinctiveFeature && (
-                                            <div className="mt-3 text-sm">
-                                                <div className="text-gray-700 font-semibold mb-1">ویژگی بارز ظاهری</div>
-                                                <div className="text-gray-700">{viewingPet.distinctiveFeature}</div>
-                                            </div>
-                                        )}
-                                    </div>
-
-                                    {/* Owner Information */}
-                                    <div className="bg-white rounded-lg ring-1 ring-gray-200 p-4">
-                                        <h3 className="text-md font-bold text-[var(--main-color)] mb-3">مشخصات سرپرست پت</h3>
-                                        <div className="grid grid-cols-2 gap-y-2 text-sm">
-                                            <span className="text-gray-500">نام و نام خانوادگی</span><span className="text-gray-900">{viewingPet.nameHead}</span>
-                                            <span className="text-gray-500">کد ملی</span><span className="text-gray-900">{viewingPet.nationalCodeHead}</span>
-                                            <span className="text-gray-500">موبایل (۱)</span><span className="text-gray-900">{viewingPet.mobile1Head}</span>
-                                            <span className="text-gray-500">موبایل (۲)</span><span className="text-gray-900">{viewingPet.mobile2Head}</span>
-                                            <span className="text-gray-500">تلفن ثابت</span><span className="text-gray-900">{viewingPet.telHead}</span>
-                                            <span className="text-gray-500">استان</span><span className="text-gray-900">{viewingPet.stateHead}</span>
-                                            <span className="text-gray-500">شهر</span><span className="text-gray-900">{viewingPet.cityHead}</span>
-                                            <span className="text-gray-500">کد پستی</span><span className="text-gray-900">{viewingPet.postalCodeHead}</span>
-                                            <span className="text-gray-500">ایمیل</span><span className="text-gray-900">{viewingPet.emailHead}</span>
-                                            <span className="text-gray-500">آدرس</span><span className="text-gray-900">{viewingPet.addressHead}</span>
-                                        </div>
-                                        <div className="mt-3 grid grid-cols-2 gap-y-2 text-sm">
-                                            {viewingPet.telegramHead && (<><span className="text-gray-500">تلگرام</span><span className="text-gray-900">{viewingPet.telegramHead}</span></>)}
-                                            {viewingPet.whatsAppHead && (<><span className="text-gray-500">واتساپ</span><span className="text-gray-900">{viewingPet.whatsAppHead}</span></>)}
-                                            {viewingPet.instagramHead && (<><span className="text-gray-500">اینستاگرام</span><span className="text-gray-900">{viewingPet.instagramHead}</span></>)}
-                                            {viewingPet.youtubeHead && (<><span className="text-gray-500">یوتیوب</span><span className="text-gray-900">{viewingPet.youtubeHead}</span></>)}
-                                            {viewingPet.linkedinHead && (<><span className="text-gray-500">لینکدین</span><span className="text-gray-900">{viewingPet.linkedinHead}</span></>)}
-                                        </div>
-                                    </div>
-
-                                    {/* Health Information */}
-                                    <div className="bg-white rounded-lg ring-1 ring-gray-200 p-4">
-                                        <h3 className="text-md font-bold text-[var(--main-color)] mb-3">ویژگی و اطلاعات سلامتی</h3>
-                                        <div className="grid grid-cols-2 gap-y-2 text-sm">
-                                            <span className="text-gray-500">دامپزشک عمومی</span><span className="text-gray-900">{viewingPet.generalVeterinarian}</span>
-                                            <span className="text-gray-500">آدرس دامپزشک عمومی</span><span className="text-gray-900">{viewingPet.addressGeneralVeterinarian}</span>
-                                            <span className="text-gray-500">تلفن دامپزشک عمومی</span><span className="text-gray-900">{viewingPet.phoneNumberGeneralVeterinarian}</span>
-                                            <span className="text-gray-500">دامپزشک متخصص</span><span className="text-gray-900">{viewingPet.specialistVeterinarian}</span>
-                                            <span className="text-gray-500">آدرس دامپزشک متخصص</span><span className="text-gray-900">{viewingPet.addressSpecialistVeterinarian}</span>
-                                            <span className="text-gray-500">تلفن دامپزشک متخصص</span><span className="text-gray-900">{viewingPet.phoneNumberSpecialistVeterinarian}</span>
-                                            <span className="text-gray-500">پت عقیم است</span><span className="text-gray-900">{viewingPet.isSterile ? "بله" : "خیر"}</span>
-                                            <span className="text-gray-500">واکسن Rabiel</span><span className="text-gray-900">{viewingPet.vaccineRabiel ? "دارد" : "ندارد"}</span>
-                                            <span className="text-gray-500">واکسن LDHPPi</span><span className="text-gray-900">{viewingPet.vaccineLDHPPi ? "دارد" : "ندارد"}</span>
-                                            <span className="text-gray-500">واکسن R.C.P</span><span className="text-gray-900">{viewingPet.vaccineRCP ? "دارد" : "ندارد"}</span>
-                                            <span className="text-gray-500">نوع تغذیه</span><span className="text-gray-900">{viewingPet.typeFeeding}</span>
-                                            <span className="text-gray-500">تعداد وعده های غذایی</span><span className="text-gray-900">{viewingPet.numberMeal}</span>
-                                        </div>
-                                        <div className="mt-3 space-y-2 text-sm">
-                                            {viewingPet.diet && (<div><span className="font-semibold text-gray-700">رژیم غذایی:</span> <span className="text-gray-700">{viewingPet.diet}</span></div>)}
-                                            {viewingPet.prohibitedFoodItems && (<div><span className="font-semibold text-gray-700">موارد ممنوع تغذیه:</span> <span className="text-gray-700">{viewingPet.prohibitedFoodItems}</span></div>)}
-                                            {viewingPet.regularlyUsedMedications && (<div><span className="font-semibold text-gray-700">داروهای مصرفی دائم:</span> <span className="text-gray-700">{viewingPet.regularlyUsedMedications}</span></div>)}
-                                            {viewingPet.prohibitedDrugs && (<div><span className="font-semibold text-gray-700">داروهای ممنوعه:</span> <span className="text-gray-700">{viewingPet.prohibitedDrugs}</span></div>)}
-                                            {viewingPet.favoriteEncouragement && (<div><span className="font-semibold text-gray-700">تشویقی مورد علاقه:</span> <span className="text-gray-700">{viewingPet.favoriteEncouragement}</span></div>)}
-                                        </div>
-                                    </div>
-
-                                    {/* Behavioral Information */}
-                                    <div className="bg-white rounded-lg ring-1 ring-gray-200 p-4">
-                                        <h3 className="text-md font-bold text-[var(--main-color)] mb-3">اطلاعات و ویژگی‌های رفتاری شخصیتی</h3>
-                                        <div className="space-y-2 text-sm">
-                                            {viewingPet.behavioralHabits && (<div><span className="font-semibold text-gray-700">عادت های رفتاری:</span> <span className="text-gray-700">{viewingPet.behavioralHabits}</span></div>)}
-                                            {viewingPet.susceptibility && (<div><span className="font-semibold text-gray-700">مهارت و استعدادها:</span> <span className="text-gray-700">{viewingPet.susceptibility}</span></div>)}
-                                            {viewingPet.sensitivities && (<div><span className="font-semibold text-gray-700">حساسیت ها:</span> <span className="text-gray-700">{viewingPet.sensitivities}</span></div>)}
-                                        </div>
-                                        <div className="mt-3 grid grid-cols-2 gap-y-2 text-sm">
-                                            <span className="text-gray-500">با پت دیگری اقامت دارد؟</span><span className="text-gray-900">{viewingPet.connectOtherPets ? "بله" : "خیر"}</span>
-                                            <span className="text-gray-500">با کودکان ارتباط دارد؟</span><span className="text-gray-900">{viewingPet.connectWithBaby ? "بله" : "خیر"}</span>
-                                        </div>
-                                    </div>
-
-                                    {/* Consultations */}
-                                    <div className="bg-white rounded-lg ring-1 ring-gray-200 p-4">
-                                        <h3 className="text-md font-bold text-[var(--main-color)] mb-3">مشاوره ها</h3>
-                                        <div className="space-y-2 text-sm">
-                                            {viewingPet.nutritionalCounseling && (<div><span className="font-semibold text-gray-700">مشاوره متخصص تغذیه:</span> <span className="text-gray-700">{viewingPet.nutritionalCounseling}</span></div>)}
-                                            {viewingPet.expertVeterinaryCounseling && (<div><span className="font-semibold text-gray-700">مشاوره دامپزشک متخصص:</span> <span className="text-gray-700">{viewingPet.expertVeterinaryCounseling}</span></div>)}
-                                            {viewingPet.trainingAdvice && (<div><span className="font-semibold text-gray-700">مشاوره تربیت پت:</span> <span className="text-gray-700">{viewingPet.trainingAdvice}</span></div>)}
-                                        </div>
-                                    </div>
-
-                                    {/* Digital Documents */}
-                                    <div className="bg-white rounded-lg ring-1 ring-gray-200 p-4">
-                                        <h3 className="text-md font-bold text-[var(--main-color)] mb-3">اسناد دیجیتال</h3>
-                                        
-                                        {/* Gallery Photos */}
-                                        {mediaFiles.galleryPhoto && mediaFiles.galleryPhoto.length > 0 && (
-                                            <div className="mb-6">
-                                                <h4 className="text-sm font-semibold text-gray-700 mb-3 flex items-center gap-2">
-                                                    <ImageIcon size={16} />
-                                                    گالری عکس‌های پت
-                                                </h4>
-                                                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
-                                                    {mediaFiles.galleryPhoto.map((photo, index) => (
-                                                        <div key={index} className="relative group">
-                                                            <img
-                                                                src={photo.url}
-                                                                alt={`عکس پت ${index + 1}`}
-                                                                className="w-full h-24 object-cover rounded-lg border shadow-sm group-hover:shadow-md transition-shadow"
-                                                            />
-                                                            <a
-                                                                href={photo.url}
-                                                                target="_blank"
-                                                                rel="noreferrer"
-                                                                className="absolute inset-0 flex items-center justify-center bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity rounded-lg"
-                                                            >
-                                                                <Eye size={20} className="text-white" />
-                                                            </a>
-                                                        </div>
-                                                    ))}
-                                                </div>
-                                            </div>
-                                        )}
-
-                                        {/* Gallery Videos */}
-                                        {mediaFiles.galleryVideo && mediaFiles.galleryVideo.length > 0 && (
-                                            <div className="mb-6">
-                                                <h4 className="text-sm font-semibold text-gray-700 mb-3 flex items-center gap-2">
-                                                    <Video size={16} />
-                                                    گالری ویدیوهای پت
-                                                </h4>
-                                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                                    {mediaFiles.galleryVideo.map((video, index) => (
-                                                        <div key={index} className="relative">
-                                                            <video
-                                                                src={video.url}
-                                                                className="w-full h-48 object-cover rounded-lg border shadow-sm"
-                                                                controls
-                                                            />
-                                                            <a
-                                                                href={video.url}
-                                                                target="_blank"
-                                                                rel="noreferrer"
-                                                                className="absolute top-2 right-2 bg-black/50 text-white p-1 rounded-full hover:bg-black/70 transition-colors"
-                                                            >
-                                                                <Eye size={16} />
-                                                            </a>
-                                                        </div>
-                                                    ))}
-                                                </div>
-                                            </div>
-                                        )}
-
-                                        {/* PDF Documents */}
-                                        <div className="space-y-3">
-                                            {mediaFiles.certificatePdf && (
-                                                <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                                                    <div className="flex items-center gap-3">
-                                                        <FileText size={20} className="text-[var(--main-color)]" />
-                                                        <div>
-                                                            <div className="font-semibold text-gray-900">شناسنامه پت</div>
-                                                            <div className="text-sm text-gray-500">فایل PDF</div>
-                                                        </div>
-                                                    </div>
-                                                    <a
-                                                        href={mediaFiles.certificatePdf.url}
-                                                        target="_blank"
-                                                        rel="noreferrer"
-                                                        className="flex items-center gap-2 bg-[var(--main-color)] text-white px-3 py-2 rounded-lg hover:bg-[var(--main-color-dark)] transition-colors"
-                                                    >
-                                                        <Download size={16} />
-                                                        دانلود
-                                                    </a>
-                                                </div>
-                                            )}
-
-                                            {mediaFiles.insurancePdf && (
-                                                <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                                                    <div className="flex items-center gap-3">
-                                                        <Shield size={20} className="text-[var(--main-color)]" />
-                                                        <div>
-                                                            <div className="font-semibold text-gray-900">بیمه نامه پت</div>
-                                                            <div className="text-sm text-gray-500">فایل PDF</div>
-                                                        </div>
-                                                    </div>
-                                                    <a
-                                                        href={mediaFiles.insurancePdf.url}
-                                                        target="_blank"
-                                                        rel="noreferrer"
-                                                        className="flex items-center gap-2 bg-[var(--main-color)] text-white px-3 py-2 rounded-lg hover:bg-[var(--main-color-dark)] transition-colors"
-                                                    >
-                                                        <Download size={16} />
-                                                        دانلود
-                                                    </a>
-                                                </div>
-                                            )}
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            {/* Footer Close */}
-                            <div className="sticky bottom-0 px-6 py-4 border-t flex justify-end bg-white/90 z-10">
-                                <button onClick={() => setViewingPet(null)} className="px-4 py-2 bg-[var(--main-color)] hover:bg-[var(--main-color-dark)] text-white rounded-lg transition-colors">بستن</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                <PetViewModal pet={viewingPet} onClose={() => setViewingPet(null)} />
             )}
 
             {/* Custom Delete Confirmation Modal */}
