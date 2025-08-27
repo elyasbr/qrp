@@ -183,17 +183,17 @@ function PetViewModal({ pet, onClose }: { pet: Pet; onClose: () => void }) {
                       </div>
                     )}
 
-                    {files.insurancePdf && (
+                    {pet.insurancePDF && (
                       <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
                         <div className="flex items-center gap-3">
                           <FileText className="text-[var(--main-color)]" size={20} />
                           <div>
                             <p className="font-medium text-gray-900">بیمه نامه</p>
-                            <p className="text-sm text-gray-500">{files.insurancePdf.fileName}</p>
+                            <p className="text-sm text-gray-500">{pet.insurancePDF}</p>
                           </div>
                         </div>
                         <a
-                          href={files.insurancePdf.url}
+                          href={`https://provider.exmodules.org/api/v1/file-manager/preview/${pet.insurancePDF}`}
                           target="_blank"
                           rel="noopener noreferrer"
                           className="flex items-center gap-1 text-[var(--main-color)] hover:text-[var(--main-color-dark)] transition-colors"
