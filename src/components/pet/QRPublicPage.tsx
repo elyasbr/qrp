@@ -14,6 +14,7 @@ interface QRPublicPageProps {
 }
 
 export default function QRPublicPage({ pet, isLoading, error }: QRPublicPageProps) {
+  console.log("🚀 ~ QRPublicPage ~ pet:", pet)
   const { files, loading: filesLoading, error: filesError } = usePetFiles(pet);
 
   if (isLoading) {
@@ -205,117 +206,118 @@ export default function QRPublicPage({ pet, isLoading, error }: QRPublicPageProp
                 </div>
               )}
 
-              {!filesLoading && !filesError && (
-                <div className="space-y-4">
-                  {/* PDF Documents */}
-                  <div className="space-y-2">
-                    {files.certificatePdf && (
-                      <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                        <div className="flex items-center gap-3">
-                          <FileText className="text-[var(--main-color)]" size={20} />
-                          <div>
-                            <p className="font-medium text-gray-900">شناسنامه پت</p>
-                            <p className="text-sm text-gray-500">{files.certificatePdf.fileName}</p>
-                          </div>
-                        </div>
-                        <a
-                          href={files.certificatePdf.url}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="flex items-center gap-1 text-[var(--main-color)] hover:text-[var(--main-color-dark)] transition-colors"
-                        >
-                          <Download size={16} />
-                          <span className="text-sm">دانلود</span>
-                        </a>
-                      </div>
-                    )}
 
-                    {files.insurancePdf && (
-                      <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                        <div className="flex items-center gap-3">
-                          <Shield className="text-[var(--main-color)]" size={20} />
-                          <div>
-                            <p className="font-medium text-gray-900">بیمه نامه</p>
-                            <p className="text-sm text-gray-500">{files.insurancePdf.fileName}</p>
-                          </div>
+              <div className="space-y-4">
+                {/* PDF Documents */}
+                <div className="space-y-2">
+                  {pet?.certificatePdfPet && (
+                    <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                      <div className="flex items-center gap-3">
+                        <FileText className="text-[var(--main-color)]" size={20} />
+                        <div>
+                          <p className="font-medium text-gray-900">شناسنامه پت</p>
+                          <p className="text-sm text-gray-500">{pet?.certificatePdfPet}</p>
                         </div>
-                        <a
-                          href={files.insurancePdf.url}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="flex items-center gap-1 text-[var(--main-color)] hover:text-[var(--main-color-dark)] transition-colors"
-                        >
-                          <Download size={16} />
-                          <span className="text-sm">دانلود</span>
-                        </a>
                       </div>
-                    )}
-                  </div>
-
-                  {/* Gallery Photos */}
-                  {files.galleryPhoto.length > 0 && (
-                    <div>
-                      <h4 className="font-medium text-gray-900 mb-3 flex items-center gap-2">
-                        <ImageIcon className="text-[var(--main-color)]" size={18} />
-                        گالری عکس‌ها
-                      </h4>
-                      <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-                        {files.galleryPhoto.map((photo, index) => (
-                          <div key={index} className="relative group">
-                            <img
-                              src={photo.url}
-                              alt={`عکس ${index + 1}`}
-                              className="w-full h-24 object-cover rounded-lg border shadow-sm"
-                            />
-                            <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors rounded-lg flex items-center justify-center">
-                              <a
-                                href={photo.url}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="opacity-0 group-hover:opacity-100 transition-opacity bg-white/90 rounded-full p-2"
-                              >
-                                <ImageIcon size={16} className="text-gray-700" />
-                              </a>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
+                      <a
+                        href={`https://provider.exmodules.org/api/v1/file-manager/preview/${pet?.certificatePdfPet}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-center gap-1 text-[var(--main-color)] hover:text-[var(--main-color-dark)] transition-colors"
+                      >
+                        <Download size={16} />
+                        <span className="text-sm">دانلود</span>
+                      </a>
                     </div>
                   )}
 
-                  {/* Gallery Videos */}
-                  {files.galleryVideo.length > 0 && (
-                    <div>
-                      <h4 className="font-medium text-gray-900 mb-3 flex items-center gap-2">
-                        <Video className="text-[var(--main-color)]" size={18} />
-                        گالری ویدیوها
-                      </h4>
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                        {files.galleryVideo.map((video, index) => (
-                          <div key={index} className="relative group">
-                            <video
-                              src={video.url}
-                              className="w-full h-32 object-cover rounded-lg border shadow-sm"
-                              controls
-                            />
-                            <div className="absolute top-2 right-2 bg-black/70 text-white text-xs px-2 py-1 rounded">
-                              {video.fileName}
-                            </div>
-                          </div>
-                        ))}
+                  {pet?.insurancePdfPet && (
+                    <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                      <div className="flex items-center gap-3">
+                        <Shield className="text-[var(--main-color)]" size={20} />
+                        <div>
+                          <p className="font-medium text-gray-900">بیمه نامه</p>
+                          <p className="text-sm text-gray-500">{pet?.insurancePdfPet}</p>
+                        </div>
                       </div>
-                    </div>
-                  )}
-
-                  {/* No files message */}
-                  {!files.certificatePdf && !files.insurancePdf && files.galleryPhoto.length === 0 && files.galleryVideo.length === 0 && (
-                    <div className="text-center py-6 text-gray-500">
-                      <FileText size={32} className="mx-auto mb-2 text-gray-300" />
-                      <p>هیچ سند دیجیتالی موجود نیست</p>
+                      <a
+                        href={`https://provider.exmodules.org/api/v1/file-manager/preview/${pet?.insurancePdfPet}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-center gap-1 text-[var(--main-color)] hover:text-[var(--main-color-dark)] transition-colors"
+                      >
+                        <Download size={16} />
+                        <span className="text-sm">دانلود</span>
+                      </a>
                     </div>
                   )}
                 </div>
-              )}
+
+                {/* Gallery Photos */}
+                {(pet?.galleriesPhoto?.length ?? 0) > 0 && (
+                  <div>
+                    <h4 className="font-medium text-gray-900 mb-3 flex items-center gap-2">
+                      <ImageIcon className="text-[var(--main-color)]" size={18} />
+                      گالری عکس‌ها
+                    </h4>
+                    <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                      {pet?.galleriesPhoto?.map((photo, index) => (
+                        <div key={index} className="relative group">
+                          <img
+                            src={`https://provider.exmodules.org/api/v1/file-manager/preview/${photo}`}
+                      
+                            alt={`عکس ${index + 1}`}
+                            className="w-full h-24 object-cover rounded-lg border shadow-sm"
+                          />
+                          <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors rounded-lg flex items-center justify-center">
+                            <a
+                              href={`https://provider.exmodules.org/api/v1/file-manager/download/${photo}`}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="opacity-0 group-hover:opacity-100 transition-opacity bg-white/90 rounded-full p-2"
+                            >
+                              <ImageIcon size={16} className="text-gray-700" />
+                            </a>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Gallery Videos */}
+                {(pet?.galleriesVideo?.length ?? 0) > 0 && (
+                  <div>
+                    <h4 className="font-medium text-gray-900 mb-3 flex items-center gap-2">
+                      <Video className="text-[var(--main-color)]" size={18} />
+                      گالری ویدیوها
+                    </h4>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                      {pet?.galleriesVideo?.map((video, index) => (
+                        <div key={index} className="relative group">
+                          <video
+                            src={`https://provider.exmodules.org/api/v1/file-manager/preview/${video}`}
+                            className="w-full h-32 object-cover rounded-lg border shadow-sm"
+                            controls
+                          />
+                          <div className="absolute top-2 right-2 bg-black/70 text-white text-xs px-2 py-1 rounded">
+                            {video}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* No files message */}
+                {!pet?.certificatePdfPet && !pet?.insurancePdfPet && (pet?.galleriesPhoto?.length ?? 0) === 0 && (pet?.galleriesVideo?.length ?? 0) === 0 && (
+                  <div className="text-center py-6 text-gray-500">
+                    <FileText size={32} className="mx-auto mb-2 text-gray-300" />
+                    <p>هیچ سند دیجیتالی موجود نیست</p>
+                  </div>
+                )}
+              </div>
+
             </div>
           </div>
         </div>
