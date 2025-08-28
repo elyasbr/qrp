@@ -1,7 +1,7 @@
 "use client";
 import React, { useEffect } from "react";
 import { useParams } from "next/navigation";
-import QRPublicPage from "@/components/pet/QRPublicPage";
+import QRPublicPage from "@/components/pet/QRPublic";
 import { usePetPublic } from "@/hooks/usePetPublic";
 
 export default function PetPublicPage() {
