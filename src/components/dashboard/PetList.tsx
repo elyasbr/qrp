@@ -39,7 +39,7 @@ function PetViewModal({ pet, onClose }: { pet: Pet; onClose: () => void }) {
                     <div className="w-32 h-32 rounded-xl overflow-hidden border-4 border-[var(--main-color)]/20 shadow-lg">
 
                       <img
-                        src={`https://provider.exmodules.org/api/v1/file-manager/preview/${pet.photoPet}`}
+                        src={`${process.env.NEXT_PUBLIC_UPLOAD_BASE_URL}/preview/${pet.photoPet}`}
                         alt={pet.namePet}
                         className="w-full h-full object-cover"
                       />
@@ -172,7 +172,7 @@ function PetViewModal({ pet, onClose }: { pet: Pet; onClose: () => void }) {
                           </div>
                         </div>
                         <a
-                          href={`https://provider.exmodules.org/api/v1/file-manager/preview/${pet?.certificatePdfPet}`}
+                          href={`${process.env.NEXT_PUBLIC_UPLOAD_BASE_URL}/preview/${pet?.certificatePdfPet}`}
                           target="_blank"
                           rel="noopener noreferrer"
                           className="flex items-center gap-1 text-[var(--main-color)] hover:text-[var(--main-color-dark)] transition-colors"
@@ -193,7 +193,7 @@ function PetViewModal({ pet, onClose }: { pet: Pet; onClose: () => void }) {
                           </div>
                         </div>
                         <a
-                          href={`https://provider.exmodules.org/api/v1/file-manager/preview/${pet.insurancePDF}`}
+                          href={`${process.env.NEXT_PUBLIC_UPLOAD_BASE_URL}/preview/${pet.insurancePDF}`}
                           target="_blank"
                           rel="noopener noreferrer"
                           className="flex items-center gap-1 text-[var(--main-color)] hover:text-[var(--main-color-dark)] transition-colors"
@@ -215,7 +215,7 @@ function PetViewModal({ pet, onClose }: { pet: Pet; onClose: () => void }) {
                       <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
                         {pet?.galleriesPhoto?.map((photo, index) => {
                           return (<div key={index} className="relative group">
-                            <img src={`https://provider.exmodules.org/api/v1/file-manager/preview/${photo}`} alt={`عکس ${index + 1}`} className="w-full h-24 object-cover rounded-lg border shadow-sm" />
+                            <img src={`${process.env.NEXT_PUBLIC_UPLOAD_BASE_URL}/preview/${photo}`} alt={`عکس ${index + 1}`} className="w-full h-24 object-cover rounded-lg border shadow-sm" />
                             <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors rounded-lg flex items-center justify-center">
                               <a href={photo} target="_blank" rel="noopener noreferrer" className="opacity-0 group-hover:opacity-100 transition-opacity bg-white/90 rounded-full p-2">
                                 <ImageIcon size={16} className="text-gray-700" />
@@ -238,8 +238,7 @@ function PetViewModal({ pet, onClose }: { pet: Pet; onClose: () => void }) {
                         {pet?.galleriesVideo?.map((video, index) => (
                           <div key={index} className="relative group">
                             <video
-
-                              src={`https://provider.exmodules.org/api/v1/file-manager/preview/${video}`}
+                              src={`${process.env.NEXT_PUBLIC_UPLOAD_BASE_URL}/preview/${video}`}
                               className="w-full h-32 object-cover rounded-lg border shadow-sm"
                               controls
                             />
@@ -449,7 +448,7 @@ export default function PetList() {
                 {/* Pet Image */}
                 <div className="h-48 bg-gradient-to-br from-blue-100 to-purple-100 flex items-center justify-center relative overflow-hidden">
                   <img
-                    src={`https://provider.exmodules.org/api/v1/file-manager/preview/${pet.photoPet}`}
+                    src={`${process.env.NEXT_PUBLIC_UPLOAD_BASE_URL}/preview/${pet.photoPet}`}
                     alt={pet.namePet}
                     className="w-full h-full object-cover"
                   />

@@ -4,8 +4,11 @@
  * This service handles file uploads to the external provider with proper authentication.
  * 
  * API Endpoints:
- * - POST https://provider.exmodules.org/api/v1/file-manager/first-upload - Upload a file
- * - GET https://provider.exmodules.org/api/v1/file-manager/preview/{fileId} - Get file preview
+ * - POST ${NEXT_PUBLIC_UPLOAD_BASE_URL}/first-upload - Upload a file
+ * - GET ${NEXT_PUBLIC_UPLOAD_BASE_URL}/preview/{fileId} - Get file preview
+ * 
+ * Environment Variables:
+ * - NEXT_PUBLIC_UPLOAD_BASE_URL: Base URL for file upload service
  * 
  * Authentication:
  * - All requests include Bearer token from localStorage
@@ -66,7 +69,7 @@ export const uploadFile = async (file: File, isPrivate: boolean = false, retryCo
     hasToken: !!token,
     tokenLength: token.length,
     tokenPreview: token.substring(0, 20) + '...',
-    uploadUrl: 'https://provider.exmodules.org/api/v1/file-manager/first-upload',
+    uploadUrl: `${process.env.NEXT_PUBLIC_UPLOAD_BASE_URL}/first-upload`,
     timestamp: new Date().toISOString()
   });
 
@@ -79,7 +82,7 @@ export const uploadFile = async (file: File, isPrivate: boolean = false, retryCo
         createdAt: string;
       };
       timestamp: string;
-    }>('https://provider.exmodules.org/api/v1/file-manager/first-upload', formData, {
+    }>(`${process.env.NEXT_PUBLIC_UPLOAD_BASE_URL}/first-upload`, formData, {
       headers: { 
         'Content-Type': 'multipart/form-data',
         'Authorization': `Bearer ${token}`,
@@ -102,11 +105,11 @@ export const uploadFile = async (file: File, isPrivate: boolean = false, retryCo
     
     // Log the specific file ID we're extracting
     console.log('📁 Extracted file ID:', response.data.result.fileId);
-    console.log('📁 Generated preview URL:', `https://provider.exmodules.org/api/v1/file-manager/preview/${response.data.result.fileId}`);
+    console.log('📁 Generated preview URL:', `${process.env.NEXT_PUBLIC_UPLOAD_BASE_URL}/preview/${response.data.result.fileId}`);
     
     // Return the fileId from the server response
     return {
-      url: `https://provider.exmodules.org/api/v1/file-manager/preview/${response.data.result.fileId}`,
+      url: `${process.env.NEXT_PUBLIC_UPLOAD_BASE_URL}/preview/${response.data.result.fileId}`,
       fileId: response.data.result.fileId,
       message: 'Upload successful'
     };
@@ -179,7 +182,7 @@ export const getFilePreview = async (fileId: string): Promise<FilePreviewRespons
   }
 
   try {
-    const response = await api.get<FilePreviewResponse>(`https://provider.exmodules.org/api/v1/file-manager/preview/${fileId}`, {
+    const response = await api.get<FilePreviewResponse>(`${process.env.NEXT_PUBLIC_UPLOAD_BASE_URL}/preview/${fileId}`, {
       headers: {
         'Authorization': `Bearer ${token}`,
       },

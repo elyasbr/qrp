@@ -77,7 +77,7 @@ export default function QRPublicPage({ pet, isLoading, error }: QRPublicPageProp
                   <div className="w-32 h-32 rounded-xl overflow-hidden border-4 border-[var(--main-color)]/20 shadow-lg">
                     {pet.photoPet ? (
                       <img
-                        src={`https://provider.exmodules.org/api/v1/file-manager/preview/${pet.photoPet}`}
+                        src={`${process.env.NEXT_PUBLIC_UPLOAD_BASE_URL}/preview/${pet.photoPet}`}
                         alt={pet.namePet}
                         className="w-full h-full object-cover"
                       />
@@ -220,7 +220,7 @@ export default function QRPublicPage({ pet, isLoading, error }: QRPublicPageProp
                         </div>
                       </div>
                       <a
-                        href={`https://provider.exmodules.org/api/v1/file-manager/preview/${pet?.certificatePdfPet}`}
+                        href={`${process.env.NEXT_PUBLIC_UPLOAD_BASE_URL}/preview/${pet?.certificatePdfPet}`}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="flex items-center gap-1 text-[var(--main-color)] hover:text-[var(--main-color-dark)] transition-colors"
@@ -241,7 +241,7 @@ export default function QRPublicPage({ pet, isLoading, error }: QRPublicPageProp
                         </div>
                       </div>
                       <a
-                        href={`https://provider.exmodules.org/api/v1/file-manager/preview/${pet?.insurancePdfPet}`}
+                        href={`${process.env.NEXT_PUBLIC_UPLOAD_BASE_URL}/preview/${pet?.insurancePdfPet}`}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="flex items-center gap-1 text-[var(--main-color)] hover:text-[var(--main-color-dark)] transition-colors"
@@ -264,14 +264,13 @@ export default function QRPublicPage({ pet, isLoading, error }: QRPublicPageProp
                       {pet?.galleriesPhoto?.map((photo, index) => (
                         <div key={index} className="relative group">
                           <img
-                            src={`https://provider.exmodules.org/api/v1/file-manager/preview/${photo}`}
-                      
+                            src={`${process.env.NEXT_PUBLIC_UPLOAD_BASE_URL}/preview/${photo}`}
                             alt={`عکس ${index + 1}`}
                             className="w-full h-24 object-cover rounded-lg border shadow-sm"
                           />
                           <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors rounded-lg flex items-center justify-center">
                             <a
-                              href={`https://provider.exmodules.org/api/v1/file-manager/download/${photo}`}
+                              href={`${process.env.NEXT_PUBLIC_UPLOAD_BASE_URL}/download/${photo}`}
                               target="_blank"
                               rel="noopener noreferrer"
                               className="opacity-0 group-hover:opacity-100 transition-opacity bg-white/90 rounded-full p-2"
@@ -296,7 +295,7 @@ export default function QRPublicPage({ pet, isLoading, error }: QRPublicPageProp
                       {pet?.galleriesVideo?.map((video, index) => (
                         <div key={index} className="relative group">
                           <video
-                            src={`https://provider.exmodules.org/api/v1/file-manager/preview/${video}`}
+                            src={`${process.env.NEXT_PUBLIC_UPLOAD_BASE_URL}/preview/${video}`}
                             className="w-full h-32 object-cover rounded-lg border shadow-sm"
                             controls
                           />

@@ -35,7 +35,7 @@ export const testNetworkConnectivity = async () => {
   // Test 2: Upload provider connectivity
   try {
     const startTime = Date.now();
-    const response = await fetch('https://provider.exmodules.org/api/v1/file-manager/preview/test', {
+    const response = await fetch(`${process.env.NEXT_PUBLIC_UPLOAD_BASE_URL}/preview/test`, {
       method: 'GET',
       mode: 'cors',
       cache: 'no-cache'
@@ -58,7 +58,7 @@ export const testNetworkConnectivity = async () => {
   // Test 3: Auth provider connectivity
   try {
     const startTime = Date.now();
-    const response = await fetch('https://auth.exmodules.org/api/v1/health', {
+    const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}health`, {
       method: 'GET',
       mode: 'cors',
       cache: 'no-cache'
