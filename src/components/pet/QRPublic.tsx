@@ -76,7 +76,7 @@ export default function QRPublic({ pet, isLoading, error }: QRPublicProps) {
                   <div className="w-32 h-32 rounded-xl overflow-hidden border-4 border-[var(--main-color)]/20 shadow-lg">
                     {pet.photoPet ? (
                       <img
-                        src={`${process.env.NEXT_PUBLIC_UPLOAD_BASE_URL}/preview/${pet.photoPet}`}
+                        src={`${process.env.NEXT_PUBLIC_UPLOAD_BASE_URL}/file-manager/preview/${pet.photoPet}`}
                         alt={pet.namePet}
                         className="w-full h-full object-cover"
                       />
@@ -237,7 +237,7 @@ export default function QRPublic({ pet, isLoading, error }: QRPublicProps) {
                             </div>
                             <div className="flex items-center gap-2">
                               <a
-                                href={`${process.env.NEXT_PUBLIC_UPLOAD_BASE_URL}/preview/${pet?.certificatePdfPet}`}
+                                href={`${process.env.NEXT_PUBLIC_UPLOAD_BASE_URL}/file-manager/preview/${pet?.certificatePdfPet}`}
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 className="p-2 text-blue-600 hover:bg-blue-100 rounded-lg transition-colors"
@@ -272,7 +272,7 @@ export default function QRPublic({ pet, isLoading, error }: QRPublicProps) {
                             </div>
                             <div className="flex items-center gap-2">
                               <a
-                                href={`${process.env.NEXT_PUBLIC_UPLOAD_BASE_URL}/preview/${pet?.insurancePdfPet}`}
+                                href={`${process.env.NEXT_PUBLIC_UPLOAD_BASE_URL}/file-manager/preview/${pet?.insurancePdfPet}`}
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 className="p-2 text-green-600 hover:bg-green-100 rounded-lg transition-colors"
@@ -309,7 +309,7 @@ export default function QRPublic({ pet, isLoading, error }: QRPublicProps) {
                           <div key={index} className="group relative bg-white border border-gray-200 rounded-xl overflow-hidden hover:shadow-lg transition-all duration-200">
                             <div className="aspect-square relative">
                               <img
-                                src={`${process.env.NEXT_PUBLIC_UPLOAD_BASE_URL}/preview/${photo}`}
+                                src={`${process.env.NEXT_PUBLIC_UPLOAD_BASE_URL}/file-manager/preview/${photo}`}
                                 alt={`عکس ${index + 1}`}
                                 className="w-full h-full object-cover"
                                 loading="lazy"
@@ -317,7 +317,7 @@ export default function QRPublic({ pet, isLoading, error }: QRPublicProps) {
                               <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-all duration-200 flex items-center justify-center">
                                 <div className="opacity-0 group-hover:opacity-100 transition-opacity flex gap-2">
                                   <a
-                                    href={`${process.env.NEXT_PUBLIC_UPLOAD_BASE_URL}/preview/${photo}`}
+                                    href={`${process.env.NEXT_PUBLIC_UPLOAD_BASE_URL}/file-manager/preview/${photo}`}
                                     target="_blank"
                                     rel="noopener noreferrer"
                                     className="bg-white/90 rounded-full p-2 hover:bg-white transition-colors"
@@ -360,7 +360,7 @@ export default function QRPublic({ pet, isLoading, error }: QRPublicProps) {
                           <div key={index} className="group relative bg-white border border-gray-200 rounded-xl overflow-hidden hover:shadow-lg transition-all duration-200">
                             <div className="aspect-video relative">
                               <video
-                                src={`${process.env.NEXT_PUBLIC_UPLOAD_BASE_URL}/preview/${video}`}
+                                src={`${process.env.NEXT_PUBLIC_UPLOAD_BASE_URL}/file-manager/preview/${video}`}
                                 className="w-full h-full object-cover"
                                 controls
                                 preload="metadata"

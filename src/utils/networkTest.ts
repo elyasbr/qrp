@@ -35,7 +35,7 @@ export const testNetworkConnectivity = async () => {
   // Test 2: Upload provider connectivity
   try {
     const startTime = Date.now();
-    const response = await fetch(`${process.env.NEXT_PUBLIC_UPLOAD_BASE_URL}/preview/test`, {
+    const response = await fetch(`${process.env.NEXT_PUBLIC_UPLOAD_BASE_URL}/file-manager/preview/test`, {
       method: 'GET',
       mode: 'cors',
       cache: 'no-cache'

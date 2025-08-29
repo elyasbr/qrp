@@ -5,7 +5,7 @@
  * 
  * API Endpoints:
  * - POST ${NEXT_PUBLIC_UPLOAD_BASE_URL}/first-upload - Upload a file
- * - GET ${NEXT_PUBLIC_UPLOAD_BASE_URL}/preview/{fileId} - Get file preview
+ * - GET ${NEXT_PUBLIC_UPLOAD_BASE_URL}/file-manager/preview/{fileId} - Get file preview
  * 
  * Environment Variables:
  * - NEXT_PUBLIC_UPLOAD_BASE_URL: Base URL for file upload service
@@ -70,7 +70,7 @@ export const uploadFile = async (file: File, isPrivate: boolean = false, retryCo
     hasToken: !!token,
     tokenLength: token.length,
     tokenPreview: token.substring(0, 20) + '...',
-    uploadUrl: `${process.env.NEXT_PUBLIC_UPLOAD_BASE_URL}/first-upload`,
+    uploadUrl: `${process.env.NEXT_PUBLIC_UPLOAD_BASE_URL}/file-manager/first-upload`,
     timestamp: new Date().toISOString()
   });
 
@@ -104,7 +104,7 @@ export const uploadFile = async (file: File, isPrivate: boolean = false, retryCo
 
     // Return the fileId from the server response
     return {
-      url: `${process.env.NEXT_PUBLIC_UPLOAD_BASE_URL}/preview/${response.data.result.fileId}`,
+      url: `${process.env.NEXT_PUBLIC_UPLOAD_BASE_URL}/file-manager/preview/${response.data.result.fileId}`,
       fileId: response.data.result.fileId,
       message: 'Upload successful'
     };
@@ -172,7 +172,7 @@ export const getFilePreview = async (fileId: string): Promise<FilePreviewRespons
       },
     });
 
-    const response = await uploadApi.get<FilePreviewResponse>(`/preview/${fileId}`);
+    const response = await uploadApi.get<FilePreviewResponse>(`/file-manager/preview/${fileId}`);
     return response.data;
   } catch (error: any) {
     console.error('File preview error:', error);
