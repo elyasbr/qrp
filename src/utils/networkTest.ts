@@ -165,11 +165,9 @@ export const testNetworkConnectivity = async () => {
 
 export const logNetworkTestResults = (results: any) => {
   console.group('🌐 Network Connectivity Test Results');
-  console.log('Timestamp:', results.timestamp);
   
   Object.entries(results.tests).forEach(([testName, testResult]) => {
     console.group(`📡 ${testName}`);
-    console.log(testResult);
     console.groupEnd();
   });
   

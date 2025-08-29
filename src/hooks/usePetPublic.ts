@@ -91,10 +91,8 @@ export const usePetFiles = (pet: any) => {
         // Fetch main pet photo
         if (pet.photoPet) {
           try {
-            console.log('Fetching main pet photo:', pet.photoPet);
             const photoPreview = await getFilePreview(pet.photoPet);
             newFiles.photoPet = photoPreview;
-            console.log('Main pet photo loaded:', photoPreview);
           } catch (err) {
             console.error('Failed to fetch main pet photo:', err);
           }
@@ -103,10 +101,8 @@ export const usePetFiles = (pet: any) => {
         // Fetch insurance PDF
         if (pet.insurancePdf) {
           try {
-            console.log('Fetching insurance PDF:', pet.insurancePdf);
             const insurancePreview = await getFilePreview(pet.insurancePdf);
             newFiles.insurancePdf = insurancePreview;
-            console.log('Insurance PDF loaded:', insurancePreview);
           } catch (err) {
             console.error('Failed to fetch insurance PDF:', err);
           }
@@ -115,10 +111,8 @@ export const usePetFiles = (pet: any) => {
         // Fetch certificate PDF
         if (pet.certificatePdf) {
           try {
-            console.log('Fetching certificate PDF:', pet.certificatePdf);
             const certificatePreview = await getFilePreview(pet.certificatePdf);
             newFiles.certificatePdf = certificatePreview;
-            console.log('Certificate PDF loaded:', certificatePreview);
           } catch (err) {
             console.error('Failed to fetch certificate PDF:', err);
           }
@@ -126,11 +120,9 @@ export const usePetFiles = (pet: any) => {
 
         // Fetch gallery photos
         if (pet.galleryPhoto && Array.isArray(pet.galleryPhoto) && pet.galleryPhoto.length > 0) {
-          console.log('Fetching gallery photos:', pet.galleryPhoto);
           const photoPromises = pet.galleryPhoto.map(async (fileId: string) => {
             try {
               const preview = await getFilePreview(fileId);
-              console.log('Gallery photo loaded:', preview);
               return preview;
             } catch (err) {
               console.error('Failed to fetch gallery photo:', fileId, err);
@@ -144,11 +136,9 @@ export const usePetFiles = (pet: any) => {
 
         // Fetch gallery videos
         if (pet.galleryVideo && Array.isArray(pet.galleryVideo) && pet.galleryVideo.length > 0) {
-          console.log('Fetching gallery videos:', pet.galleryVideo);
           const videoPromises = pet.galleryVideo.map(async (fileId: string) => {
             try {
               const preview = await getFilePreview(fileId);
-              console.log('Gallery video loaded:', preview);
               return preview;
             } catch (err) {
               console.error('Failed to fetch gallery video:', fileId, err);
@@ -161,7 +151,6 @@ export const usePetFiles = (pet: any) => {
         }
 
         setFiles(newFiles);
-        console.log('All files loaded successfully:', newFiles);
       } catch (err) {
         console.error('Error fetching files:', err);
         setError('خطا در بارگذاری فایل‌ها');

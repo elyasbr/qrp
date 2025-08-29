@@ -30,15 +30,8 @@ export default function UploadTest() {
     setUploadResult(null);
 
     try {
-      console.log("Starting test upload with file:", {
-        name: selectedFile.name,
-        size: selectedFile.size,
-        type: selectedFile.type
-      });
-
       const result = await uploadFile(selectedFile, false);
-      
-      console.log("Upload successful:", result);
+
       setUploadResult(result);
       showSuccess("آپلود موفقیت‌آمیز بود!");
       

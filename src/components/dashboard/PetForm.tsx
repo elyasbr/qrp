@@ -106,10 +106,8 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
     for (let i = 0; i < files.length; i++) {
       const file = files[i];
       try {
-        console.log(`Uploading ${fileType} ${i + 1}/${files.length}: ${file.name}`);
         const uploadResult = await uploadFile(file, isPrivate);
         fileIds.push(uploadResult.fileId);
-        console.log(`✅ ${fileType} ${i + 1} uploaded successfully:`, uploadResult.fileId);
       } catch (error) {
         console.error(`❌ Failed to upload ${fileType} ${i + 1}:`, error);
         throw error; // Re-throw to stop the process
@@ -469,15 +467,11 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
       // Upload files if selected
       if (selectedIdentificationImage) {
         try {
-          console.log("Starting identification image upload...");
           const imgRes = await uploadFile(selectedIdentificationImage, false); // Public image
-          console.log("Identification image upload successful:", imgRes);
           submitData.photoPet = imgRes.fileId; // Use fileId instead of URL
         } catch (err) {
-          console.error("Identification image upload failed", err);
           if (err instanceof Error) {
             if (err.message === 'Upload was canceled') {
-              console.log("Upload was canceled by user");
               setLoading(false);
               return;
             }
@@ -511,15 +505,12 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
       // Upload multiple pet images
       if (selectedPetImages.length > 0) {
         try {
-          console.log("Starting pet images upload...");
           const imageFileIds = await uploadMultipleFiles(selectedPetImages, false, "pet image");
-          console.log("All pet images uploaded successfully:", imageFileIds);
           submitData.galleryPhoto = imageFileIds; // Array of file IDs
         } catch (err) {
           console.error("Pet images upload failed", err);
           if (err instanceof Error) {
             if (err.message === 'Upload was canceled') {
-              console.log("Pet images upload was canceled by user");
               setLoading(false);
               return;
             }
@@ -553,15 +544,12 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
       // Upload multiple videos
       if (selectedVideos.length > 0) {
         try {
-          console.log("Starting videos upload...");
           const videoFileIds = await uploadMultipleFiles(selectedVideos, false, "video");
-          console.log("All videos uploaded successfully:", videoFileIds);
           submitData.galleryVideo = videoFileIds; // Array of file IDs
         } catch (err) {
           console.error("Videos upload failed", err);
           if (err instanceof Error) {
             if (err.message === 'Upload was canceled') {
-              console.log("Videos upload was canceled by user");
               setLoading(false);
               return;
             }
@@ -594,9 +582,7 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
 
       if (selectedCertificatePDF) {
         try {
-          console.log("Starting certificate PDF upload...");
           const certRes = await uploadFile(selectedCertificatePDF, true); // Private PDF
-          console.log("Certificate PDF upload successful:", certRes);
           submitData.certificatePdf = certRes.fileId; // Use fileId instead of URL
         } catch (err) {
           console.error("Certificate PDF upload failed", err);
@@ -630,9 +616,7 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
 
       if (selectedInsurancePDF) {
         try {
-          console.log("Starting insurance PDF upload...");
           const insRes = await uploadFile(selectedInsurancePDF, true); // Private PDF
-          console.log("Insurance PDF upload successful:", insRes);
           submitData.insurancePdf = insRes.fileId; // Use fileId instead of URL
         } catch (err) {
           console.error("Insurance PDF upload failed", err);
@@ -684,16 +668,13 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
       }
 
       // Log the final data being sent
-      console.log("Final submit data:", submitData);
 
       if (pet) {
         // Update existing pet
-        console.log("Updating pet with ID:", pet.petId);
         await updatePet(pet.petId || "", submitData as Pet);
         showSuccess("پت با موفقیت ویرایش شد");
       } else {
         // Create new pet
-        console.log("Creating new pet");
         await createPet(submitData as Pet);
         showSuccess("پت با موفقیت اضافه شد");
       }

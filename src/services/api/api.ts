@@ -40,7 +40,7 @@ class TokenManager {
 const tokenManager = new TokenManager();
 
 const api = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_BASE_URL || 'https://auth.exmodules.org/api/v1/',
+  baseURL: process.env.NEXT_PUBLIC_API_BASE_URL,
   timeout: 30000, // Increased timeout to 30 seconds
   headers: {
     'Content-Type': 'application/json',
@@ -76,7 +76,7 @@ export default api;
 
 // Create a public API instance that does not send auth headers
 export const publicApi = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_BASE_URL || 'https://auth.exmodules.org/api/v1/',
+  baseURL: process.env.NEXT_PUBLIC_API_BASE_URL,
   timeout: 10000,
   headers: {
     'Content-Type': 'application/json',

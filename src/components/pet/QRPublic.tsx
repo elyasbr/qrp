@@ -14,7 +14,6 @@ interface QRPublicProps {
 }
 
 export default function QRPublic({ pet, isLoading, error }: QRPublicProps) {
-  console.log("🚀 ~ QRPublicPage ~ pet:", pet)
   const { files, loading: filesLoading, error: filesError } = usePetFiles(pet);
 
   if (isLoading) {

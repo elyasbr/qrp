@@ -19,8 +19,9 @@
  * - PDFs: Use isPrivate=true for secure access
  */
 
-import api from './api';
+import axios from 'axios';
 import { getToken } from './auth';
+
 
 export interface UploadResponse {
   url: string;
@@ -74,7 +75,17 @@ export const uploadFile = async (file: File, isPrivate: boolean = false, retryCo
   });
 
   try {
-    const response = await api.post<{
+    // Create a temporary axios instance for upload service with the upload base URL
+    const uploadApi = axios.create({
+      baseURL: process.env.NEXT_PUBLIC_UPLOAD_BASE_URL,
+      timeout: 60000, // 60 seconds timeout for file uploads
+      headers: {
+        'Content-Type': 'multipart/form-data',
+        'Authorization': `Bearer ${token}`,
+      },
+    });
+
+    const response = await uploadApi.post<{
       statusCode: number;
       result: {
         uploadId: string;
@@ -82,13 +93,8 @@ export const uploadFile = async (file: File, isPrivate: boolean = false, retryCo
         createdAt: string;
       };
       timestamp: string;
-    }>(`${process.env.NEXT_PUBLIC_UPLOAD_BASE_URL}/first-upload`, formData, {
-      headers: { 
-        'Content-Type': 'multipart/form-data',
-        'Authorization': `Bearer ${token}`,
-      },
-      timeout: 60000, // 60 seconds timeout for file uploads
-      onUploadProgress: (progressEvent) => {
+    }>('/first-upload', formData, {
+      onUploadProgress: (progressEvent: any) => {
         if (progressEvent.total) {
           const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);
           console.log(`📤 Upload progress: ${percentCompleted}% (${progressEvent.loaded}/${progressEvent.total} bytes)`);
@@ -96,17 +102,6 @@ export const uploadFile = async (file: File, isPrivate: boolean = false, retryCo
       },
     });
 
-    console.log('✅ Upload successful:', {
-      response: response.data,
-      status: response.status,
-      headers: response.headers,
-      timestamp: new Date().toISOString()
-    });
-    
-    // Log the specific file ID we're extracting
-    console.log('📁 Extracted file ID:', response.data.result.fileId);
-    console.log('📁 Generated preview URL:', `${process.env.NEXT_PUBLIC_UPLOAD_BASE_URL}/preview/${response.data.result.fileId}`);
-    
     // Return the fileId from the server response
     return {
       url: `${process.env.NEXT_PUBLIC_UPLOAD_BASE_URL}/preview/${response.data.result.fileId}`,
@@ -114,25 +109,14 @@ export const uploadFile = async (file: File, isPrivate: boolean = false, retryCo
       message: 'Upload successful'
     };
   } catch (error: any) {
-    console.error(`❌ File upload error (attempt ${retryCount + 1}):`, {
-      error,
-      errorCode: error.code,
-      errorMessage: error.message,
-      errorResponse: error.response,
-      errorRequest: error.request,
-      timestamp: new Date().toISOString()
-    });
     
     // Handle different types of errors
     if (error.code === 'ERR_CANCELED' || error.message?.includes('canceled')) {
-      console.log('🛑 Upload request was canceled by user or network');
       throw new Error('Upload was canceled');
     }
     
     if (error.code === 'ECONNABORTED' || error.message?.includes('timeout')) {
-      console.log('⏰ Upload request timed out');
       if (retryCount < maxRetries) {
-        console.log(`🔄 Retrying upload (${retryCount + 1}/${maxRetries})...`);
         // Wait a bit before retrying
         await new Promise(resolve => setTimeout(resolve, 1000 * (retryCount + 1)));
         return uploadFile(file, isPrivate, retryCount + 1);
@@ -141,12 +125,10 @@ export const uploadFile = async (file: File, isPrivate: boolean = false, retryCo
     }
     
     if (error.response?.status === 401) {
-      console.log('🔒 Upload failed: Unauthorized - token may be invalid');
       throw new Error('Authentication failed. Please login again.');
     }
     
     if (error.response?.status === 413) {
-      console.log('📏 Upload failed: File too large');
       throw new Error('File is too large. Please choose a smaller file.');
     }
     
@@ -156,7 +138,6 @@ export const uploadFile = async (file: File, isPrivate: boolean = false, retryCo
     
     // Network errors - retry if possible
     if ((error.code === 'ERR_NETWORK' || error.message?.includes('Network Error')) && retryCount < maxRetries) {
-      console.log(`🔄 Network error, retrying upload (${retryCount + 1}/${maxRetries})...`);
       // Wait a bit before retrying
       await new Promise(resolve => setTimeout(resolve, 1000 * (retryCount + 1)));
       return uploadFile(file, isPrivate, retryCount + 1);
@@ -182,12 +163,16 @@ export const getFilePreview = async (fileId: string): Promise<FilePreviewRespons
   }
 
   try {
-    const response = await api.get<FilePreviewResponse>(`${process.env.NEXT_PUBLIC_UPLOAD_BASE_URL}/preview/${fileId}`, {
+    // Create a temporary axios instance for upload service with the upload base URL
+    const uploadApi = axios.create({
+      baseURL: process.env.NEXT_PUBLIC_UPLOAD_BASE_URL,
+      timeout: 30000, // 30 seconds timeout
       headers: {
         'Authorization': `Bearer ${token}`,
       },
-      timeout: 30000, // 30 seconds timeout
     });
+
+    const response = await uploadApi.get<FilePreviewResponse>(`/preview/${fileId}`);
     return response.data;
   } catch (error: any) {
     console.error('File preview error:', error);
