@@ -1,6 +1,7 @@
 import { AxiosError } from 'axios';
 import api from './api';
 
+
 interface User {
   id: number;
   name: string;
@@ -54,7 +55,7 @@ export const getRoles = async (): Promise<{ roles: any[] }> => {
 // 1) Pre-register (create temp user mobile)
 export const preRegisterMobile = async (mobile: string, iso3Country = 'IRN'): Promise<any> => {
   try {
-    const response = await api.post(`/user/mobile/pre-register`, { iso3Country, mobile: String(mobile) });
+    const response = await api.post(`https://api.iranrad.pet/api/v1/user/mobile/pre-register`, { iso3Country, mobile: String(mobile) });
     return response.data;
   } catch (error) {
     throw new Error((error as AxiosError)?.message || 'Failed to pre-register mobile');
