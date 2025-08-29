@@ -6,3 +6,8 @@ services:
     ports:
       - "4040:4040"
     restart: always
+    networks:
+      - shared-net
+networks:
+  shared-net:
+    external: true
