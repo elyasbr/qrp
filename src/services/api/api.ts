@@ -38,7 +38,14 @@ class TokenManager {
 }
 
 const tokenManager = new TokenManager();
-
+console.log("----tttt-----")
+console.log({
+  baseURL: process.env.NEXT_PUBLIC_API_BASE_URL,
+  timeout: 30000, // Increased timeout to 30 seconds
+  headers: {
+    'Content-Type': 'application/json',
+  },
+})
 const api = axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_BASE_URL,
   timeout: 30000, // Increased timeout to 30 seconds
