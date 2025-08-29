@@ -93,7 +93,7 @@ export const uploadFile = async (file: File, isPrivate: boolean = false, retryCo
         createdAt: string;
       };
       timestamp: string;
-    }>('/first-upload', formData, {
+    }>('/file-manager//first-upload', formData, {
       onUploadProgress: (progressEvent: any) => {
         if (progressEvent.total) {
           const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);
