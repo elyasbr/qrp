@@ -4,5 +4,5 @@ services:
     container_name: dapp-chain-2025-prod
     build: .
     ports:
-      - 3000:3000
+      - "4040:4040"
     restart: always

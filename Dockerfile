@@ -21,6 +21,6 @@ RUN npm ci --only=production
 
 ENV NODE_ENV production
 
-EXPOSE 3000
+EXPOSE 4040
 
 CMD ["npm", "run", "start"]
