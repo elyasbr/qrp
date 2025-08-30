@@ -263,69 +263,6 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
       .replace(/[٠-٩]/g, (d) => String(arabic.indexOf(d)));
   };
 
-  // const defaultFormData: Partial<Pet> = {
-  //   namePet: "",
-  //   typePet: "DOG",
-  //   breedName: "",
-  //   blood: "",
-  //   sex: "MEN",
-  //   birthDate: "",
-  //   birthCertificateNumberPet: "",
-  //   microChipCode: "",
-  //   insuranceNumber: "",
-  //   colorPet: "UNKNOWN",
-  //   distinctiveFeature: "",
-  //   weightPet: 0,
-  //   heightPet: 0,
-  //   issuingVeterinarian: "",
-  //   addressVeterinarian: "",
-  //   phoneNumberVeterinarian: "",
-  //   issuingMedicalSystem: "",
-  //   nameHead: "",
-  //   nationalCodeHead: "",
-  //   mobile1Head: "",
-  //   mobile2Head: "",
-  //   telHead: "",
-  //   iso3Head: "",
-  //   stateHead: "",
-  //   cityHead: "",
-  //   addressHead: "",
-  //   postalCodeHead: "",
-  //   emailHead: "",
-  //   telegramHead: "",
-  //   youtubeHead: "",
-  //   instagramHead: "",
-  //   whatsAppHead: "",
-  //   linkedinHead: "",
-  //   generalVeterinarian: "",
-  //   addressGeneralVeterinarian: "",
-  //   phoneNumberGeneralVeterinarian: "",
-  //   specialistVeterinarian: "",
-  //   addressSpecialistVeterinarian: "",
-  //   phoneNumberSpecialistVeterinarian: "",
-  //   isSterile: false,
-  //   vaccineRabiel: false,
-  //   vaccineLDHPPi: false,
-  //   vaccineRCP: false,
-  //   typeFeeding: "",
-  //   numberMeal: 0,
-  //   diet: "",
-  //   prohibitedFoodItems: "",
-  //   regularlyUsedMedications: "",
-  //   prohibitedDrugs: "",
-  //   favoriteEncouragement: "",
-  //   behavioralHabits: "",
-  //   susceptibility: "",
-  //   sensitivities: "",
-  //   connectOtherPets: false,
-  //   connectWithBaby: false,
-  //   nutritionalCounseling: "",
-  //   expertVeterinaryCounseling: "",
-  //   trainingAdvice: "",
-  // };
-
-
-
   // Function to format phone numbers with +98 prefix
   const formatPhoneNumber = (phoneNumber: string): string => {
     if (!phoneNumber) return "";
@@ -356,7 +293,10 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
   useEffect(() => {
     if (pet && pet.petId) {
       getPetById(pet.petId).then((data) => {
-        setFormData({ ...defaultFormData, ...data });
+        setFormData((prev) => ({
+          ...prev,
+          ...data
+        }));
       });
     }
   }, [pet]);
