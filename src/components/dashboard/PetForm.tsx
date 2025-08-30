@@ -442,6 +442,9 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
           setLoading(false);
           return;
         }
+      } else if (pet && pet.photoPet) {
+        // If editing and no new photo selected, preserve existing photo
+        submitData.photoPet = pet.photoPet;
       }
 
       // Upload multiple pet images
@@ -481,8 +484,11 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
           setLoading(false);
           return;
         }
+      } else if (pet && pet.galleriesPhoto && pet.galleriesPhoto.length > 0) {
+        // If editing and no new images selected, preserve existing gallery photos
+        submitData.galleryPhoto = pet.galleriesPhoto;
       } else {
-        // Ensure empty array is sent when no pet images are selected
+        // If creating new pet or no existing photos, send empty array
         submitData.galleryPhoto = [];
       }
 
@@ -523,15 +529,18 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
           setLoading(false);
           return;
         }
+      } else if (pet && pet.galleriesVideo && pet.galleriesVideo.length > 0) {
+        // If editing and no new videos selected, preserve existing gallery videos
+        submitData.galleryVideo = pet.galleriesVideo;
       } else {
-        // Ensure empty array is sent when no videos are selected
+        // If creating new pet or no existing videos, send empty array
         submitData.galleryVideo = [];
       }
 
       if (selectedCertificatePDF) {
         try {
           const certRes = await uploadFile(selectedCertificatePDF, true); // Private PDF
-          submitData.certificatePdf = certRes.fileId; // Use fileId instead of URL
+          submitData.certificatePdfPet = certRes.fileId; // Use fileId instead of URL
         } catch (err) {
           console.error("Certificate PDF upload failed", err);
           if (err instanceof Error) {
@@ -560,12 +569,15 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
           setLoading(false);
           return;
         }
+      } else if (pet && pet.certificatePdfPet) {
+        // If editing and no new certificate PDF selected, preserve existing PDF
+        submitData.certificatePdfPet = pet.certificatePdfPet;
       }
 
       if (selectedInsurancePDF) {
         try {
           const insRes = await uploadFile(selectedInsurancePDF, true); // Private PDF
-          submitData.insurancePdf = insRes.fileId; // Use fileId instead of URL
+          submitData.insurancePdfPet = insRes.fileId; // Use fileId instead of URL
         } catch (err) {
           console.error("Insurance PDF upload failed", err);
           if (err instanceof Error) {
@@ -594,6 +606,9 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
           setLoading(false);
           return;
         }
+      } else if (pet && pet.insurancePdfPet) {
+        // If editing and no new insurance PDF selected, preserve existing PDF
+        submitData.insurancePdfPet = pet.insurancePdfPet;
       }
 
       // Double-check that critical required fields are not empty
