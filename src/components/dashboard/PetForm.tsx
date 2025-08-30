@@ -541,6 +541,9 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
           setLoading(false);
           return;
         }
+      } else {
+        // Ensure empty array is sent when no pet images are selected
+        submitData.galleryPhoto = [];
       }
 
       // Upload multiple videos
@@ -580,6 +583,9 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
           setLoading(false);
           return;
         }
+      } else {
+        // Ensure empty array is sent when no videos are selected
+        submitData.galleryVideo = [];
       }
 
       if (selectedCertificatePDF) {
