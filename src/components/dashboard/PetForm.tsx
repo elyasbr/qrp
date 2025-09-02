@@ -1,6 +1,6 @@
 "use client";
 import { useState, useEffect } from "react";
-import { X, Save, Loader2 } from "lucide-react";
+import { X, Save, Loader2, Camera, Video, FileText, Play, Download, Eye } from "lucide-react";
 import DatePicker from "react-multi-date-picker";
 import DateObject from "react-date-object";
 import persian from "react-date-object/calendars/persian";
@@ -87,19 +87,18 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
   const [selectedCertificatePDF, setSelectedCertificatePDF] = useState<File | null>(null);
   const [selectedInsurancePDF, setSelectedInsurancePDF] = useState<File | null>(null);
   
-  /**
-   * Helper function to upload multiple files and collect file IDs
-   * 
-   * This function handles the upload of multiple files and returns an array of file IDs
-   * that can be sent to the backend for the updatePet service.
-   * 
-   * The backend expects:
-   * - photoPet: string (single file ID for main pet photo)
-   * - insurancePdf: string (single file ID for insurance PDF)
-   * - certificatePdf: string (single file ID for certificate PDF)
-   * - galleryPhoto: string[] (array of file IDs for pet photos)
-   * - galleryVideo: string[] (array of file IDs for pet videos)
-   */
+  // File preview URLs
+  const [identificationImagePreview, setIdentificationImagePreview] = useState<string | null>(null);
+  const [petImagePreviews, setPetImagePreviews] = useState<string[]>([]);
+  const [videoPreviews, setVideoPreviews] = useState<string[]>([]);
+
+  // Existing pet media from database
+  const [existingPetPhoto, setExistingPetPhoto] = useState<string | null>(null);
+  const [existingPetImages, setExistingPetImages] = useState<string[]>([]);
+  const [existingPetVideos, setExistingPetVideos] = useState<string[]>([]);
+  const [existingCertificatePDF, setExistingCertificatePDF] = useState<string | null>(null);
+  const [existingInsurancePDF, setExistingInsurancePDF] = useState<string | null>(null);
+  
   const uploadMultipleFiles = async (files: File[], isPrivate: boolean = false, fileType: string): Promise<string[]> => {
     const fileIds: string[] = [];
     
@@ -117,11 +116,6 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
     return fileIds;
   };
   
-  // File preview URLs
-  const [identificationImagePreview, setIdentificationImagePreview] = useState<string | null>(null);
-  const [petImagePreviews, setPetImagePreviews] = useState<string[]>([]);
-  const [videoPreviews, setVideoPreviews] = useState<string[]>([]);
-
   // Format file size utility function
   const formatFileSize = (bytes: number): string => {
     if (bytes === 0) return '0 Bytes';
@@ -253,6 +247,27 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
     }
   };
 
+  // Remove existing media (for replacement)
+  const removeExistingMedia = (type: 'photo' | 'images' | 'videos' | 'certificate' | 'insurance') => {
+    switch (type) {
+      case 'photo':
+        setExistingPetPhoto(null);
+        break;
+      case 'images':
+        setExistingPetImages([]);
+        break;
+      case 'videos':
+        setExistingPetVideos([]);
+        break;
+      case 'certificate':
+        setExistingCertificatePDF(null);
+        break;
+      case 'insurance':
+        setExistingInsurancePDF(null);
+        break;
+    }
+  };
+
   // Normalize digits to ASCII for backend compatibility
   const toEnglishDigits = (input: string): string => {
     if (!input) return input;
@@ -297,6 +312,23 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
           ...prev,
           ...data
         }));
+        
+        // Load existing pet media
+        if (data.photoPet) {
+          setExistingPetPhoto(data.photoPet);
+        }
+        if (data.galleriesPhoto && data.galleriesPhoto.length > 0) {
+          setExistingPetImages(data.galleriesPhoto);
+        }
+        if (data.galleriesVideo && data.galleriesVideo.length > 0) {
+          setExistingPetVideos(data.galleriesVideo);
+        }
+        if (data.certificatePdfPet) {
+          setExistingCertificatePDF(data.certificatePdfPet);
+        }
+        if (data.insurancePdfPet) {
+          setExistingInsurancePDF(data.insurancePdfPet);
+        }
       });
     }
   }, [pet]);
@@ -447,8 +479,11 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
           setLoading(false);
           return;
         }
-      } else if (pet && pet.photoPet) {
+      } else if (existingPetPhoto) {
         // If editing and no new photo selected, preserve existing photo
+        submitData.photoPet = existingPetPhoto;
+      } else if (pet && pet.photoPet) {
+        // Fallback to original pet data
         submitData.photoPet = pet.photoPet;
       }
 
@@ -488,8 +523,11 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
           setLoading(false);
           return;
         }
-      } else if (pet && pet.galleriesPhoto && pet.galleriesPhoto.length > 0) {
+      } else if (existingPetImages.length > 0) {
         // If editing and no new images selected, preserve existing gallery photos
+        submitData.galleryPhoto = existingPetImages;
+      } else if (pet && pet.galleriesPhoto && pet.galleriesPhoto.length > 0) {
+        // Fallback to original pet data
         submitData.galleryPhoto = pet.galleriesPhoto;
       } else {
         // If creating new pet or no existing photos, send empty array
@@ -532,8 +570,11 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
           setLoading(false);
           return;
         }
-      } else if (pet && pet.galleriesVideo && pet.galleriesVideo.length > 0) {
+      } else if (existingPetVideos.length > 0) {
         // If editing and no new videos selected, preserve existing gallery videos
+        submitData.galleryVideo = existingPetVideos;
+      } else if (pet && pet.galleriesVideo && pet.galleriesVideo.length > 0) {
+        // Fallback to original pet data
         submitData.galleryVideo = pet.galleriesVideo;
       } else {
         // If creating new pet or no existing videos, send empty array
@@ -571,8 +612,11 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
           setLoading(false);
           return;
         }
-      } else if (pet && pet.certificatePdfPet) {
+      } else if (existingCertificatePDF) {
         // If editing and no new certificate PDF selected, preserve existing PDF
+        submitData.certificatePdfPet = existingCertificatePDF;
+      } else if (pet && pet.certificatePdfPet) {
+        // Fallback to original pet data
         submitData.certificatePdfPet = pet.certificatePdfPet;
       }
 
@@ -607,8 +651,11 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
           setLoading(false);
           return;
         }
-      } else if (pet && pet.insurancePdfPet) {
+      } else if (existingInsurancePDF) {
         // If editing and no new insurance PDF selected, preserve existing PDF
+        submitData.insurancePdfPet = existingInsurancePDF;
+      } else if (pet && pet.insurancePdfPet) {
+        // Fallback to original pet data
         submitData.insurancePdfPet = pet.insurancePdfPet;
       }
 
@@ -674,6 +721,329 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
 
           {/* Form */}
           <form onSubmit={handleSubmit} className="space-y-6">
+            {/* Pet Profile Display Section */}
+            <div className="bg-gray-50 rounded-lg p-6 border border-gray-200">
+              <h3 className="text-lg font-semibold text-[var(--main-color)] mb-4 flex items-center gap-2">
+                <Camera size={20} />
+                {pet ? "پروفایل فعلی پت" : "آپلود رسانه‌های پت"}
+              </h3>
+
+              {/* Pet Info Summary when editing */}
+              {pet && (
+                <div className="mb-6 p-4 bg-white rounded-lg border border-gray-200">
+                  <h4 className="text-md font-medium text-gray-700 mb-3 flex items-center gap-2">
+                    📋 اطلاعات کلی پت
+                  </h4>
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+                    <div>
+                      <span className="text-gray-500">نام:</span>
+                      <span className="font-medium text-gray-900 mr-2">{pet.namePet || "نامشخص"}</span>
+                    </div>
+                    <div>
+                      <span className="text-gray-500">نوع:</span>
+                      <span className="font-medium text-gray-900 mr-2">{pet.typePet === "DOG" ? "سگ" : pet.typePet === "CAT" ? "گربه" : pet.typePet}</span>
+                    </div>
+                    <div>
+                      <span className="text-gray-500">جنسیت:</span>
+                      <span className="font-medium text-gray-900 mr-2">{pet.sex === "MEN" ? "نر" : pet.sex === "WOMEN" ? "ماده" : "نامشخص"}</span>
+                    </div>
+                    <div>
+                      <span className="text-gray-500">رنگ:</span>
+                      <span className="font-medium text-gray-900 mr-2">{pet.colorPet !== "UNKNOWN" ? pet.colorPet : "نامشخص"}</span>
+                    </div>
+                  </div>
+                </div>
+              )}
+              
+              {(existingPetPhoto || existingPetImages.length > 0 || existingPetVideos.length > 0 || existingCertificatePDF || existingInsurancePDF) ? (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {/* Main Pet Photo */}
+                  {existingPetPhoto && (
+                    <div className="bg-white rounded-lg p-4 border border-gray-200">
+                      <h4 className="text-sm font-medium text-gray-700 mb-2 flex items-center gap-2">
+                        <Camera size={16} />
+                        عکس اصلی پت
+                      </h4>
+                      <div className="relative group">
+                        <img
+                          src={`${process.env.NEXT_PUBLIC_UPLOAD_BASE_URL}/file-manager/preview/${existingPetPhoto}`}
+                          alt="Pet Photo"
+                          className="w-full h-32 object-cover rounded-lg border shadow-sm"
+                        />
+                        <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity rounded-lg flex items-center justify-center">
+                          <div className="flex gap-2">
+                            <a
+                              href={`${process.env.NEXT_PUBLIC_UPLOAD_BASE_URL}/file-manager/preview/${existingPetPhoto}`}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="p-2 bg-white/20 hover:bg-white/30 rounded-lg transition-colors"
+                              title="مشاهده"
+                            >
+                              <Eye size={16} className="text-white" />
+                            </a>
+                            <a
+                              href={`${process.env.NEXT_PUBLIC_UPLOAD_BASE_URL}/download/${existingPetPhoto}`}
+                              className="p-2 bg-white/20 hover:bg-white/30 rounded-lg transition-colors"
+                              title="دانلود"
+                            >
+                              <Download size={16} className="text-white" />
+                            </a>
+                          </div>
+                        </div>
+                      </div>
+                      <div className="flex gap-2 mt-2">
+                        <button
+                          type="button"
+                          onClick={() => removeExistingMedia('photo')}
+                          className="flex-1 flex items-center justify-center gap-2 p-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors text-sm"
+                        >
+                          <X size={14} />
+                          حذف عکس
+                        </button>
+                      </div>
+                      <p className="text-xs text-gray-500 mt-2">برای تغییر، عکس جدید انتخاب کنید</p>
+                    </div>
+                  )}
+
+                  {/* Pet Images Gallery */}
+                  {existingPetImages.length > 0 && (
+                    <div className="bg-white rounded-lg p-4 border border-gray-200">
+                      <h4 className="text-sm font-medium text-gray-700 mb-2 flex items-center gap-2">
+                        <Camera size={16} />
+                        گالری عکس‌ها ({existingPetImages.length})
+                      </h4>
+                      <div className="grid grid-cols-2 gap-2">
+                        {existingPetImages.slice(0, 4).map((photo, index) => (
+                          <div key={index} className="relative group">
+                            <img
+                              src={`${process.env.NEXT_PUBLIC_UPLOAD_BASE_URL}/file-manager/preview/${photo}`}
+                              alt={`Pet Photo ${index + 1}`}
+                              className="w-full h-20 object-cover rounded-lg border shadow-sm"
+                            />
+                            <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity rounded-lg flex items-center justify-center">
+                              <div className="flex gap-1">
+                                <a
+                                  href={`${process.env.NEXT_PUBLIC_UPLOAD_BASE_URL}/file-manager/preview/${photo}`}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="p-1 bg-white/20 hover:bg-white/30 rounded transition-colors"
+                                  title="مشاهده"
+                                >
+                                  <Eye size={12} className="text-white" />
+                                </a>
+                                <a
+                                  href={`${process.env.NEXT_PUBLIC_UPLOAD_BASE_URL}/download/${photo}`}
+                                  className="p-1 bg-white/20 hover:bg-white/30 rounded transition-colors"
+                                  title="دانلود"
+                                >
+                                  <Download size={12} className="text-white" />
+                                </a>
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                        {existingPetImages.length > 4 && (
+                          <div className="flex items-center justify-center h-20 bg-gray-100 rounded-lg border-2 border-dashed border-gray-300">
+                            <span className="text-xs text-gray-500">+{existingPetImages.length - 4} عکس دیگر</span>
+                          </div>
+                        )}
+                      </div>
+                      <div className="flex gap-2 mt-2">
+                        <button
+                          type="button"
+                          onClick={() => removeExistingMedia('images')}
+                          className="flex-1 flex items-center justify-center gap-2 p-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors text-sm"
+                        >
+                          <X size={14} />
+                          حذف همه عکس‌ها
+                        </button>
+                      </div>
+                      <p className="text-xs text-gray-500 mt-2">برای تغییر، عکس‌های جدید انتخاب کنید</p>
+                    </div>
+                  )}
+
+                  {/* Pet Videos */}
+                  {existingPetVideos.length > 0 && (
+                    <div className="bg-white rounded-lg p-4 border border-gray-200">
+                      <h4 className="text-sm font-medium text-gray-700 mb-2 flex items-center gap-2">
+                        <Video size={16} />
+                        ویدیوها ({existingPetVideos.length})
+                      </h4>
+                      <div className="space-y-2">
+                        {existingPetVideos.slice(0, 2).map((video, index) => (
+                          <div key={index} className="relative group">
+                            <video
+                              src={`${process.env.NEXT_PUBLIC_UPLOAD_BASE_URL}/file-manager/preview/${video}`}
+                              className="w-full h-20 object-cover rounded-lg border shadow-sm"
+                              controls
+                            />
+                            <div className="absolute top-1 right-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                              <div className="flex gap-1">
+                                <a
+                                  href={`${process.env.NEXT_PUBLIC_UPLOAD_BASE_URL}/file-manager/preview/${video}`}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="p-1 bg-white/80 hover:bg-white rounded transition-colors"
+                                  title="مشاهده"
+                                >
+                                  <Eye size={12} />
+                                </a>
+                                <a
+                                  href={`${process.env.NEXT_PUBLIC_UPLOAD_BASE_URL}/download/${video}`}
+                                  className="p-1 bg-white/80 hover:bg-white rounded transition-colors"
+                                  title="دانلود"
+                                >
+                                  <Download size={12} />
+                                </a>
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                        {existingPetVideos.length > 2 && (
+                          <div className="text-center py-2 bg-gray-100 rounded-lg border-2 border-dashed border-gray-300">
+                            <span className="text-xs text-gray-500">+{existingPetVideos.length - 2} ویدیوی دیگر</span>
+                          </div>
+                        )}
+                      </div>
+                      <div className="flex gap-2 mt-2">
+                        <button
+                          type="button"
+                          onClick={() => removeExistingMedia('videos')}
+                          className="flex-1 flex items-center justify-center gap-2 p-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors text-sm"
+                        >
+                          <X size={14} />
+                          حذف همه ویدیوها
+                        </button>
+                      </div>
+                      <p className="text-xs text-gray-500 mt-2">برای تغییر، ویدیوهای جدید انتخاب کنید</p>
+                    </div>
+                  )}
+
+                  {/* Certificate PDF */}
+                  {existingCertificatePDF && (
+                    <div className="bg-white rounded-lg p-4 border border-gray-200">
+                      <h4 className="text-sm font-medium text-gray-700 mb-2 flex items-center gap-2">
+                        <FileText size={16} />
+                        شناسنامه پت
+                      </h4>
+                      <div className="flex items-center gap-2 p-3 bg-gray-100 rounded-lg">
+                        <FileText size={24} className="text-blue-600" />
+                        <div className="flex-1">
+                          <p className="text-sm font-medium text-gray-900">فایل PDF شناسنامه</p>
+                          <p className="text-xs text-gray-500">برای تغییر، فایل جدید انتخاب کنید</p>
+                        </div>
+                      </div>
+                      <div className="flex gap-2 mt-2">
+                        <a
+                          href={`${process.env.NEXT_PUBLIC_UPLOAD_BASE_URL}/file-manager/preview/${existingCertificatePDF}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="flex-1 flex items-center justify-center gap-2 p-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors text-sm"
+                        >
+                          <Eye size={14} />
+                          مشاهده
+                        </a>
+                        <a
+                          href={`${process.env.NEXT_PUBLIC_UPLOAD_BASE_URL}/download/${existingCertificatePDF}`}
+                          className="flex-1 flex items-center justify-center gap-2 p-2 bg-green-600 hover:bg-green-700 text-white rounded-lg transition-colors text-sm"
+                        >
+                          <Download size={14} />
+                          دانلود
+                        </a>
+                      </div>
+                      <div className="flex gap-2 mt-2">
+                        <button
+                          type="button"
+                          onClick={() => removeExistingMedia('certificate')}
+                          className="flex-1 flex items-center justify-center gap-2 p-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors text-sm"
+                        >
+                          <X size={14} />
+                          حذف فایل
+                        </button>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Insurance PDF */}
+                  {existingInsurancePDF && (
+                    <div className="bg-white rounded-lg p-4 border border-gray-200">
+                      <h4 className="text-sm font-medium text-gray-700 mb-2 flex items-center gap-2">
+                        <FileText size={16} />
+                        بیمه نامه پت
+                      </h4>
+                      <div className="flex items-center gap-2 p-3 bg-gray-100 rounded-lg">
+                        <FileText size={24} className="text-blue-600" />
+                        <div className="flex-1">
+                          <p className="text-sm font-medium text-gray-900">فایل PDF بیمه نامه</p>
+                          <p className="text-xs text-gray-500">برای تغییر، فایل جدید انتخاب کنید</p>
+                        </div>
+                      </div>
+                      <div className="flex gap-2 mt-2">
+                        <a
+                          href={`${process.env.NEXT_PUBLIC_UPLOAD_BASE_URL}/file-manager/preview/${existingInsurancePDF}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="flex-1 flex items-center justify-center gap-2 p-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors text-sm"
+                        >
+                          <Eye size={14} />
+                          مشاهده
+                        </a>
+                        <a
+                          href={`${process.env.NEXT_PUBLIC_UPLOAD_BASE_URL}/download/${existingInsurancePDF}`}
+                          className="flex-1 flex items-center justify-center gap-2 p-2 bg-green-600 hover:bg-green-700 text-white rounded-lg transition-colors text-sm"
+                        >
+                          <Download size={14} />
+                          دانلود
+                        </a>
+                      </div>
+                      <div className="flex gap-2 mt-2">
+                        <button
+                          type="button"
+                          onClick={() => removeExistingMedia('insurance')}
+                          className="flex-1 flex items-center justify-center gap-2 p-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors text-sm"
+                        >
+                          <X size={14} />
+                          حذف فایل
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <div className="text-center py-8">
+                  <div className="flex flex-col items-center gap-4">
+                    <div className="w-16 h-16 bg-[var(--main-color)]/10 rounded-full flex items-center justify-center">
+                      <Camera size={24} className="text-[var(--main-color)]" />
+                    </div>
+                    <div>
+                      <h4 className="text-lg font-medium text-gray-900 mb-2">
+                        {pet ? "هنوز رسانه‌ای آپلود نشده" : "شروع کنید"}
+                      </h4>
+                      <p className="text-gray-500">
+                        {pet 
+                          ? "برای شروع، عکس اصلی پت، گالری عکس‌ها، ویدیوها و اسناد را آپلود کنید"
+                          : "برای شروع، عکس اصلی پت، گالری عکس‌ها، ویدیوها و اسناد را آپلود کنید"
+                        }
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Current Form Data Summary when editing */}
+            {pet && (
+              <div className="bg-blue-50 rounded-lg p-4 border border-blue-200">
+                <h4 className="text-md font-medium text-blue-700 mb-3 flex items-center gap-2">
+                  📝 اطلاعات فرم فعلی
+                </h4>
+                <p className="text-sm text-blue-600">
+                  در حال ویرایش اطلاعات پت "{pet.namePet || "نامشخص"}" هستید. 
+                  تغییرات خود را در فیلدهای زیر اعمال کنید.
+                </p>
+              </div>
+            )}
+
             {/* Basic Information */}
             <div className="grid grid-cols-1 gap-6">
               <div>
@@ -1339,6 +1709,14 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
             {/* Digital Links and Documents */}
             <div>
               <h3 className="text-lg font-semibold text-[var(--main-color)] mb-4">لینک و اسناد دیجیتال</h3>
+              
+              {/* Media Upload Help */}
+              <div className="mb-4 p-3 bg-yellow-50 rounded-lg border border-yellow-200">
+                <p className="text-sm text-yellow-700">
+                  💡 <strong>نکته:</strong> برای تغییر رسانه‌های موجود، ابتدا آنها را از بخش "پروفایل فعلی پت" حذف کنید، 
+                  سپس فایل‌های جدید را انتخاب کنید. فایل‌های جدید جایگزین فایل‌های قبلی خواهند شد.
+                </p>
+              </div>
               <div className="grid grid-cols-1 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">فایل PDF شناسنامه</label>
