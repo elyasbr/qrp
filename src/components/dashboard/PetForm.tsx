@@ -406,6 +406,11 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
         trainingAdvice: String(formData.trainingAdvice)
       };
 
+      // Check if files are selected for debugging
+      if (selectedIdentificationImage || selectedPetImages.length > 0 || selectedVideos.length > 0 || selectedCertificatePDF || selectedInsurancePDF) {
+        // Files are selected, proceed with uploads
+      }
+
       // Upload files if selected
       if (selectedIdentificationImage) {
         try {
@@ -453,7 +458,6 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
           const imageFileIds = await uploadMultipleFiles(selectedPetImages, false, "pet image");
           submitData.galleryPhoto = imageFileIds; // Array of file IDs
         } catch (err) {
-          console.error("Pet images upload failed", err);
           if (err instanceof Error) {
             if (err.message === 'Upload was canceled') {
               setLoading(false);
@@ -498,7 +502,6 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
           const videoFileIds = await uploadMultipleFiles(selectedVideos, false, "video");
           submitData.galleryVideo = videoFileIds; // Array of file IDs
         } catch (err) {
-          console.error("Videos upload failed", err);
           if (err instanceof Error) {
             if (err.message === 'Upload was canceled') {
               setLoading(false);
@@ -542,7 +545,6 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
           const certRes = await uploadFile(selectedCertificatePDF, true); // Private PDF
           submitData.certificatePdfPet = certRes.fileId; // Use fileId instead of URL
         } catch (err) {
-          console.error("Certificate PDF upload failed", err);
           if (err instanceof Error) {
             if (err.message.includes('Authentication failed')) {
               showError("خطا در احراز هویت. لطفاً دوباره وارد شوید");
@@ -579,7 +581,6 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
           const insRes = await uploadFile(selectedInsurancePDF, true); // Private PDF
           submitData.insurancePdfPet = insRes.fileId; // Use fileId instead of URL
         } catch (err) {
-          console.error("Insurance PDF upload failed", err);
           if (err instanceof Error) {
             if (err.message.includes('Authentication failed')) {
               showError("خطا در احراز هویت. لطفاً دوباره وارد شوید");
@@ -623,14 +624,11 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
       for (const field of criticalFields) {
         const value = submitData[field as keyof typeof submitData];
         if (!value || value === '' || value === 'undefined' || value === 'null') {
-          console.error(`Critical field ${field} is empty or invalid:`, value);
           showError(`فیلد ${field} اجباری است و نمی‌تواند خالی باشد`);
           setLoading(false);
           return;
         }
       }
-
-      // Log the final data being sent
 
       if (pet) {
         // Update existing pet
@@ -643,7 +641,6 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
       }
       onSuccess();
     } catch (error: any) {
-      console.error("Pet submission error:", error);
       if (error.response?.data?.message) {
         // Handle API validation errors
         const errorMessages = Array.isArray(error.response.data.message)
@@ -1610,7 +1607,7 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
 
             {/* Form Actions */}
             <div className="w-full flex justify-between gap-3 pt-6 border-t">
-              {/* <button
+               <button
                 type="button"
                 onClick={() => {
                   setFormData({
@@ -1676,7 +1673,7 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
                 className="px-4 py-2 text-blue-600 bg-blue-50 hover:bg-blue-100 rounded-lg transition-colors"
               >
                 پر کردن داده‌های تست
-              </button> */}
+              </button> 
               <div className="flex justify-end gap-3 w-full">
                 <button
                   type="button"
