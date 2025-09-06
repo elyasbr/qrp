@@ -38,7 +38,6 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
     nameHead: "",
     nationalCodeHead: "",
     mobile1Head: "",
-    mobile2Head: "",
     telHead: "",
     iso3Head: "",
     stateHead: "",
@@ -357,6 +356,7 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
       'mobile1Head',
       'phoneNumberGeneralVeterinarian',
       'phoneNumberSpecialistVeterinarian'
+      // Removed microchip and other optional fields
     ];
 
     const missingFields = requiredStringFields.filter(field =>
@@ -398,7 +398,6 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
         nameHead: String(formData.nameHead),
         nationalCodeHead: String(formData.nationalCodeHead),
         mobile1Head: formatPhoneNumber(formData.mobile1Head ?? ""),
-        mobile2Head: formatPhoneNumber(formData.mobile2Head ?? ""),
         telHead: formatPhoneNumber(formData.telHead ?? ""),
         iso3Head: String(formData.iso3Head || "IRN"),
         stateHead: String(formData.stateHead),
@@ -1205,6 +1204,7 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
                     <label className="block text-sm font-medium text-gray-700 mb-1">کد میکروچیپ پت</label>
                     <input
                       type="text"
+                      placeholder="اختیاری"
                       value={formData.microChipCode || ""}
                       onChange={(e) => handleInputChange("microChipCode", e.target.value)}
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--main-color)] focus:border-transparent"
@@ -1336,7 +1336,7 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">موبایل(شماره ضروری اول) <span className="text-red-500">*</span></label>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">موبایل <span className="text-red-500">*</span></label>
                     <input
                       type="tel"
                       value={formData.mobile1Head || ""}
@@ -1347,19 +1347,9 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
                     />
                   </div>
 
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">موبایل( شماره ضروری دوم)</label>
-                    <input
-                      type="tel"
-                      value={formData.mobile2Head || ""}
-                      onChange={(e) => handlePhoneNumberChange("mobile2Head", e.target.value)}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--main-color)] focus:border-transparent"
-                      placeholder="مثال: 9987654321"
-                    />
-                  </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">تلفن ثابت(شماره ضروری سوم)</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">تلفن ثابت</label>
                     <input
                       type="tel"
                       value={formData.telHead || ""}
@@ -1414,6 +1404,7 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
                     <input
                       type="email"
                       value={formData.emailHead || ""}
+                      placeholder="ایمیل اختیاری"
                       onChange={(e) => handleInputChange("emailHead", e.target.value)}
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--main-color)] focus:border-transparent"
                     />
@@ -1426,7 +1417,7 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
                       value={formData.telegramHead || ""}
                       onChange={(e) => handleInputChange("telegramHead", e.target.value)}
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--main-color)] focus:border-transparent"
-                      placeholder="مثال: @username"
+                      placeholder="مثال: @username (اختیاری)"
                     />
                   </div>
 
@@ -1437,7 +1428,7 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
                       value={formData.whatsAppHead || ""}
                       onChange={(e) => handlePhoneNumberChange("whatsAppHead", e.target.value)}
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--main-color)] focus:border-transparent"
-                      placeholder="مثال: 9123456789"
+                      placeholder="مثال: 9123456789 (اختیاری)"
                     />
                   </div>
 
@@ -1448,13 +1439,15 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
                       value={formData.instagramHead || ""}
                       onChange={(e) => handleInputChange("instagramHead", e.target.value)}
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--main-color)] focus:border-transparent"
-                      placeholder="مثال: @username"
+                      placeholder="اختیاری"
+
                     />
                   </div>
 
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">اکانت یوتیوب</label>
                     <input
+                      placeholder="اختیاری"
                       type="text"
                       value={formData.youtubeHead || ""}
                       onChange={(e) => handleInputChange("youtubeHead", e.target.value)}
@@ -1465,6 +1458,7 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">اکانت لینکدین</label>
                     <input
+                      placeholder="اختیاری"
                       type="text"
                       value={formData.linkedinHead || ""}
                       onChange={(e) => handleInputChange("linkedinHead", e.target.value)}
@@ -2007,7 +2001,6 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
                     nameHead: "احمد احمدی",
                     nationalCodeHead: "1234567890",
                     mobile1Head: "+989123456789",
-                    mobile2Head: "+989987654321",
                     telHead: "+982112345678",
                     iso3Head: "IRN",
                     stateHead: "تهران",
