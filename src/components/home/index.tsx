@@ -1,7 +1,7 @@
 "use client";
 import React, { useState } from "react";
 import Link from "next/link";
-import { ArrowRight, Menu, SquareX } from "lucide-react";
+import { ArrowRight, Menu, SquareX, SquareChevronRight } from "lucide-react";
 import Image from "next/image";
 import { useAuth } from "@/hooks/useAuth";
 
@@ -50,38 +50,53 @@ export default function Home() {
 
         </div>
 
-        {/* Mobile Menu with smoother animation */}
-        <div className="relative">
-          {/* Overlay */}
-          {menuOpen && (
-            <div
-              className={`fixed inset-0 z-40  transition-opacity duration-500 ease-in-out md:hidden ${menuOpen ? 'opacity-100' : 'opacity-0'}`}
-              onClick={() => setMenuOpen(false)}
-            />
-          )}
-          {/* Animated Menu */}
-          <div
-            className={`absolute top-full left-0 right-0 z-50 md:hidden transition-all duration-500 ease-in-out transform ${
-              menuOpen
-                ? 'opacity-100 translate-y-0 scale-100 pointer-events-auto'
-                : 'opacity-0 -translate-y-6 scale-95 pointer-events-none'
-            } bg-white ring ring-blue-400 shadow-sm/30 mx-2 rounded-xl mt-2 shadow-lg border-t border-gray-200`}
-            style={{ willChange: 'opacity, transform' }}
-          >
-            <div className="flex flex-col gap-3 p-4">
-              {links.map((link) => (
-                <Link
-                  key={link.label}
-                  href={link.href}
-                  onClick={() => setMenuOpen(false)}
-                  className="text-sm font-medium text-gray-700 hover:text-[var(--main-color)] transition"
-                >
-                  {link.label}
+        {/* Mobile Menu */}
+        {/* Overlay */}
+        <div
+          className={`fixed inset-0 z-40 md:hidden transition-opacity duration-300 backdrop-blur-sm ${
+            menuOpen ? "opacity-100 bg-black/30 pointer-events-auto" : "opacity-0 pointer-events-none"
+          }`}
+          onClick={() => setMenuOpen(false)}
+        />
+
+        {/* Mobile Menu */}
+        <aside
+          className={`
+            fixed top-0 right-0 h-full w-64 bg-white shadow-xl rounded-l-2xl transform-gpu will-change-transform transition-all duration-500 ease-out z-50
+            md:hidden
+            ${menuOpen ? "translate-x-0 opacity-100" : "translate-x-full opacity-0"}
+          `}
+        >
+          <div className="flex flex-col h-full">
+            {/* Mobile header */}
+            <div className="flex justify-between items-center p-4 border-b border-gray-200">
+              <div className="text-[var(--main-color)] font-extrabold text-xl font-Morabba">
+                <Link href="/">
+                  <Image alt="logo" src="/images/logo.jpg" width={100} height={100} />
                 </Link>
-              ))}
+              </div>
+              <button onClick={() => setMenuOpen(false)} className="text-gray-600">
+                <SquareChevronRight size={24} />
+              </button>
             </div>
+
+            {/* Navigation */}
+            <nav className="flex flex-col flex-1">
+              <div className="p-4 flex-1">
+                {links.map((link) => (
+                  <Link
+                    key={link.label}
+                    href={link.href}
+                    className="flex items-center gap-3 text-gray-700 hover:bg-gray-100 p-3 rounded-lg transition-all mb-2"
+                    onClick={() => setMenuOpen(false)}
+                  >
+                    <span className="text-sm font-semibold">{link.label}</span>
+                  </Link>
+                ))}
+              </div>
+            </nav>
           </div>
-        </div>
+        </aside>
       </nav>
 
       {/* Landing Section */}
