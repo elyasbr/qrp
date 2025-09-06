@@ -1475,7 +1475,7 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
 
               <div className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">نام دامپزشک عمومی</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">نام دامپزشک </label>
                   <input
                     type="text"
                     value={formData.generalVeterinarian || ""}
@@ -1496,34 +1496,6 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
                     type="tel"
                     value={formData.phoneNumberGeneralVeterinarian || ""}
                     onChange={(e) => handlePhoneNumberChange("phoneNumberGeneralVeterinarian", e.target.value)}
-                    className="w-full mt-2 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--main-color)] focus:border-transparent"
-                    required
-                    placeholder="مثال: 2112345678 (اجباری)"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">نام دامپزشک متخصص</label>
-                  <input
-                    type="text"
-                    value={formData.specialistVeterinarian || ""}
-                    onChange={(e) => handleInputChange("specialistVeterinarian", e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--main-color)] focus:border-transparent"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">آدرس و شماره تلفن دامپزشک متخصص</label>
-                  <input
-                    type="text"
-                    value={formData.addressSpecialistVeterinarian || ""}
-                    onChange={(e) => handleInputChange("addressSpecialistVeterinarian", e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--main-color)] focus:border-transparent"
-                  />
-                  <input
-                    type="tel"
-                    value={formData.phoneNumberSpecialistVeterinarian || ""}
-                    onChange={(e) => handlePhoneNumberChange("phoneNumberSpecialistVeterinarian", e.target.value)}
                     className="w-full mt-2 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--main-color)] focus:border-transparent"
                     required
                     placeholder="مثال: 2112345678 (اجباری)"
@@ -1592,7 +1564,7 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">تشویقی مورد عالقه</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">تشویقی مورد علاقه</label>
                   <textarea
                     value={formData.favoriteEncouragement || ""}
                     onChange={(e) => handleInputChange("favoriteEncouragement", e.target.value)}
@@ -1610,7 +1582,7 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
                     onChange={(e) => handleInputChange("isSterile", e.target.checked)}
                     className="mr-2"
                   />
-                  <span className="text-sm text-gray-700">پت عقیم است / نیست</span>
+                  <span className="text-sm text-gray-700">پت عقیم است</span>
                 </label>
 
                 <label className="flex items-center">
@@ -1620,7 +1592,7 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
                     onChange={(e) => handleInputChange("vaccineRabiel", e.target.checked)}
                     className="mr-2"
                   />
-                  <span className="text-sm text-gray-700">وضعیتواکسنRabiel</span>
+                  <span className="text-sm text-gray-700">وضعیت واکسن Rabiel </span>
                 </label>
 
                 <label className="flex items-center">
@@ -1685,7 +1657,7 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
                     onChange={(e) => handleInputChange("connectOtherPets", e.target.checked)}
                     className="mr-2"
                   />
-                  <span className="text-sm text-gray-700">با پت دیگری اقامت داره؟</span>
+                  <span className="text-sm text-gray-700">با پت دیگری اقامت دارد</span>
                 </label>
 
                 <label className="flex items-center">
@@ -1695,7 +1667,7 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
                     onChange={(e) => handleInputChange("connectWithBaby", e.target.checked)}
                     className="mr-2"
                   />
-                  <span className="text-sm text-gray-700">پت شما با کودکان ارتباط دارد؟</span>
+                  <span className="text-sm text-gray-700">پت شما با کودکان ارتباط دارد</span>
                 </label>
               </div>
             </div>
@@ -1942,6 +1914,7 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
             </div>
 
             {/* Consultations */}
+            
             <div>
               <h3 className="text-lg font-semibold text-[var(--main-color)] mb-4">مشاوره ها</h3>
               <div className="grid grid-cols-1 gap-4">
@@ -1979,7 +1952,7 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
 
             {/* Form Actions */}
             <div className="w-full flex justify-between gap-3 pt-6 border-t">
-               <button
+               {/* <button
                 type="button"
                 onClick={() => {
                   setFormData({
@@ -2044,7 +2017,7 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
                 className="px-4 py-2 text-blue-600 bg-blue-50 hover:bg-blue-100 rounded-lg transition-colors"
               >
                 پر کردن داده‌های تست
-              </button> 
+              </button>  */}
               <div className="flex justify-end gap-3 w-full">
                 <button
                   type="button"
