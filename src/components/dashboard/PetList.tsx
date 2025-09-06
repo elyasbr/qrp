@@ -502,7 +502,7 @@ export default function PetList() {
             {/* Add Button */}
             <button
               onClick={() => setShowForm(true)}
-              className="flex items-center gap-2 bg-[var(--main-color)] hover:bg-[var(--main-color-dark)] text-white px-4 py-2 rounded-lg transition-colors"
+              className="flex cursor-pointer items-center gap-2 bg-[var(--main-color)] hover:bg-[var(--main-color-dark)] text-white px-4 py-2 rounded-lg transition-colors"
             >
               <Plus size={20} />
               افزودن پت جدید
@@ -528,7 +528,7 @@ export default function PetList() {
             {!searchTerm && (
               <button
                 onClick={() => setShowForm(true)}
-                className="bg-[var(--main-color)] hover:bg-[var(--main-color-dark)] text-white px-4 py-2 rounded-lg transition-colors"
+                className=" cursor-pointer  bg-[var(--main-color)] hover:bg-[var(--main-color-dark)] text-white px-4 py-2 rounded-lg transition-colors"
               >
                 افزودن پت جدید
               </button>

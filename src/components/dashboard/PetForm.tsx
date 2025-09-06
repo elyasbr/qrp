@@ -9,6 +9,7 @@ import gregorian from "react-date-object/calendars/gregorian";
 import { Pet, createPet, updatePet, getPetById } from "@/services/api/petService";
 import { uploadFile } from "@/services/api/uploadService";
 import { useSnackbar } from "@/hooks/useSnackbar";
+import { useAuth } from "@/hooks/useAuth";
 
 interface PetFormProps {
   pet?: Pet | null;
@@ -17,6 +18,7 @@ interface PetFormProps {
 }
 
 export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
+  const { userPayload } = useAuth();
   const [formData, setFormData] = useState<Partial<Pet>>({
     namePet: "",
     typePet: "DOG",
@@ -1913,42 +1915,43 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
               </div>
             </div>
 
-            {/* Consultations */}
-            
-            <div>
-              <h3 className="text-lg font-semibold text-[var(--main-color)] mb-4">مشاوره ها</h3>
-              <div className="grid grid-cols-1 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">مشاوره متخصص تغذیه</label>
-                  <textarea
-                    value={formData.nutritionalCounseling || ""}
-                    onChange={(e) => handleInputChange("nutritionalCounseling", e.target.value)}
-                    rows={3}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--main-color)] focus:border-transparent"
-                  />
-                </div>
+            {/* Consultations - Only visible to admin */}
+            {userPayload?.role === "admin" && (
+              <div>
+                <h3 className="text-lg font-semibold text-[var(--main-color)] mb-4">مشاوره ها</h3>
+                <div className="grid grid-cols-1 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">مشاوره متخصص تغذیه</label>
+                    <textarea
+                      value={formData.nutritionalCounseling || ""}
+                      onChange={(e) => handleInputChange("nutritionalCounseling", e.target.value)}
+                      rows={3}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--main-color)] focus:border-transparent"
+                    />
+                  </div>
 
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">مشاوره دامپزشک متخصص</label>
-                  <textarea
-                    value={formData.expertVeterinaryCounseling || ""}
-                    onChange={(e) => handleInputChange("expertVeterinaryCounseling", e.target.value)}
-                    rows={3}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--main-color)] focus:border-transparent"
-                  />
-                </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">مشاوره دامپزشک متخصص</label>
+                    <textarea
+                      value={formData.expertVeterinaryCounseling || ""}
+                      onChange={(e) => handleInputChange("expertVeterinaryCounseling", e.target.value)}
+                      rows={3}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--main-color)] focus:border-transparent"
+                    />
+                  </div>
 
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">مشاوره تربیت پت</label>
-                  <textarea
-                    value={formData.trainingAdvice || ""}
-                    onChange={(e) => handleInputChange("trainingAdvice", e.target.value)}
-                    rows={3}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--main-color)] focus:border-transparent"
-                  />
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">مشاوره تربیت پت</label>
+                    <textarea
+                      value={formData.trainingAdvice || ""}
+                      onChange={(e) => handleInputChange("trainingAdvice", e.target.value)}
+                      rows={3}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--main-color)] focus:border-transparent"
+                    />
+                  </div>
                 </div>
               </div>
-            </div>
+            )}
 
             {/* Form Actions */}
             <div className="w-full flex justify-between gap-3 pt-6 border-t">
@@ -2036,7 +2039,7 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
                   ) : (
                     <Save size={16} />
                   )}
-                  {loading ? "در حال ذخیره..." : (pet ? "ویرایش" : "ذخیره")}
+                  {loading ? "در حال ذخیره..." : (pet ? "ثبت" : "ذخیره")}
                 </button>
               </div>
             </div>

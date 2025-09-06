@@ -21,12 +21,12 @@ const Profile = () => {
                 <h2 className="text-xl font-bold text-[var(--foreground)]">ایران راد </h2>
                 <p className="text-sm text-gray-600 dark:text-gray-400">iranrad@example.com</p>
 
-                <div className="mt-4 flex gap-2 flex-wrap justify-center">
+                {/* <div className="mt-4 flex gap-2 flex-wrap justify-center">
                     <button className="flex items-center cursor-pointer gap-2 px-4 py-2 rounded-xl bg-[var(--main-color)] text-white hover:bg-[var(--main-color-dark)] transition">
                         <Pencil size={18} />
                         ویرایش پروفایل
                     </button>
-                </div>
+                </div> */}
             </div>
         </div>
     );
