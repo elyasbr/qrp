@@ -1,5 +1,5 @@
-import { AxiosError } from 'axios';
-import api, { publicApi } from './api';
+import { AxiosError } from "axios";
+import api, { publicApi } from "./api";
 
 // Pet interface based on the API schema
 export interface Pet {
@@ -13,7 +13,21 @@ export interface Pet {
   birthCertificateNumberPet: string;
   microChipCode: string;
   insuranceNumber?: string;
-  colorPet: "RED" | "BLUE" | "GREEN" | "YELLOW" | "BLACK" | "WHITE" | "ORANGE" | "PURPLE" | "PINK" | "BROWN" | "GRAY" | "CYAN" | "MAGENTA" | "UNKNOWN";
+  colorPet:
+    | "RED"
+    | "BLUE"
+    | "GREEN"
+    | "YELLOW"
+    | "BLACK"
+    | "WHITE"
+    | "ORANGE"
+    | "PURPLE"
+    | "PINK"
+    | "BROWN"
+    | "GRAY"
+    | "CYAN"
+    | "MAGENTA"
+    | "UNKNOWN";
   distinctiveFeature: string;
   weightPet: number;
   heightPet: number;
@@ -40,9 +54,6 @@ export interface Pet {
   generalVeterinarian: string;
   addressGeneralVeterinarian: string;
   phoneNumberGeneralVeterinarian: string;
-  specialistVeterinarian: string;
-  addressSpecialistVeterinarian: string;
-  phoneNumberSpecialistVeterinarian: string;
   isSterile: boolean;
   vaccineRabiel: boolean;
   vaccineLDHPPi: boolean;
@@ -101,65 +112,88 @@ export interface PetPaginationResponse {
 // Create Pet
 export const createPet = async (petData: Pet): Promise<{ message: string }> => {
   try {
-    const response = await api.post<{ message: string }>('/pet', petData);
+    const response = await api.post<{ message: string }>("/pet", petData);
     return response.data;
   } catch (error) {
-    throw new Error((error as AxiosError)?.message || 'Failed to create pet');
+    throw new Error((error as AxiosError)?.message || "Failed to create pet");
   }
 };
 
 // Get Pet by ID
 export const getPetById = async (dataPetId: string): Promise<Pet> => {
   try {
-    const response = await api.get<{ statusCode: number; result: Pet }>(`/pet/${dataPetId}`);
+    const response = await api.get<{ statusCode: number; result: Pet }>(
+      `/pet/${dataPetId}`
+    );
     return response.data.result;
   } catch (error) {
-    throw new Error((error as AxiosError)?.message || 'Failed to fetch pet');
+    throw new Error((error as AxiosError)?.message || "Failed to fetch pet");
   }
 };
 
 // Public: Get Pet by ID without auth (for QR landing)
 export const getPetByIdPublic = async (dataPetId: string): Promise<Pet> => {
   try {
-    const response = await publicApi.get<{ statusCode: number; result: Pet }>(`/pet/qr/${dataPetId}`);
+    const response = await publicApi.get<{ statusCode: number; result: Pet }>(
+      `/pet/qr/${dataPetId}`
+    );
     return response.data.result;
   } catch (error) {
-    if (error && typeof error === 'object' && 'response' in error) {
+    if (error && typeof error === "object" && "response" in error) {
       const axiosError = error as any;
-      const message = axiosError.response?.data?.message || axiosError.message || 'Failed to fetch pet';
+      const message =
+        axiosError.response?.data?.message ||
+        axiosError.message ||
+        "Failed to fetch pet";
       throw new Error(message);
     }
-    throw new Error('Failed to fetch pet');
+    throw new Error("Failed to fetch pet");
   }
 };
 
 // Update Pet
-export const updatePet = async (dataPetId: string, petData: Pet): Promise<Pet> => {
+export const updatePet = async (
+  dataPetId: string,
+  petData: Pet
+): Promise<Pet> => {
   try {
-    const response = await api.put<{ statusCode: number; result: Pet }>(`/pet/${dataPetId}`, petData);
+    const response = await api.put<{ statusCode: number; result: Pet }>(
+      `/pet/${dataPetId}`,
+      petData
+    );
     return response.data.result;
   } catch (error) {
-    throw new Error((error as AxiosError)?.message || 'Failed to update pet');
+    throw new Error((error as AxiosError)?.message || "Failed to update pet");
   }
 };
 
 // Delete Pet
-export const deletePet = async (dataPetId: string): Promise<{ statusCode: number; timestamp: string }> => {
+export const deletePet = async (
+  dataPetId: string
+): Promise<{ statusCode: number; timestamp: string }> => {
   try {
-    const response = await api.delete<{ statusCode: number; timestamp: string }>(`/pet/${dataPetId}`);
+    const response = await api.delete<{
+      statusCode: number;
+      timestamp: string;
+    }>(`/pet/${dataPetId}`);
     return response.data;
   } catch (error) {
-    throw new Error((error as AxiosError)?.message || 'Failed to delete pet');
+    throw new Error((error as AxiosError)?.message || "Failed to delete pet");
   }
 };
 
 // Get Paginated Pets
-export const getPetsPaginated = async (paginationData: PetPaginationRequest): Promise<PetPaginationResponse> => {
+export const getPetsPaginated = async (
+  paginationData: PetPaginationRequest
+): Promise<PetPaginationResponse> => {
   try {
-    const response = await api.post<PetPaginationResponse>('/pet/pagination', paginationData);
+    const response = await api.post<PetPaginationResponse>(
+      "/pet/pagination",
+      paginationData
+    );
     return response.data;
   } catch (error) {
-    throw new Error((error as AxiosError)?.message || 'Failed to fetch pets');
+    throw new Error((error as AxiosError)?.message || "Failed to fetch pets");
   }
 };
 
@@ -170,10 +204,12 @@ export const getAllPets = async (): Promise<Pet[]> => {
       page: 1,
       limit: 1000, // Large limit to get all pets
       filter: {},
-      sort: { createdAt: -1 }
+      sort: { createdAt: -1 },
     });
     return response.result.data;
   } catch (error) {
-    throw new Error((error as AxiosError)?.message || 'Failed to fetch all pets');
+    throw new Error(
+      (error as AxiosError)?.message || "Failed to fetch all pets"
+    );
   }
 };

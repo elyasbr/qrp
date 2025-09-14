@@ -9,12 +9,14 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@tanstack/react-query": "^5.87.4",
     "@types/qrcode": "^1.5.5",
     "axios": "^1.11.0",
     "lucide-react": "^0.533.0",
     "next": "15.4.4",
     "qrcode": "^1.5.4",
     "react": "19.1.0",
+    "react-date-object": "^2.1.9",
     "react-dom": "19.1.0",
     "react-multi-date-picker": "^4.5.0"
   },

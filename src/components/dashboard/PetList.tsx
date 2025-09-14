@@ -1,7 +1,28 @@
 "use client";
 import { useState, useEffect, useRef } from "react";
-import { Plus, Edit, Trash2, Eye, Search, Filter, MoreVertical, PawPrint, QrCode, FileText, Video, Image as ImageIcon, Download, Play, Shield } from "lucide-react";
-import { Pet, getAllPets, deletePet, getPetById } from "@/services/api/petService";
+import {
+  Plus,
+  Edit,
+  Trash2,
+  Eye,
+  Search,
+  Filter,
+  MoreVertical,
+  PawPrint,
+  QrCode,
+  FileText,
+  Video,
+  Image as ImageIcon,
+  Download,
+  Play,
+  Shield,
+} from "lucide-react";
+import {
+  Pet,
+  getAllPets,
+  deletePet,
+  getPetById,
+} from "@/services/api/petService";
 import { useSnackbar } from "@/hooks/useSnackbar";
 import Snackbar from "@/components/common/Snackbar";
 import PetForm from "./PetForm";
@@ -14,14 +35,24 @@ function PetViewModal({ pet, onClose }: { pet: Pet; onClose: () => void }) {
   const { files, loading: filesLoading, error: filesError } = usePetFiles(pet);
 
   return (
-    <div className="fixed inset-0 bg-black/20 backdrop-blur-sm flex items-center justify-center p-4 z-50" onClick={onClose}>
-      <div className="relative w-full max-w-3xl" onClick={(e) => e.stopPropagation()}>
+    <div
+      className="fixed inset-0 bg-black/20 backdrop-blur-sm flex items-center justify-center p-4 z-50"
+      onClick={onClose}
+    >
+      <div
+        className="relative w-full max-w-3xl"
+        onClick={(e) => e.stopPropagation()}
+      >
         <div className="absolute inset-0 -z-10 blur-2xl rounded-3xl bg-gradient-to-tr from-[var(--main-color)]/20 to-purple-400/20" />
         <div className="bg-white/90 rounded-2xl shadow-xl ring-1 ring-gray-200 flex flex-col max-h-[90vh] overflow-hidden">
           {/* Header */}
           <div className="sticky top-0 bg-white/90 z-10 flex items-center justify-between px-6 py-4 border-b">
             <div className="w-full flex justify-end gap-2">
-              <button onClick={onClose} className="text-gray-400 hover:text-[var(--main-color)] transition-colors" aria-label="Close">
+              <button
+                onClick={onClose}
+                className="text-gray-400 hover:text-[var(--main-color)] transition-colors"
+                aria-label="Close"
+              >
                 ✕
               </button>
             </div>
@@ -32,112 +63,322 @@ function PetViewModal({ pet, onClose }: { pet: Pet; onClose: () => void }) {
             <div className="space-y-6">
               {/* Pet Characteristics */}
               <div className="bg-white rounded-lg ring-1 ring-gray-200 p-4">
-                <h3 className="text-md font-bold text-[var(--main-color)] mb-3">مشخصات حیوان خانگی</h3>
+                <h3 className="text-md font-bold text-[var(--main-color)] mb-3">
+                  مشخصات حیوان خانگی
+                </h3>
                 <div className="grid grid-cols-2 gap-y-2 text-sm">
                   <span className="text-gray-500">تصویر پت</span>
                   <div className="flex justify-start mb-4">
                     <div className="w-32 h-32 rounded-xl overflow-hidden border-4 border-[var(--main-color)]/20 shadow-lg">
-
                       <img
                         src={`${process.env.NEXT_PUBLIC_UPLOAD_BASE_URL}/file-manager/preview/${pet.photoPet}`}
                         alt={pet.namePet}
                         className="w-full h-full object-cover"
                       />
-
                     </div>
                   </div>
-                  <span className="text-gray-500">شماره بیمه</span><span className="text-gray-900">{pet.insuranceNumber || "تعیین نشده"}</span>
-                  <span className="text-gray-500">نام پت</span><span className="text-gray-900">{pet.namePet}</span>
-                  <span className="text-gray-500">نوع پت</span><span className="text-gray-900">{pet.typePet}</span>
-                  <span className="text-gray-500">جنسیت</span><span className="text-gray-900">{pet.sex === "MEN" ? "نر" : pet.sex === "WOMEN" ? "ماده" : "نامشخص"}</span>
-                  <span className="text-gray-500">تاریخ تولد</span><span className="text-gray-900">{pet.birthDate ? formatPersianDate(pet.birthDate) : ""}</span>
-                  <span className="text-gray-500">شماره شناسنامه</span><span className="text-gray-900">{pet.birthCertificateNumberPet}</span>
-                  <span className="text-gray-500">کد میکروچیپ</span><span className="text-gray-900">{pet.microChipCode}</span>
-                  <span className="text-gray-500">رنگ پت</span><span className="text-gray-900">{pet.colorPet}</span>
-                  <span className="text-gray-500">وزن</span><span className="text-gray-900">{pet.weightPet} کیلوگرم</span>
-                  <span className="text-gray-500">قد</span><span className="text-gray-900">{pet.heightPet} سانتی‌متر</span>
-                  <span className="text-gray-500">دامپزشک صادر کننده</span><span className="text-gray-900">{pet.issuingVeterinarian}</span>
-                  <span className="text-gray-500">نظام دامپزشکی</span><span className="text-gray-900">{pet.issuingMedicalSystem}</span>
+                  <span className="text-gray-500">شماره بیمه</span>
+                  <span className="text-gray-900">
+                    {pet.insuranceNumber || "تعیین نشده"}
+                  </span>
+                  <span className="text-gray-500">نام پت</span>
+                  <span className="text-gray-900">{pet.namePet}</span>
+                  <span className="text-gray-500">نوع پت</span>
+                  <span className="text-gray-900">{pet.typePet}</span>
+                  <span className="text-gray-500">جنسیت</span>
+                  <span className="text-gray-900">
+                    {pet.sex === "MEN"
+                      ? "نر"
+                      : pet.sex === "WOMEN"
+                      ? "ماده"
+                      : "نامشخص"}
+                  </span>
+                  <span className="text-gray-500">تاریخ تولد</span>
+                  <span className="text-gray-900">
+                    {pet.birthDate ? formatPersianDate(pet.birthDate) : ""}
+                  </span>
+                  <span className="text-gray-500">شماره شناسنامه</span>
+                  <span className="text-gray-900">
+                    {pet.birthCertificateNumberPet}
+                  </span>
+                  <span className="text-gray-500">کد میکروچیپ</span>
+                  <span className="text-gray-900">{pet.microChipCode}</span>
+                  <span className="text-gray-500">رنگ پت</span>
+                  <span className="text-gray-900">{pet.colorPet}</span>
+                  <span className="text-gray-500">وزن</span>
+                  <span className="text-gray-900">{pet.weightPet} کیلوگرم</span>
+                  <span className="text-gray-500">قد</span>
+                  <span className="text-gray-900">
+                    {pet.heightPet} سانتی‌متر
+                  </span>
+                  <span className="text-gray-500">دامپزشک صادر کننده</span>
+                  <span className="text-gray-900">
+                    {pet.issuingVeterinarian}
+                  </span>
+                  <span className="text-gray-500">نظام دامپزشکی</span>
+                  <span className="text-gray-900">
+                    {pet.issuingMedicalSystem}
+                  </span>
                 </div>
                 {pet.distinctiveFeature && (
                   <div className="mt-3 text-sm">
-                    <div className="text-gray-700 font-semibold mb-1">ویژگی بارز ظاهری</div>
-                    <div className="text-gray-700">{pet.distinctiveFeature}</div>
+                    <div className="text-gray-700 font-semibold mb-1">
+                      ویژگی بارز ظاهری
+                    </div>
+                    <div className="text-gray-700">
+                      {pet.distinctiveFeature}
+                    </div>
                   </div>
                 )}
               </div>
 
               {/* Owner Information */}
               <div className="bg-white rounded-lg ring-1 ring-gray-200 p-4">
-                <h3 className="text-md font-bold text-[var(--main-color)] mb-3">مشخصات سرپرست پت</h3>
+                <h3 className="text-md font-bold text-[var(--main-color)] mb-3">
+                  مشخصات سرپرست پت
+                </h3>
                 <div className="grid grid-cols-2 gap-y-2 text-sm">
-                  <span className="text-gray-500">نام و نام خانوادگی</span><span className="text-gray-900">{pet.nameHead}</span>
-                  <span className="text-gray-500">کد ملی</span><span className="text-gray-900">{pet.nationalCodeHead}</span>
-                  <span className="text-gray-500">موبایل (۱)</span><span className="text-gray-900">{pet.mobile1Head}</span>
-                  <span className="text-gray-500">موبایل (۲)</span><span className="text-gray-900">{pet.mobile2Head}</span>
-                  <span className="text-gray-500">تلفن ثابت</span><span className="text-gray-900">{pet.telHead}</span>
-                  <span className="text-gray-500">استان</span><span className="text-gray-900">{pet.stateHead}</span>
-                  <span className="text-gray-500">شهر</span><span className="text-gray-900">{pet.cityHead}</span>
-                  <span className="text-gray-500">کد پستی</span><span className="text-gray-900">{pet.postalCodeHead}</span>
-                  <span className="text-gray-500">ایمیل</span><span className="text-gray-900">{pet.emailHead}</span>
-                  <span className="text-gray-500">آدرس</span><span className="text-gray-900">{pet.addressHead}</span>
+                  <span className="text-gray-500">نام و نام خانوادگی</span>
+                  <span className="text-gray-900">{pet.nameHead}</span>
+                  <span className="text-gray-500">کد ملی</span>
+                  <span className="text-gray-900">{pet.nationalCodeHead}</span>
+                  <span className="text-gray-500">موبایل (۱)</span>
+                  <span className="text-gray-900">{pet.mobile1Head}</span>
+                  <span className="text-gray-500">موبایل (۲)</span>
+                  <span className="text-gray-900">{pet.mobile2Head}</span>
+                  <span className="text-gray-500">تلفن ثابت</span>
+                  <span className="text-gray-900">{pet.telHead}</span>
+                  <span className="text-gray-500">استان</span>
+                  <span className="text-gray-900">{pet.stateHead}</span>
+                  <span className="text-gray-500">شهر</span>
+                  <span className="text-gray-900">{pet.cityHead}</span>
+                  <span className="text-gray-500">کد پستی</span>
+                  <span className="text-gray-900">{pet.postalCodeHead}</span>
+                  <span className="text-gray-500">ایمیل</span>
+                  <span className="text-gray-900">{pet.emailHead}</span>
+                  <span className="text-gray-500">آدرس</span>
+                  <span className="text-gray-900">{pet.addressHead}</span>
                 </div>
                 <div className="mt-3 grid grid-cols-2 gap-y-2 text-sm">
-                  {pet.telegramHead && (<><span className="text-gray-500">تلگرام</span><span className="text-gray-900">{pet.telegramHead}</span></>)}
-                  {pet.whatsAppHead && (<><span className="text-gray-500">واتساپ</span><span className="text-gray-900">{pet.whatsAppHead}</span></>)}
-                  {pet.instagramHead && (<><span className="text-gray-500">اینستاگرام</span><span className="text-gray-900">{pet.instagramHead}</span></>)}
-                  {pet.youtubeHead && (<><span className="text-gray-500">یوتیوب</span><span className="text-gray-900">{pet.youtubeHead}</span></>)}
-                  {pet.linkedinHead && (<><span className="text-gray-500">لینکدین</span><span className="text-gray-900">{pet.linkedinHead}</span></>)}
+                  {pet.telegramHead && (
+                    <>
+                      <span className="text-gray-500">تلگرام</span>
+                      <span className="text-gray-900">{pet.telegramHead}</span>
+                    </>
+                  )}
+                  {pet.whatsAppHead && (
+                    <>
+                      <span className="text-gray-500">واتساپ</span>
+                      <span className="text-gray-900">{pet.whatsAppHead}</span>
+                    </>
+                  )}
+                  {pet.instagramHead && (
+                    <>
+                      <span className="text-gray-500">اینستاگرام</span>
+                      <span className="text-gray-900">{pet.instagramHead}</span>
+                    </>
+                  )}
+                  {pet.youtubeHead && (
+                    <>
+                      <span className="text-gray-500">یوتیوب</span>
+                      <span className="text-gray-900">{pet.youtubeHead}</span>
+                    </>
+                  )}
+                  {pet.linkedinHead && (
+                    <>
+                      <span className="text-gray-500">لینکدین</span>
+                      <span className="text-gray-900">{pet.linkedinHead}</span>
+                    </>
+                  )}
                 </div>
               </div>
 
               {/* Health Information */}
               <div className="bg-white rounded-lg ring-1 ring-gray-200 p-4">
-                <h3 className="text-md font-bold text-[var(--main-color)] mb-3">ویژگی و اطلاعات سلامتی</h3>
+                <h3 className="text-md font-bold text-[var(--main-color)] mb-3">
+                  ویژگی و اطلاعات سلامتی
+                </h3>
                 <div className="grid grid-cols-2 gap-y-2 text-sm">
-                  <span className="text-gray-500">دامپزشک عمومی</span><span className="text-gray-900">{pet.generalVeterinarian}</span>
-                  <span className="text-gray-500">آدرس دامپزشک عمومی</span><span className="text-gray-900">{pet.addressGeneralVeterinarian}</span>
-                  <span className="text-gray-500">تلفن دامپزشک عمومی</span><span className="text-gray-900">{pet.phoneNumberGeneralVeterinarian}</span>
-                  <span className="text-gray-500">دامپزشک متخصص</span><span className="text-gray-900">{pet.specialistVeterinarian}</span>
-                  <span className="text-gray-500">آدرس دامپزشک متخصص</span><span className="text-gray-900">{pet.addressSpecialistVeterinarian}</span>
-                  <span className="text-gray-500">تلفن دامپزشک متخصص</span><span className="text-gray-900">{pet.phoneNumberSpecialistVeterinarian}</span>
-                  <span className="text-gray-500">پت عقیم است</span><span className="text-gray-900">{pet.isSterile ? "بله" : "خیر"}</span>
-                  <span className="text-gray-500">واکسن Rabiel</span><span className="text-gray-900">{pet.vaccineRabiel ? "دارد" : "ندارد"}</span>
-                  <span className="text-gray-500">واکسن LDHPPi</span><span className="text-gray-900">{pet.vaccineLDHPPi ? "دارد" : "ندارد"}</span>
-                  <span className="text-gray-500">واکسن R.C.P</span><span className="text-gray-900">{pet.vaccineRCP ? "دارد" : "ندارد"}</span>
-                  <span className="text-gray-500">نوع تغذیه</span><span className="text-gray-900">{pet.typeFeeding}</span>
-                  <span className="text-gray-500">تعداد وعده های غذایی</span><span className="text-gray-900">{pet.numberMeal}</span>
+                  <span className="text-gray-500">دامپزشک عمومی</span>
+                  <span className="text-gray-900">
+                    {pet.generalVeterinarian}
+                  </span>
+                  <span className="text-gray-500">آدرس دامپزشک عمومی</span>
+                  <span className="text-gray-900">
+                    {pet.addressGeneralVeterinarian}
+                  </span>
+                  <span className="text-gray-500">تلفن دامپزشک عمومی</span>
+                  <span className="text-gray-900">
+                    {pet.phoneNumberGeneralVeterinarian}
+                  </span>
+                  <span className="text-gray-500">دامپزشک متخصص</span>
+                  <span className="text-gray-900">
+                    {pet.specialistVeterinarian}
+                  </span>
+                  <span className="text-gray-500">آدرس دامپزشک متخصص</span>
+                  <span className="text-gray-900">
+                    {pet.addressSpecialistVeterinarian}
+                  </span>
+                  <span className="text-gray-500">تلفن دامپزشک متخصص</span>
+                  <span className="text-gray-900">
+                    {pet.phoneNumberSpecialistVeterinarian}
+                  </span>
+                  <span className="text-gray-500">پت عقیم است</span>
+                  <span className="text-gray-900">
+                    {pet.isSterile ? "بله" : "خیر"}
+                  </span>
+                  <span className="text-gray-500">واکسن Rabiel</span>
+                  <span className="text-gray-900">
+                    {pet.vaccineRabiel ? "دارد" : "ندارد"}
+                  </span>
+                  <span className="text-gray-500">واکسن LDHPPi</span>
+                  <span className="text-gray-900">
+                    {pet.vaccineLDHPPi ? "دارد" : "ندارد"}
+                  </span>
+                  <span className="text-gray-500">واکسن R.C.P</span>
+                  <span className="text-gray-900">
+                    {pet.vaccineRCP ? "دارد" : "ندارد"}
+                  </span>
+                  <span className="text-gray-500">نوع تغذیه</span>
+                  <span className="text-gray-900">{pet.typeFeeding}</span>
+                  <span className="text-gray-500">تعداد وعده های غذایی</span>
+                  <span className="text-gray-900">{pet.numberMeal}</span>
                 </div>
                 <div className="mt-3 space-y-2 text-sm">
-                  {pet.diet && (<div><span className="font-semibold text-gray-700">رژیم غذایی:</span> <span className="text-gray-700">{pet.diet}</span></div>)}
-                  {pet.prohibitedFoodItems && (<div><span className="font-semibold text-gray-700">موارد ممنوع تغذیه:</span> <span className="text-gray-700">{pet.prohibitedFoodItems}</span></div>)}
-                  {pet.regularlyUsedMedications && (<div><span className="font-semibold text-gray-700">داروهای مصرفی دائم:</span> <span className="text-gray-700">{pet.regularlyUsedMedications}</span></div>)}
-                  {pet.prohibitedDrugs && (<div><span className="font-semibold text-gray-700">داروهای ممنوعه:</span> <span className="text-gray-700">{pet.prohibitedDrugs}</span></div>)}
-                  {pet.favoriteEncouragement && (<div><span className="font-semibold text-gray-700">تشویقی مورد علاقه:</span> <span className="text-gray-700">{pet.favoriteEncouragement}</span></div>)}
+                  {pet.diet && (
+                    <div>
+                      <span className="font-semibold text-gray-700">
+                        رژیم غذایی:
+                      </span>{" "}
+                      <span className="text-gray-700">{pet.diet}</span>
+                    </div>
+                  )}
+                  {pet.prohibitedFoodItems && (
+                    <div>
+                      <span className="font-semibold text-gray-700">
+                        موارد ممنوع تغذیه:
+                      </span>{" "}
+                      <span className="text-gray-700">
+                        {pet.prohibitedFoodItems}
+                      </span>
+                    </div>
+                  )}
+                  {pet.regularlyUsedMedications && (
+                    <div>
+                      <span className="font-semibold text-gray-700">
+                        داروهای مصرفی دائم:
+                      </span>{" "}
+                      <span className="text-gray-700">
+                        {pet.regularlyUsedMedications}
+                      </span>
+                    </div>
+                  )}
+                  {pet.prohibitedDrugs && (
+                    <div>
+                      <span className="font-semibold text-gray-700">
+                        داروهای ممنوعه:
+                      </span>{" "}
+                      <span className="text-gray-700">
+                        {pet.prohibitedDrugs}
+                      </span>
+                    </div>
+                  )}
+                  {pet.favoriteEncouragement && (
+                    <div>
+                      <span className="font-semibold text-gray-700">
+                        تشویقی مورد علاقه:
+                      </span>{" "}
+                      <span className="text-gray-700">
+                        {pet.favoriteEncouragement}
+                      </span>
+                    </div>
+                  )}
                 </div>
               </div>
 
               {/* Behavioral Information */}
               <div className="bg-white rounded-lg ring-1 ring-gray-200 p-4">
-                <h3 className="text-md font-bold text-[var(--main-color)] mb-3">اطلاعات و ویژگی‌های رفتاری شخصیتی</h3>
+                <h3 className="text-md font-bold text-[var(--main-color)] mb-3">
+                  اطلاعات و ویژگی‌های رفتاری شخصیتی
+                </h3>
                 <div className="space-y-2 text-sm">
-                  {pet.behavioralHabits && (<div><span className="font-semibold text-gray-700">عادت های رفتاری:</span> <span className="text-gray-700">{pet.behavioralHabits}</span></div>)}
-                  {pet.susceptibility && (<div><span className="font-semibold text-gray-700">مهارت و استعدادها:</span> <span className="text-gray-700">{pet.susceptibility}</span></div>)}
-                  {pet.sensitivities && (<div><span className="font-semibold text-gray-700">حساسیت ها:</span> <span className="text-gray-700">{pet.sensitivities}</span></div>)}
+                  {pet.behavioralHabits && (
+                    <div>
+                      <span className="font-semibold text-gray-700">
+                        عادت های رفتاری:
+                      </span>{" "}
+                      <span className="text-gray-700">
+                        {pet.behavioralHabits}
+                      </span>
+                    </div>
+                  )}
+                  {pet.susceptibility && (
+                    <div>
+                      <span className="font-semibold text-gray-700">
+                        مهارت و استعدادها:
+                      </span>{" "}
+                      <span className="text-gray-700">
+                        {pet.susceptibility}
+                      </span>
+                    </div>
+                  )}
+                  {pet.sensitivities && (
+                    <div>
+                      <span className="font-semibold text-gray-700">
+                        حساسیت ها:
+                      </span>{" "}
+                      <span className="text-gray-700">{pet.sensitivities}</span>
+                    </div>
+                  )}
                 </div>
                 <div className="mt-3 grid grid-cols-2 gap-y-2 text-sm">
-                  <span className="text-gray-500">با پت دیگری اقامت دارد؟</span><span className="text-gray-900">{pet.connectOtherPets ? "بله" : "خیر"}</span>
-                  <span className="text-gray-500">با کودکان ارتباط دارد؟</span><span className="text-gray-900">{pet.connectWithBaby ? "بله" : "خیر"}</span>
+                  <span className="text-gray-500">با پت دیگری اقامت دارد؟</span>
+                  <span className="text-gray-900">
+                    {pet.connectOtherPets ? "بله" : "خیر"}
+                  </span>
+                  <span className="text-gray-500">با کودکان ارتباط دارد؟</span>
+                  <span className="text-gray-900">
+                    {pet.connectWithBaby ? "بله" : "خیر"}
+                  </span>
                 </div>
               </div>
 
               {/* Consultations */}
               <div className="bg-white rounded-lg ring-1 ring-gray-200 p-4">
-                <h3 className="text-md font-bold text-[var(--main-color)] mb-3">مشاوره ها</h3>
+                <h3 className="text-md font-bold text-[var(--main-color)] mb-3">
+                  مشاوره ها
+                </h3>
                 <div className="space-y-2 text-sm">
-                  {pet.nutritionalCounseling && (<div><span className="font-semibold text-gray-700">مشاوره متخصص تغذیه:</span> <span className="text-gray-700">{pet.nutritionalCounseling}</span></div>)}
-                  {pet.expertVeterinaryCounseling && (<div><span className="font-semibold text-gray-700">مشاوره دامپزشک متخصص:</span> <span className="text-gray-700">{pet.expertVeterinaryCounseling}</span></div>)}
-                  {pet.trainingAdvice && (<div><span className="font-semibold text-gray-700">مشاوره تربیت پت:</span> <span className="text-gray-700">{pet.trainingAdvice}</span></div>)}
+                  {pet.nutritionalCounseling && (
+                    <div>
+                      <span className="font-semibold text-gray-700">
+                        مشاوره متخصص تغذیه:
+                      </span>{" "}
+                      <span className="text-gray-700">
+                        {pet.nutritionalCounseling}
+                      </span>
+                    </div>
+                  )}
+                  {pet.expertVeterinaryCounseling && (
+                    <div>
+                      <span className="font-semibold text-gray-700">
+                        مشاوره دامپزشک متخصص:
+                      </span>{" "}
+                      <span className="text-gray-700">
+                        {pet.expertVeterinaryCounseling}
+                      </span>
+                    </div>
+                  )}
+                  {pet.trainingAdvice && (
+                    <div>
+                      <span className="font-semibold text-gray-700">
+                        مشاوره تربیت پت:
+                      </span>{" "}
+                      <span className="text-gray-700">
+                        {pet.trainingAdvice}
+                      </span>
+                    </div>
+                  )}
                 </div>
               </div>
 
@@ -147,13 +388,17 @@ function PetViewModal({ pet, onClose }: { pet: Pet; onClose: () => void }) {
                   <div className="p-2 bg-[var(--main-color)]/10 rounded-lg">
                     <FileText className="text-[var(--main-color)]" size={20} />
                   </div>
-                  <h3 className="text-lg font-bold text-[var(--main-color)]">اسناد دیجیتال</h3>
+                  <h3 className="text-lg font-bold text-[var(--main-color)]">
+                    اسناد دیجیتال
+                  </h3>
                 </div>
 
                 {filesLoading && (
                   <div className="text-center py-8">
                     <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-[var(--main-color)] mb-3"></div>
-                    <p className="text-sm text-gray-500">در حال بارگذاری فایل‌ها...</p>
+                    <p className="text-sm text-gray-500">
+                      در حال بارگذاری فایل‌ها...
+                    </p>
                   </div>
                 )}
 
@@ -171,21 +416,33 @@ function PetViewModal({ pet, onClose }: { pet: Pet; onClose: () => void }) {
                     {(pet?.certificatePdfPet || pet?.insurancePdfPet) && (
                       <div className="space-y-3">
                         <h4 className="font-semibold text-gray-800 mb-3 flex items-center gap-2">
-                          <FileText className="text-[var(--main-color)]" size={18} />
+                          <FileText
+                            className="text-[var(--main-color)]"
+                            size={18}
+                          />
                           اسناد رسمی
                         </h4>
-                        
+
                         {pet?.certificatePdfPet && (
                           <div className="group relative bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-xl p-4 hover:shadow-md transition-all duration-200">
                             <div className="flex items-center justify-between">
                               <div className="flex items-center gap-3">
                                 <div className="p-2 bg-blue-100 rounded-lg">
-                                  <FileText className="text-blue-600" size={20} />
+                                  <FileText
+                                    className="text-blue-600"
+                                    size={20}
+                                  />
                                 </div>
                                 <div>
-                                  <p className="font-semibold text-gray-900">شناسنامه پت</p>
-                                  <p className="text-sm text-gray-500 mt-1">سند رسمی شناسایی حیوان خانگی</p>
-                                  <p className="text-xs text-gray-400 mt-1">{pet?.certificatePdfPet}</p>
+                                  <p className="font-semibold text-gray-900">
+                                    شناسنامه پت
+                                  </p>
+                                  <p className="text-sm text-gray-500 mt-1">
+                                    سند رسمی شناسایی حیوان خانگی
+                                  </p>
+                                  <p className="text-xs text-gray-400 mt-1">
+                                    {pet?.certificatePdfPet}
+                                  </p>
                                 </div>
                               </div>
                               <div className="flex items-center gap-2">
@@ -215,12 +472,21 @@ function PetViewModal({ pet, onClose }: { pet: Pet; onClose: () => void }) {
                             <div className="flex items-center justify-between">
                               <div className="flex items-center gap-3">
                                 <div className="p-2 bg-green-100 rounded-lg">
-                                  <Shield className="text-green-600" size={20} />
+                                  <Shield
+                                    className="text-green-600"
+                                    size={20}
+                                  />
                                 </div>
                                 <div>
-                                  <p className="font-semibold text-gray-900">بیمه نامه</p>
-                                  <p className="text-sm text-gray-500 mt-1">سند بیمه حیوان خانگی</p>
-                                  <p className="text-xs text-gray-400 mt-1">{pet?.insurancePdfPet}</p>
+                                  <p className="font-semibold text-gray-900">
+                                    بیمه نامه
+                                  </p>
+                                  <p className="text-sm text-gray-500 mt-1">
+                                    سند بیمه حیوان خانگی
+                                  </p>
+                                  <p className="text-xs text-gray-400 mt-1">
+                                    {pet?.insurancePdfPet}
+                                  </p>
                                 </div>
                               </div>
                               <div className="flex items-center gap-2">
@@ -251,7 +517,10 @@ function PetViewModal({ pet, onClose }: { pet: Pet; onClose: () => void }) {
                     {(pet?.galleriesPhoto?.length ?? 0) > 0 && (
                       <div className="space-y-3">
                         <h4 className="font-semibold text-gray-800 mb-3 flex items-center gap-2">
-                          <ImageIcon className="text-[var(--main-color)]" size={18} />
+                          <ImageIcon
+                            className="text-[var(--main-color)]"
+                            size={18}
+                          />
                           گالری عکس‌ها
                           <span className="bg-gray-100 text-gray-600 text-xs px-2 py-1 rounded-full">
                             {pet?.galleriesPhoto?.length}
@@ -259,7 +528,10 @@ function PetViewModal({ pet, onClose }: { pet: Pet; onClose: () => void }) {
                         </h4>
                         <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                           {pet?.galleriesPhoto?.map((photo, index) => (
-                            <div key={index} className="group relative bg-white border border-gray-200 rounded-xl overflow-hidden hover:shadow-lg transition-all duration-200">
+                            <div
+                              key={index}
+                              className="group relative bg-white border border-gray-200 rounded-xl overflow-hidden hover:shadow-lg transition-all duration-200"
+                            >
                               <div className="aspect-square relative">
                                 <img
                                   src={`${process.env.NEXT_PUBLIC_UPLOAD_BASE_URL}/file-manager/preview/${photo}`}
@@ -276,21 +548,31 @@ function PetViewModal({ pet, onClose }: { pet: Pet; onClose: () => void }) {
                                       className="bg-white/90 rounded-full p-2 hover:bg-white transition-colors"
                                       title="مشاهده"
                                     >
-                                      <ImageIcon size={16} className="text-gray-700" />
+                                      <ImageIcon
+                                        size={16}
+                                        className="text-gray-700"
+                                      />
                                     </a>
                                     <a
                                       href={`${process.env.NEXT_PUBLIC_UPLOAD_BASE_URL}/download/${photo}`}
                                       className="bg-white/90 rounded-full p-2 hover:bg-white transition-colors"
                                       title="دانلود"
                                     >
-                                      <Download size={16} className="text-gray-700" />
+                                      <Download
+                                        size={16}
+                                        className="text-gray-700"
+                                      />
                                     </a>
                                   </div>
                                 </div>
                               </div>
                               <div className="p-3">
-                                <p className="text-sm font-medium text-gray-900 truncate">عکس {index + 1}</p>
-                                <p className="text-xs text-gray-500 truncate">{photo}</p>
+                                <p className="text-sm font-medium text-gray-900 truncate">
+                                  عکس {index + 1}
+                                </p>
+                                <p className="text-xs text-gray-500 truncate">
+                                  {photo}
+                                </p>
                               </div>
                             </div>
                           ))}
@@ -302,7 +584,10 @@ function PetViewModal({ pet, onClose }: { pet: Pet; onClose: () => void }) {
                     {(pet?.galleriesVideo?.length ?? 0) > 0 && (
                       <div className="space-y-3">
                         <h4 className="font-semibold text-gray-800 mb-3 flex items-center gap-2">
-                          <Video className="text-[var(--main-color)]" size={18} />
+                          <Video
+                            className="text-[var(--main-color)]"
+                            size={18}
+                          />
                           گالری ویدیوها
                           <span className="bg-gray-100 text-gray-600 text-xs px-2 py-1 rounded-full">
                             {pet?.galleriesVideo?.length}
@@ -310,7 +595,10 @@ function PetViewModal({ pet, onClose }: { pet: Pet; onClose: () => void }) {
                         </h4>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                           {pet?.galleriesVideo?.map((video, index) => (
-                            <div key={index} className="group relative bg-white border border-gray-200 rounded-xl overflow-hidden hover:shadow-lg transition-all duration-200">
+                            <div
+                              key={index}
+                              className="group relative bg-white border border-gray-200 rounded-xl overflow-hidden hover:shadow-lg transition-all duration-200"
+                            >
                               <div className="aspect-video relative">
                                 <video
                                   src={`${process.env.NEXT_PUBLIC_UPLOAD_BASE_URL}/file-manager/preview/${video}`}
@@ -323,8 +611,12 @@ function PetViewModal({ pet, onClose }: { pet: Pet; onClose: () => void }) {
                                 </div>
                               </div>
                               <div className="p-3">
-                                <p className="text-sm font-medium text-gray-900 truncate">ویدیو {index + 1}</p>
-                                <p className="text-xs text-gray-500 truncate">{video}</p>
+                                <p className="text-sm font-medium text-gray-900 truncate">
+                                  ویدیو {index + 1}
+                                </p>
+                                <p className="text-xs text-gray-500 truncate">
+                                  {video}
+                                </p>
                                 <div className="flex gap-2 mt-2">
                                   <a
                                     href={`${process.env.NEXT_PUBLIC_UPLOAD_BASE_URL}/download/${video}`}
@@ -342,15 +634,23 @@ function PetViewModal({ pet, onClose }: { pet: Pet; onClose: () => void }) {
                     )}
 
                     {/* No files message */}
-                    {!pet?.certificatePdfPet && !pet?.insurancePdfPet && (pet?.galleriesPhoto?.length ?? 0) === 0 && (pet?.galleriesVideo?.length ?? 0) === 0 && (
-                      <div className="text-center py-12">
-                        <div className="p-4 bg-gray-50 rounded-full w-16 h-16 mx-auto mb-4 flex items-center justify-center">
-                          <FileText size={32} className="text-gray-300" />
+                    {!pet?.certificatePdfPet &&
+                      !pet?.insurancePdfPet &&
+                      (pet?.galleriesPhoto?.length ?? 0) === 0 &&
+                      (pet?.galleriesVideo?.length ?? 0) === 0 && (
+                        <div className="text-center py-12">
+                          <div className="p-4 bg-gray-50 rounded-full w-16 h-16 mx-auto mb-4 flex items-center justify-center">
+                            <FileText size={32} className="text-gray-300" />
+                          </div>
+                          <h4 className="text-gray-600 font-medium mb-2">
+                            هیچ سند دیجیتالی موجود نیست
+                          </h4>
+                          <p className="text-sm text-gray-500">
+                            در حال حاضر هیچ فایل یا سندی برای این حیوان خانگی
+                            آپلود نشده است.
+                          </p>
                         </div>
-                        <h4 className="text-gray-600 font-medium mb-2">هیچ سند دیجیتالی موجود نیست</h4>
-                        <p className="text-sm text-gray-500">در حال حاضر هیچ فایل یا سندی برای این حیوان خانگی آپلود نشده است.</p>
-                      </div>
-                    )}
+                      )}
                   </div>
                 )}
               </div>
@@ -358,7 +658,12 @@ function PetViewModal({ pet, onClose }: { pet: Pet; onClose: () => void }) {
           </div>
           {/* Footer Close */}
           <div className="sticky bottom-0 px-6 py-4 border-t flex justify-end bg-white/90 z-10">
-            <button onClick={onClose} className="px-4 py-2 bg-[var(--main-color)] hover:bg-[var(--main-color-dark)] text-white rounded-lg transition-colors">بستن</button>
+            <button
+              onClick={onClose}
+              className="px-4 py-2 bg-[var(--main-color)] hover:bg-[var(--main-color-dark)] text-white rounded-lg transition-colors"
+            >
+              بستن
+            </button>
           </div>
         </div>
       </div>
@@ -423,7 +728,9 @@ export default function PetList() {
       const latestPet = await getPetById(pet.petId || "");
       setViewingPet(latestPet);
     } catch (error: any) {
-      showError("خطا در دریافت اطلاعات پت: " + (error.message || "خطای نامشخص"));
+      showError(
+        "خطا در دریافت اطلاعات پت: " + (error.message || "خطای نامشخص")
+      );
     }
   };
 
@@ -445,14 +752,17 @@ export default function PetList() {
   };
 
   const handleFormSuccess = () => {
-    showSuccess(editingPet ? "پت با موفقیت ویرایش شد" : "پت با موفقیت اضافه شد");
+    showSuccess(
+      editingPet ? "پت با موفقیت ویرایش شد" : "پت با موفقیت اضافه شد"
+    );
     handleFormClose();
     loadPets();
   };
 
   // Filter and search pets
-  const filteredPets = pets.filter(pet => {
-    const matchesSearch = pet.namePet.toLowerCase().includes(searchTerm.toLowerCase()) ||
+  const filteredPets = pets.filter((pet) => {
+    const matchesSearch =
+      pet.namePet.toLowerCase().includes(searchTerm.toLowerCase()) ||
       pet.typePet.toLowerCase().includes(searchTerm.toLowerCase()) ||
       pet.colorPet.toLowerCase().includes(searchTerm.toLowerCase());
 
@@ -467,7 +777,9 @@ export default function PetList() {
             <div className="absolute inset-0 rounded-full border-4 border-[var(--main-color)]/20"></div>
             <div className="absolute inset-0 rounded-full border-4 border-transparent border-t-[var(--main-color)] animate-spin"></div>
           </div>
-          <div className="text-[var(--main-color)] font-semibold">در حال بارگذاری...</div>
+          <div className="text-[var(--main-color)] font-semibold">
+            در حال بارگذاری...
+          </div>
         </div>
       </div>
     );
@@ -478,7 +790,9 @@ export default function PetList() {
       <div className="p-6 bg-gray-50 min-h-screen mt-14 lg:mt-0">
         {/* Header */}
         <div className="mb-6">
-          <h1 className="text-2xl font-bold text-[var(--main-color)] mb-2">لیست پت</h1>
+          <h1 className="text-2xl font-bold text-[var(--main-color)] mb-2">
+            لیست پت
+          </h1>
           <p className="text-gray-600">مدیریت و مشاهده پت ثبت شده</p>
         </div>
 
@@ -488,7 +802,10 @@ export default function PetList() {
             {/* Search */}
             <div className="hidden lg:flex flex-1 max-w-md">
               <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
+                <Search
+                  className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
+                  size={20}
+                />
                 <input
                   type="text"
                   placeholder="جستجو در پت..."
@@ -514,16 +831,27 @@ export default function PetList() {
         {filteredPets.length === 0 ? (
           <div className="bg-white rounded-lg shadow-sm p-8 text-center">
             <div className="text-gray-400 mb-4">
-              <svg className="mx-auto h-12 w-12" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
+              <svg
+                className="mx-auto h-12 w-12"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"
+                />
               </svg>
             </div>
-            <h3 className="text-lg font-medium text-gray-900 mb-2">هیچ پت یافت نشد</h3>
+            <h3 className="text-lg font-medium text-gray-900 mb-2">
+              هیچ پت یافت نشد
+            </h3>
             <p className="text-gray-500 mb-4">
               {searchTerm
                 ? "لطفاً جستجو را تغییر دهید یا پت جدیدی اضافه کنید"
-                : "برای شروع، پت جدیدی اضافه کنید"
-              }
+                : "برای شروع، پت جدیدی اضافه کنید"}
             </p>
             {!searchTerm && (
               <button
@@ -535,16 +863,22 @@ export default function PetList() {
             )}
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 w-full">
             {filteredPets.map((pet, index) => (
-              <div key={index} className="bg-white rounded-lg shadow-sm overflow-hidden hover:shadow-md transition-shadow">
-
+              <div
+                key={index}
+                className="bg-white md:min-w-[320px] rounded-lg shadow-sm overflow-hidden hover:shadow-md transition-shadow"
+              >
                 {/* Pet Info */}
                 <div className="p-4">
                   <div className="flex items-start justify-between mb-3">
                     <div>
-                      <h3 className="font-semibold text-gray-900 text-lg mb-1">{pet.namePet}</h3>
-                      <span className="text-sm text-gray-600">{pet.typePet}</span>
+                      <h3 className="font-semibold text-gray-900 text-lg mb-1">
+                        {pet.namePet}
+                      </h3>
+                      <span className="text-sm text-gray-600">
+                        {pet.typePet}
+                      </span>
                     </div>
                   </div>
 
@@ -552,7 +886,9 @@ export default function PetList() {
                   <div className="space-y-2 mb-4">
                     <div className="flex justify-between text-sm">
                       <span className="text-gray-500">شماره بیمه:</span>
-                      <span className="text-gray-900">{pet.insuranceNumber || "تعیین نشده"}</span>
+                      <span className="text-gray-900">
+                        {pet.insuranceNumber || "تعیین نشده"}
+                      </span>
                     </div>
                     <div className="flex justify-between text-sm">
                       <span className="text-gray-500">اسم:</span>
@@ -561,7 +897,11 @@ export default function PetList() {
                     <div className="flex justify-between text-sm">
                       <span className="text-gray-500">جنسیت:</span>
                       <span className="text-gray-900">
-                        {pet.sex === "MEN" ? "نر" : pet.sex === "WOMEN" ? "ماده" : "نامشخص"}
+                        {pet.sex === "MEN"
+                          ? "نر"
+                          : pet.sex === "WOMEN"
+                          ? "ماده"
+                          : "نامشخص"}
                       </span>
                     </div>
                     <div className="flex justify-between text-sm">
@@ -571,7 +911,9 @@ export default function PetList() {
                     {pet.birthDate && (
                       <div className="flex justify-between text-sm">
                         <span className="text-gray-500">تاریخ تولد:</span>
-                        <span className="text-gray-900">{new Date(pet.birthDate).toLocaleDateString('fa-IR')}</span>
+                        <span className="text-gray-900">
+                          {new Date(pet.birthDate).toLocaleDateString("fa-IR")}
+                        </span>
                       </div>
                     )}
                   </div>
@@ -663,8 +1005,14 @@ export default function PetList() {
       {deleteModalOpen && petToDelete && (
         <div className="fixed inset-0 bg-white/5 backdrop-blur-sm flex items-center justify-center z-50">
           <div className="bg-white rounded-lg shadow-lg p-6 max-w-sm w-full">
-            <h2 className="text-lg font-bold mb-4 text-gray-900">تایید حذف پت</h2>
-            <p className="mb-6 text-gray-700">آیا مطمئن هستید که می‌خواهید پت <span className="font-bold">{petToDelete.namePet}</span> را حذف کنید؟ این عملیات قابل بازگشت نیست.</p>
+            <h2 className="text-lg font-bold mb-4 text-gray-900">
+              تایید حذف پت
+            </h2>
+            <p className="mb-6 text-gray-700">
+              آیا مطمئن هستید که می‌خواهید پت{" "}
+              <span className="font-bold">{petToDelete.namePet}</span> را حذف
+              کنید؟ این عملیات قابل بازگشت نیست.
+            </p>
             <div className="flex justify-end gap-3">
               <button
                 onClick={() => {

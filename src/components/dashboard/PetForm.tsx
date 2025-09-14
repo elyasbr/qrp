@@ -1,12 +1,27 @@
 "use client";
 import { useState, useEffect } from "react";
-import { X, Save, Loader2, Camera, Video, FileText, Play, Download, Eye } from "lucide-react";
+import {
+  X,
+  Save,
+  Loader2,
+  Camera,
+  Video,
+  FileText,
+  Play,
+  Download,
+  Eye,
+} from "lucide-react";
 import DatePicker from "react-multi-date-picker";
 import DateObject from "react-date-object";
 import persian from "react-date-object/calendars/persian";
 import persian_fa from "react-date-object/locales/persian_fa";
 import gregorian from "react-date-object/calendars/gregorian";
-import { Pet, createPet, updatePet, getPetById } from "@/services/api/petService";
+import {
+  Pet,
+  createPet,
+  updatePet,
+  getPetById,
+} from "@/services/api/petService";
 import { uploadFile } from "@/services/api/uploadService";
 import { useSnackbar } from "@/hooks/useSnackbar";
 import { useAuth } from "@/hooks/useAuth";
@@ -55,9 +70,6 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
     generalVeterinarian: "",
     addressGeneralVeterinarian: "",
     phoneNumberGeneralVeterinarian: "",
-    specialistVeterinarian: "",
-    addressSpecialistVeterinarian: "",
-    phoneNumberSpecialistVeterinarian: "",
     isSterile: false,
     vaccineRabiel: false,
     vaccineLDHPPi: false,
@@ -76,20 +88,26 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
     connectWithBaby: false,
     nutritionalCounseling: "",
     expertVeterinaryCounseling: "",
-    trainingAdvice: ""
+    trainingAdvice: "",
   });
 
   const [loading, setLoading] = useState(false);
   const { showError, showSuccess } = useSnackbar();
   const [formSearch, setFormSearch] = useState("");
-  const [selectedIdentificationImage, setSelectedIdentificationImage] = useState<File | null>(null);
+  const [selectedIdentificationImage, setSelectedIdentificationImage] =
+    useState<File | null>(null);
   const [selectedPetImages, setSelectedPetImages] = useState<File[]>([]);
   const [selectedVideos, setSelectedVideos] = useState<File[]>([]);
-  const [selectedCertificatePDF, setSelectedCertificatePDF] = useState<File | null>(null);
-  const [selectedInsurancePDF, setSelectedInsurancePDF] = useState<File | null>(null);
-  
+  const [selectedCertificatePDF, setSelectedCertificatePDF] =
+    useState<File | null>(null);
+  const [selectedInsurancePDF, setSelectedInsurancePDF] = useState<File | null>(
+    null
+  );
+
   // File preview URLs
-  const [identificationImagePreview, setIdentificationImagePreview] = useState<string | null>(null);
+  const [identificationImagePreview, setIdentificationImagePreview] = useState<
+    string | null
+  >(null);
   const [petImagePreviews, setPetImagePreviews] = useState<string[]>([]);
   const [videoPreviews, setVideoPreviews] = useState<string[]>([]);
 
@@ -97,12 +115,20 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
   const [existingPetPhoto, setExistingPetPhoto] = useState<string | null>(null);
   const [existingPetImages, setExistingPetImages] = useState<string[]>([]);
   const [existingPetVideos, setExistingPetVideos] = useState<string[]>([]);
-  const [existingCertificatePDF, setExistingCertificatePDF] = useState<string | null>(null);
-  const [existingInsurancePDF, setExistingInsurancePDF] = useState<string | null>(null);
-  
-  const uploadMultipleFiles = async (files: File[], isPrivate: boolean = false, fileType: string): Promise<string[]> => {
+  const [existingCertificatePDF, setExistingCertificatePDF] = useState<
+    string | null
+  >(null);
+  const [existingInsurancePDF, setExistingInsurancePDF] = useState<
+    string | null
+  >(null);
+
+  const uploadMultipleFiles = async (
+    files: File[],
+    isPrivate: boolean = false,
+    fileType: string
+  ): Promise<string[]> => {
     const fileIds: string[] = [];
-    
+
     for (let i = 0; i < files.length; i++) {
       const file = files[i];
       try {
@@ -113,73 +139,107 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
         throw error; // Re-throw to stop the process
       }
     }
-    
+
     return fileIds;
   };
-  
+
   // Format file size utility function
   const formatFileSize = (bytes: number): string => {
-    if (bytes === 0) return '0 Bytes';
+    if (bytes === 0) return "0 Bytes";
     const k = 1024;
-    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+    const sizes = ["Bytes", "KB", "MB", "GB"];
     const i = Math.floor(Math.log(bytes) / Math.log(k));
-    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + " " + sizes[i];
   };
 
   // Handle file selection with preview
-  const handleFileSelect = (file: File | null, type: 'identificationImage' | 'petImage' | 'video' | 'pdf', setter: (file: File | null) => void, previewSetter?: (preview: string | null) => void) => {
+  const handleFileSelect = (
+    file: File | null,
+    type: "identificationImage" | "petImage" | "video" | "pdf",
+    setter: (file: File | null) => void,
+    previewSetter?: (preview: string | null) => void
+  ) => {
     if (file) {
       // File size validation
       const maxSizes = {
         identificationImage: 5 * 1024 * 1024, // 5MB
         petImage: 5 * 1024 * 1024, // 5MB
         video: 20 * 1024 * 1024, // 20MB
-        pdf: 10 * 1024 * 1024 // 10MB
+        pdf: 10 * 1024 * 1024, // 10MB
       };
-      
+
       if (file.size > maxSizes[type]) {
         const maxSizeMB = maxSizes[type] / (1024 * 1024);
         showError(`حجم فایل بیش از ${maxSizeMB}MB است`);
         return;
       }
-      
+
       // File type validation
       const validTypes = {
-        identificationImage: ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'],
-        petImage: ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'],
-        video: ['video/mp4', 'video/avi', 'video/mov', 'video/wmv', 'video/flv'],
-        pdf: ['application/pdf']
+        identificationImage: [
+          "image/jpeg",
+          "image/jpg",
+          "image/png",
+          "image/gif",
+          "image/webp",
+        ],
+        petImage: [
+          "image/jpeg",
+          "image/jpg",
+          "image/png",
+          "image/gif",
+          "image/webp",
+        ],
+        video: [
+          "video/mp4",
+          "video/avi",
+          "video/mov",
+          "video/wmv",
+          "video/flv",
+        ],
+        pdf: ["application/pdf"],
       };
-      
+
       if (!validTypes[type].includes(file.type)) {
-        showError(`نوع فایل نامعتبر است. لطفاً فایل ${type === 'identificationImage' || type === 'petImage' ? 'تصویر' : type === 'video' ? 'ویدیو' : 'PDF'} انتخاب کنید`);
+        showError(
+          `نوع فایل نامعتبر است. لطفاً فایل ${
+            type === "identificationImage" || type === "petImage"
+              ? "تصویر"
+              : type === "video"
+              ? "ویدیو"
+              : "PDF"
+          } انتخاب کنید`
+        );
         return;
       }
     }
-    
+
     setter(file);
-    
+
     if (file) {
-      if (type === 'identificationImage' || type === 'petImage') {
+      if (type === "identificationImage" || type === "petImage") {
         const reader = new FileReader();
         reader.onload = (e) => previewSetter?.(e.target?.result as string);
         reader.readAsDataURL(file);
-      } else if (type === 'video') {
+      } else if (type === "video") {
         const reader = new FileReader();
         reader.onload = (e) => setVideoPreviews([e.target?.result as string]);
         reader.readAsDataURL(file);
       }
     } else {
-      if (type === 'identificationImage' || type === 'petImage') {
+      if (type === "identificationImage" || type === "petImage") {
         previewSetter?.(null);
-      } else if (type === 'video') {
+      } else if (type === "video") {
         setVideoPreviews([]);
       }
     }
   };
 
   // Handle multiple file selection for gallery
-  const handleGalleryFileSelect = (files: FileList | null, type: 'petImage' | 'video') => {
+  const handleGalleryFileSelect = (
+    files: FileList | null,
+    type: "petImage" | "video"
+  ) => {
     if (!files || files.length === 0) return;
 
     const maxSizes = {
@@ -188,8 +248,14 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
     };
 
     const validTypes = {
-      petImage: ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'],
-      video: ['video/mp4', 'video/avi', 'video/mov', 'video/wmv', 'video/flv'],
+      petImage: [
+        "image/jpeg",
+        "image/jpg",
+        "image/png",
+        "image/gif",
+        "image/webp",
+      ],
+      video: ["video/mp4", "video/avi", "video/mov", "video/wmv", "video/flv"],
     };
 
     const newFiles: File[] = [];
@@ -197,14 +263,14 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
 
     for (let i = 0; i < files.length; i++) {
       const file = files[i];
-      
+
       // File size validation
       if (file.size > maxSizes[type]) {
         const maxSizeMB = maxSizes[type] / (1024 * 1024);
         showError(`فایل ${file.name} بیش از ${maxSizeMB}MB است`);
         continue;
       }
-      
+
       // File type validation
       if (!validTypes[type].includes(file.type)) {
         showError(`فایل ${file.name} نوع نامعتبر است`);
@@ -214,23 +280,23 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
       newFiles.push(file);
     }
 
-    if (type === 'petImage') {
-      setSelectedPetImages(prev => [...prev, ...newFiles]);
+    if (type === "petImage") {
+      setSelectedPetImages((prev) => [...prev, ...newFiles]);
       // Generate previews for new files
-      newFiles.forEach(file => {
+      newFiles.forEach((file) => {
         const reader = new FileReader();
         reader.onload = (e) => {
-          setPetImagePreviews(prev => [...prev, e.target?.result as string]);
+          setPetImagePreviews((prev) => [...prev, e.target?.result as string]);
         };
         reader.readAsDataURL(file);
       });
-    } else if (type === 'video') {
-      setSelectedVideos(prev => [...prev, ...newFiles]);
+    } else if (type === "video") {
+      setSelectedVideos((prev) => [...prev, ...newFiles]);
       // Generate previews for new files
-      newFiles.forEach(file => {
+      newFiles.forEach((file) => {
         const reader = new FileReader();
         reader.onload = (e) => {
-          setVideoPreviews(prev => [...prev, e.target?.result as string]);
+          setVideoPreviews((prev) => [...prev, e.target?.result as string]);
         };
         reader.readAsDataURL(file);
       });
@@ -238,32 +304,34 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
   };
 
   // Remove file from gallery
-  const removeFileFromGallery = (index: number, type: 'petImage' | 'video') => {
-    if (type === 'petImage') {
-      setSelectedPetImages(prev => prev.filter((_, i) => i !== index));
-      setPetImagePreviews(prev => prev.filter((_, i) => i !== index));
-    } else if (type === 'video') {
-      setSelectedVideos(prev => prev.filter((_, i) => i !== index));
-      setVideoPreviews(prev => prev.filter((_, i) => i !== index));
+  const removeFileFromGallery = (index: number, type: "petImage" | "video") => {
+    if (type === "petImage") {
+      setSelectedPetImages((prev) => prev.filter((_, i) => i !== index));
+      setPetImagePreviews((prev) => prev.filter((_, i) => i !== index));
+    } else if (type === "video") {
+      setSelectedVideos((prev) => prev.filter((_, i) => i !== index));
+      setVideoPreviews((prev) => prev.filter((_, i) => i !== index));
     }
   };
 
   // Remove existing media (for replacement)
-  const removeExistingMedia = (type: 'photo' | 'images' | 'videos' | 'certificate' | 'insurance') => {
+  const removeExistingMedia = (
+    type: "photo" | "images" | "videos" | "certificate" | "insurance"
+  ) => {
     switch (type) {
-      case 'photo':
+      case "photo":
         setExistingPetPhoto(null);
         break;
-      case 'images':
+      case "images":
         setExistingPetImages([]);
         break;
-      case 'videos':
+      case "videos":
         setExistingPetVideos([]);
         break;
-      case 'certificate':
+      case "certificate":
         setExistingCertificatePDF(null);
         break;
-      case 'insurance':
+      case "insurance":
         setExistingInsurancePDF(null);
         break;
     }
@@ -311,9 +379,9 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
       getPetById(pet.petId).then((data) => {
         setFormData((prev) => ({
           ...prev,
-          ...data
+          ...data,
         }));
-        
+
         // Load existing pet media
         if (data.photoPet) {
           setExistingPetPhoto(data.photoPet);
@@ -335,34 +403,36 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
   }, [pet]);
 
   const handleInputChange = (field: keyof Pet, value: any) => {
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [field]: value
+      [field]: value,
     }));
   };
 
   // Handle phone number input changes with formatting
   const handlePhoneNumberChange = (field: keyof Pet, value: string) => {
     const formattedNumber = formatPhoneNumber(value);
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [field]: formattedNumber
+      [field]: formattedNumber,
     }));
   };
 
   const validateRequiredFields = (data: Partial<Pet>) => {
     const requiredStringFields = [
-      'namePet',
-      'typePet',
-      'phoneNumberVeterinarian',
-      'mobile1Head',
-      'phoneNumberGeneralVeterinarian',
-      'phoneNumberSpecialistVeterinarian'
+      "namePet",
+      "typePet",
+      "typeFeeding",
+      "phoneNumberVeterinarian",
+      "mobile1Head",
+      "phoneNumberGeneralVeterinarian",
       // Removed microchip and other optional fields
     ];
 
-    const missingFields = requiredStringFields.filter(field =>
-      !data[field as keyof Pet] || String(data[field as keyof Pet]).trim() === ""
+    const missingFields = requiredStringFields.filter(
+      (field) =>
+        !data[field as keyof Pet] ||
+        String(data[field as keyof Pet]).trim() === ""
     );
 
     return missingFields;
@@ -370,40 +440,45 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
-    // Prevent multiple submissions
+    // console.log("STEP 1: handleSubmit triggered");
+
     if (loading) {
+      // console.log("STEP 2: Already loading, exit");
       return;
     }
-    
+
     setLoading(true);
+    // console.log("STEP 3: Loading set true");
 
     try {
-      // Prepare data with all required fields having proper values
-      const submitData: any = {
-        namePet: String(formData.namePet ),
-        typePet: String(formData.typePet ),
-        breedName: String(formData.breedName ),
+      // console.log("STEP 4: Preparing submitData");
+      // Build raw object first
+      const rawData: any = {
+        namePet: String(formData.namePet),
+        typePet: String(formData.typePet),
+        breedName: String(formData.breedName),
         blood: String(formData.blood ?? ""),
-        sex: String(formData.sex ),
-        birthDate: toEnglishDigits(String(formData.birthDate )),
-        birthCertificateNumberPet: String(formData.birthCertificateNumberPet ),
-        microChipCode: String(formData.microChipCode ),
-        colorPet: String(formData.colorPet ),
-        distinctiveFeature: String(formData.distinctiveFeature ),
-        weightPet: Number(formData.weightPet) ,
-        heightPet: Number(formData.heightPet) ,
-        issuingVeterinarian: String(formData.issuingVeterinarian ),
+        sex: String(formData.sex),
+        birthDate: toEnglishDigits(String(formData.birthDate)),
+        birthCertificateNumberPet: String(formData.birthCertificateNumberPet),
+        microChipCode: String(formData.microChipCode),
+        colorPet: String(formData.colorPet),
+        distinctiveFeature: String(formData.distinctiveFeature),
+        weightPet: Number(formData.weightPet),
+        heightPet: Number(formData.heightPet),
+        issuingVeterinarian: String(formData.issuingVeterinarian),
         addressVeterinarian: String(formData.addressVeterinarian),
-        phoneNumberVeterinarian: formatPhoneNumber(formData.phoneNumberVeterinarian ?? ""),
-        issuingMedicalSystem: String(formData.issuingMedicalSystem ),
+        phoneNumberVeterinarian: formatPhoneNumber(
+          formData.phoneNumberVeterinarian ?? ""
+        ),
+        issuingMedicalSystem: String(formData.issuingMedicalSystem),
         nameHead: String(formData.nameHead),
         nationalCodeHead: String(formData.nationalCodeHead),
         mobile1Head: formatPhoneNumber(formData.mobile1Head ?? ""),
         telHead: formatPhoneNumber(formData.telHead ?? ""),
         iso3Head: String(formData.iso3Head || "IRN"),
         stateHead: String(formData.stateHead),
-        cityHead: String(formData.cityHead ),
+        cityHead: String(formData.cityHead),
         addressHead: String(formData.addressHead),
         postalCodeHead: String(formData.postalCodeHead),
         emailHead: String(formData.emailHead),
@@ -413,11 +488,12 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
         whatsAppHead: formatPhoneNumber(formData.whatsAppHead ?? ""),
         linkedinHead: String(formData.linkedinHead ?? ""),
         generalVeterinarian: String(formData.generalVeterinarian ?? ""),
-        addressGeneralVeterinarian: String(formData.addressGeneralVeterinarian ?? ""),
-        phoneNumberGeneralVeterinarian: formatPhoneNumber(formData.phoneNumberGeneralVeterinarian ?? ""),
-        specialistVeterinarian: String(formData.specialistVeterinarian),
-        addressSpecialistVeterinarian: String(formData.addressSpecialistVeterinarian),
-        phoneNumberSpecialistVeterinarian: formatPhoneNumber(formData.phoneNumberSpecialistVeterinarian ?? ""),
+        addressGeneralVeterinarian: String(
+          formData.addressGeneralVeterinarian ?? ""
+        ),
+        phoneNumberGeneralVeterinarian: formatPhoneNumber(
+          formData.phoneNumberGeneralVeterinarian ?? ""
+        ),
         isSterile: Boolean(formData.isSterile),
         vaccineRabiel: Boolean(formData.vaccineRabiel),
         vaccineLDHPPi: Boolean(formData.vaccineLDHPPi),
@@ -436,269 +512,169 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
         connectWithBaby: Boolean(formData.connectWithBaby),
         nutritionalCounseling: String(formData.nutritionalCounseling),
         expertVeterinaryCounseling: String(formData.expertVeterinaryCounseling),
-        trainingAdvice: String(formData.trainingAdvice)
+        trainingAdvice: String(formData.trainingAdvice),
       };
 
-      // Check if files are selected for debugging
-      if (selectedIdentificationImage || selectedPetImages.length > 0 || selectedVideos.length > 0 || selectedCertificatePDF || selectedInsurancePDF) {
-        // Files are selected, proceed with uploads
-      }
+      // Filter out empty values
+      const submitData = Object.fromEntries(
+        Object.entries(rawData).filter(([_, value]) => {
+          // keep booleans and numbers (even 0 / false) but remove empty strings or null/undefined
+          if (typeof value === "string") return value.trim() !== "";
+          if (value === null || value === undefined) return false;
+          return true;
+        })
+      );
 
-      // Upload files if selected
+      // console.log("STEP 5: submitData prepared", submitData);
+
       if (selectedIdentificationImage) {
+        // console.log("STEP 6: Uploading identification image");
         try {
-          const imgRes = await uploadFile(selectedIdentificationImage, false); // Public image
-          submitData.photoPet = imgRes.fileId; // Use fileId instead of URL
+          const imgRes = await uploadFile(selectedIdentificationImage, false);
+          submitData.photoPet = imgRes.fileId;
+          // console.log("STEP 7: Identification image uploaded");
         } catch (err) {
-          if (err instanceof Error) {
-            if (err.message === 'Upload was canceled') {
-              setLoading(false);
-              return;
-            }
-            if (err.message.includes('Authentication failed')) {
-              showError("خطا در احراز هویت. لطفاً دوباره وارد شوید");
-              setLoading(false);
-              return;
-            }
-            if (err.message.includes('timed out')) {
-              showError("آپلود فایل زمان بر بود. لطفاً دوباره تلاش کنید");
-              setLoading(false);
-              return;
-            }
-            if (err.message.includes('File too large')) {
-              showError("حجم فایل بیش از حد مجاز است");
-              setLoading(false);
-              return;
-            }
-            if (err.message.includes('Network error')) {
-              showError("خطا در شبکه. لطفاً اتصال اینترنت خود را بررسی کنید");
-              setLoading(false);
-              return;
-            }
-          }
-          showError("آپلود عکس شناسایی ناموفق بود: " + (err instanceof Error ? err.message : 'خطای نامشخص'));
+          // console.log("STEP 8: Identification image upload failed");
           setLoading(false);
           return;
         }
       } else if (existingPetPhoto) {
-        // If editing and no new photo selected, preserve existing photo
+        // console.log("STEP 9: Using existingPetPhoto");
         submitData.photoPet = existingPetPhoto;
       } else if (pet && pet.photoPet) {
-        // Fallback to original pet data
+        // console.log("STEP 10: Using pet.photoPet");
         submitData.photoPet = pet.photoPet;
       }
 
-      // Upload multiple pet images
       if (selectedPetImages.length > 0) {
+        // console.log("STEP 11: Uploading multiple pet images");
         try {
-          const imageFileIds = await uploadMultipleFiles(selectedPetImages, false, "pet image");
-          submitData.galleryPhoto = imageFileIds; // Array of file IDs
+          const imageFileIds = await uploadMultipleFiles(
+            selectedPetImages,
+            false,
+            "pet image"
+          );
+          submitData.galleryPhoto = imageFileIds;
+          // console.log("STEP 12: Pet images uploaded");
         } catch (err) {
-          if (err instanceof Error) {
-            if (err.message === 'Upload was canceled') {
-              setLoading(false);
-              return;
-            }
-            if (err.message.includes('Authentication failed')) {
-              showError("خطا در احراز هویت. لطفاً دوباره وارد شوید");
-              setLoading(false);
-              return;
-            }
-            if (err.message.includes('timed out')) {
-              showError("آپلود عکس‌ها زمان بر بود. لطفاً دوباره تلاش کنید");
-              setLoading(false);
-              return;
-            }
-            if (err.message.includes('File too large')) {
-              showError("حجم یکی از عکس‌ها بیش از حد مجاز است");
-              setLoading(false);
-              return;
-            }
-            if (err.message.includes('Network error')) {
-              showError("خطا در شبکه. لطفاً اتصال اینترنت خود را بررسی کنید");
-              setLoading(false);
-              return;
-            }
-          }
-          showError("آپلود عکس‌های پت ناموفق بود: " + (err instanceof Error ? err.message : 'خطای نامشخص'));
+          // console.log("STEP 13: Pet images upload failed");
           setLoading(false);
           return;
         }
       } else if (existingPetImages.length > 0) {
-        // If editing and no new images selected, preserve existing gallery photos
+        // console.log("STEP 14: Using existingPetImages");
         submitData.galleryPhoto = existingPetImages;
-      } else if (pet && pet.galleriesPhoto && pet.galleriesPhoto.length > 0) {
-        // Fallback to original pet data
+        //@ts-ignore
+      } else if (pet && pet.galleriesPhoto?.length > 0) {
+        // console.log("STEP 15: Using pet.galleriesPhoto");
         submitData.galleryPhoto = pet.galleriesPhoto;
       } else {
-        // If creating new pet or no existing photos, send empty array
+        // console.log("STEP 16: No pet images, empty array");
         submitData.galleryPhoto = [];
       }
 
-      // Upload multiple videos
       if (selectedVideos.length > 0) {
+        // console.log("STEP 17: Uploading videos");
         try {
-          const videoFileIds = await uploadMultipleFiles(selectedVideos, false, "video");
-          submitData.galleryVideo = videoFileIds; // Array of file IDs
+          const videoFileIds = await uploadMultipleFiles(
+            selectedVideos,
+            false,
+            "video"
+          );
+          submitData.galleryVideo = videoFileIds;
+          // console.log("STEP 18: Videos uploaded");
         } catch (err) {
-          if (err instanceof Error) {
-            if (err.message === 'Upload was canceled') {
-              setLoading(false);
-              return;
-            }
-            if (err.message.includes('Authentication failed')) {
-              showError("خطا در احراز هویت. لطفاً دوباره وارد شوید");
-              setLoading(false);
-              return;
-            }
-            if (err.message.includes('timed out')) {
-              showError("آپلود ویدیوها زمان بر بود. لطفاً دوباره تلاش کنید");
-              setLoading(false);
-              return;
-            }
-            if (err.message.includes('File too large')) {
-              showError("حجم یکی از ویدیوها بیش از حد مجاز است");
-              setLoading(false);
-              return;
-            }
-            if (err.message.includes('Network error')) {
-              showError("خطا در شبکه. لطفاً اتصال اینترنت خود را بررسی کنید");
-              setLoading(false);
-              return;
-            }
-          }
-          showError("آپلود ویدیوها ناموفق بود: " + (err instanceof Error ? err.message : 'خطای نامشخص'));
+          // console.log("STEP 19: Videos upload failed");
           setLoading(false);
           return;
         }
       } else if (existingPetVideos.length > 0) {
-        // If editing and no new videos selected, preserve existing gallery videos
+        // console.log("STEP 20: Using existingPetVideos");
         submitData.galleryVideo = existingPetVideos;
-      } else if (pet && pet.galleriesVideo && pet.galleriesVideo.length > 0) {
-        // Fallback to original pet data
+        // @ts-ignore
+      } else if (pet && pet.galleriesVideo?.length > 0) {
+        // console.log("STEP 21: Using pet.galleriesVideo");
         submitData.galleryVideo = pet.galleriesVideo;
       } else {
-        // If creating new pet or no existing videos, send empty array
+        // console.log("STEP 22: No videos, empty array");
         submitData.galleryVideo = [];
       }
 
       if (selectedCertificatePDF) {
+        // console.log("STEP 23: Uploading certificate PDF");
         try {
-          const certRes = await uploadFile(selectedCertificatePDF, true); // Private PDF
-          submitData.certificatePdfPet = certRes.fileId; // Use fileId instead of URL
+          const certRes = await uploadFile(selectedCertificatePDF, true);
+          submitData.certificatePdfPet = certRes.fileId;
+          // console.log("STEP 24: Certificate PDF uploaded");
         } catch (err) {
-          if (err instanceof Error) {
-            if (err.message.includes('Authentication failed')) {
-              showError("خطا در احراز هویت. لطفاً دوباره وارد شوید");
-              setLoading(false);
-              return;
-            }
-            if (err.message.includes('timed out')) {
-              showError("آپلود فایل PDF زمان بر بود. لطفاً دوباره تلاش کنید");
-              setLoading(false);
-              return;
-            }
-            if (err.message.includes('File too large')) {
-              showError("حجم فایل PDF بیش از حد مجاز است");
-              setLoading(false);
-              return;
-            }
-            if (err.message.includes('Network error')) {
-              showError("خطا در شبکه. لطفاً اتصال اینترنت خود را بررسی کنید");
-              setLoading(false);
-              return;
-            }
-          }
-          showError("آپلود فایل PDF شناسنامه ناموفق بود: " + (err instanceof Error ? err.message : 'خطای نامشخص'));
+          // console.log("STEP 25: Certificate PDF upload failed");
           setLoading(false);
           return;
         }
       } else if (existingCertificatePDF) {
-        // If editing and no new certificate PDF selected, preserve existing PDF
+        // console.log("STEP 26: Using existingCertificatePDF");
         submitData.certificatePdfPet = existingCertificatePDF;
       } else if (pet && pet.certificatePdfPet) {
-        // Fallback to original pet data
+        // console.log("STEP 27: Using pet.certificatePdfPet");
         submitData.certificatePdfPet = pet.certificatePdfPet;
       }
 
       if (selectedInsurancePDF) {
+        // console.log("STEP 28: Uploading insurance PDF");
         try {
-          const insRes = await uploadFile(selectedInsurancePDF, true); // Private PDF
-          submitData.insurancePdfPet = insRes.fileId; // Use fileId instead of URL
+          const insRes = await uploadFile(selectedInsurancePDF, true);
+          submitData.insurancePdfPet = insRes.fileId;
+          // console.log("STEP 29: Insurance PDF uploaded");
         } catch (err) {
-          if (err instanceof Error) {
-            if (err.message.includes('Authentication failed')) {
-              showError("خطا در احراز هویت. لطفاً دوباره وارد شوید");
-              setLoading(false);
-              return;
-            }
-            if (err.message.includes('timed out')) {
-              showError("آپلود فایل PDF بیمه نامه زمان بر بود. لطفاً دوباره تلاش کنید");
-              setLoading(false);
-              return;
-            }
-            if (err.message.includes('File too large')) {
-              showError("حجم فایل PDF بیمه نامه بیش از حد مجاز است");
-              setLoading(false);
-              return;
-            }
-            if (err.message.includes('Network error')) {
-              showError("خطا در شبکه. لطفاً اتصال اینترنت خود را بررسی کنید");
-              setLoading(false);
-              return;
-            }
-          }
-          showError("آپلود فایل PDF بیمه نامه ناموفق بود: " + (err instanceof Error ? err.message : 'خطای نامشخص'));
+          // console.log("STEP 30: Insurance PDF upload failed");
           setLoading(false);
           return;
         }
       } else if (existingInsurancePDF) {
-        // If editing and no new insurance PDF selected, preserve existing PDF
+        // console.log("STEP 31: Using existingInsurancePDF");
         submitData.insurancePdfPet = existingInsurancePDF;
       } else if (pet && pet.insurancePdfPet) {
-        // Fallback to original pet data
+        // console.log("STEP 32: Using pet.insurancePdfPet");
         submitData.insurancePdfPet = pet.insurancePdfPet;
       }
 
-      // Double-check that critical required fields are not empty
+      // console.log("STEP 33: Checking critical fields");
       const criticalFields = [
-        'typePet',
-        'phoneNumberVeterinarian',
-        'mobile1Head',
-        'phoneNumberGeneralVeterinarian',
-        'phoneNumberSpecialistVeterinarian'
+        "typePet",
+        "phoneNumberVeterinarian",
+        "mobile1Head",
+        "phoneNumberGeneralVeterinarian",
       ];
 
       for (const field of criticalFields) {
         const value = submitData[field as keyof typeof submitData];
-        if (!value || value === '' || value === 'undefined' || value === 'null') {
-          showError(`فیلد ${field} اجباری است و نمی‌تواند خالی باشد`);
+        if (
+          !value ||
+          value === "" ||
+          value === "undefined" ||
+          value === "null"
+        ) {
+          console.log("STEP 34: Missing critical field", field);
           setLoading(false);
           return;
         }
       }
 
       if (pet) {
-        // Update existing pet
-        await updatePet(pet.petId || "", submitData as Pet);
-        showSuccess("پت با موفقیت ویرایش شد");
+        // console.log("STEP 35: Updating pet");
+        await updatePet(pet.petId || "", submitData as unknown as Pet);
       } else {
-        // Create new pet
-        await createPet(submitData as Pet);
-        showSuccess("پت با موفقیت اضافه شد");
+        // console.log("STEP 36: Creating pet");
+        await createPet(submitData as unknown as Pet);
       }
+
+      // console.log("STEP 37: onSuccess()");
       onSuccess();
     } catch (error: any) {
-      if (error.response?.data?.message) {
-        // Handle API validation errors
-        const errorMessages = Array.isArray(error.response.data.message)
-          ? error.response.data.message.map((err: any) => err.msg || err).join(", ")
-          : error.response.data.message;
-        showError(`خطا در اعتبارسنجی: ${errorMessages}`);
-      } else {
-        showError("خطا در ذخیره اطلاعات: " + (error.message || "خطای نامشخص"));
-      }
+      // console.log("STEP 38: Caught error in try/catch");
+      setLoading(false);
     } finally {
+      // console.log("STEP 39: Finally block, setLoading(false)");
       setLoading(false);
     }
   };
@@ -738,25 +714,45 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
                     <div>
                       <span className="text-gray-500">نام:</span>
-                      <span className="font-medium text-gray-900 mr-2">{pet.namePet || "نامشخص"}</span>
+                      <span className="font-medium text-gray-900 mr-2">
+                        {pet.namePet || "نامشخص"}
+                      </span>
                     </div>
                     <div>
                       <span className="text-gray-500">نوع:</span>
-                      <span className="font-medium text-gray-900 mr-2">{pet.typePet === "DOG" ? "سگ" : pet.typePet === "CAT" ? "گربه" : pet.typePet}</span>
+                      <span className="font-medium text-gray-900 mr-2">
+                        {pet.typePet === "DOG"
+                          ? "سگ"
+                          : pet.typePet === "CAT"
+                          ? "گربه"
+                          : pet.typePet}
+                      </span>
                     </div>
                     <div>
                       <span className="text-gray-500">جنسیت:</span>
-                      <span className="font-medium text-gray-900 mr-2">{pet.sex === "MEN" ? "نر" : pet.sex === "WOMEN" ? "ماده" : "نامشخص"}</span>
+                      <span className="font-medium text-gray-900 mr-2">
+                        {pet.sex === "MEN"
+                          ? "نر"
+                          : pet.sex === "WOMEN"
+                          ? "ماده"
+                          : "نامشخص"}
+                      </span>
                     </div>
                     <div>
                       <span className="text-gray-500">رنگ:</span>
-                      <span className="font-medium text-gray-900 mr-2">{pet.colorPet !== "UNKNOWN" ? pet.colorPet : "نامشخص"}</span>
+                      <span className="font-medium text-gray-900 mr-2">
+                        {pet.colorPet !== "UNKNOWN" ? pet.colorPet : "نامشخص"}
+                      </span>
                     </div>
                   </div>
                 </div>
               )}
-              
-              {(existingPetPhoto || existingPetImages.length > 0 || existingPetVideos.length > 0 || existingCertificatePDF || existingInsurancePDF) ? (
+
+              {existingPetPhoto ||
+              existingPetImages.length > 0 ||
+              existingPetVideos.length > 0 ||
+              existingCertificatePDF ||
+              existingInsurancePDF ? (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                   {/* Main Pet Photo */}
                   {existingPetPhoto && (
@@ -795,14 +791,16 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
                       <div className="flex gap-2 mt-2">
                         <button
                           type="button"
-                          onClick={() => removeExistingMedia('photo')}
+                          onClick={() => removeExistingMedia("photo")}
                           className="flex-1 flex items-center justify-center gap-2 p-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors text-sm"
                         >
                           <X size={14} />
                           حذف عکس
                         </button>
                       </div>
-                      <p className="text-xs text-gray-500 mt-2">برای تغییر، عکس جدید انتخاب کنید</p>
+                      <p className="text-xs text-gray-500 mt-2">
+                        برای تغییر، عکس جدید انتخاب کنید
+                      </p>
                     </div>
                   )}
 
@@ -845,21 +843,25 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
                         ))}
                         {existingPetImages.length > 4 && (
                           <div className="flex items-center justify-center h-20 bg-gray-100 rounded-lg border-2 border-dashed border-gray-300">
-                            <span className="text-xs text-gray-500">+{existingPetImages.length - 4} عکس دیگر</span>
+                            <span className="text-xs text-gray-500">
+                              +{existingPetImages.length - 4} عکس دیگر
+                            </span>
                           </div>
                         )}
                       </div>
                       <div className="flex gap-2 mt-2">
                         <button
                           type="button"
-                          onClick={() => removeExistingMedia('images')}
+                          onClick={() => removeExistingMedia("images")}
                           className="flex-1 flex items-center justify-center gap-2 p-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors text-sm"
                         >
                           <X size={14} />
                           حذف همه عکس‌ها
                         </button>
                       </div>
-                      <p className="text-xs text-gray-500 mt-2">برای تغییر، عکس‌های جدید انتخاب کنید</p>
+                      <p className="text-xs text-gray-500 mt-2">
+                        برای تغییر، عکس‌های جدید انتخاب کنید
+                      </p>
                     </div>
                   )}
 
@@ -902,21 +904,25 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
                         ))}
                         {existingPetVideos.length > 2 && (
                           <div className="text-center py-2 bg-gray-100 rounded-lg border-2 border-dashed border-gray-300">
-                            <span className="text-xs text-gray-500">+{existingPetVideos.length - 2} ویدیوی دیگر</span>
+                            <span className="text-xs text-gray-500">
+                              +{existingPetVideos.length - 2} ویدیوی دیگر
+                            </span>
                           </div>
                         )}
                       </div>
                       <div className="flex gap-2 mt-2">
                         <button
                           type="button"
-                          onClick={() => removeExistingMedia('videos')}
+                          onClick={() => removeExistingMedia("videos")}
                           className="flex-1 flex items-center justify-center gap-2 p-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors text-sm"
                         >
                           <X size={14} />
                           حذف همه ویدیوها
                         </button>
                       </div>
-                      <p className="text-xs text-gray-500 mt-2">برای تغییر، ویدیوهای جدید انتخاب کنید</p>
+                      <p className="text-xs text-gray-500 mt-2">
+                        برای تغییر، ویدیوهای جدید انتخاب کنید
+                      </p>
                     </div>
                   )}
 
@@ -930,8 +936,12 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
                       <div className="flex items-center gap-2 p-3 bg-gray-100 rounded-lg">
                         <FileText size={24} className="text-blue-600" />
                         <div className="flex-1">
-                          <p className="text-sm font-medium text-gray-900">فایل PDF شناسنامه</p>
-                          <p className="text-xs text-gray-500">برای تغییر، فایل جدید انتخاب کنید</p>
+                          <p className="text-sm font-medium text-gray-900">
+                            فایل PDF شناسنامه
+                          </p>
+                          <p className="text-xs text-gray-500">
+                            برای تغییر، فایل جدید انتخاب کنید
+                          </p>
                         </div>
                       </div>
                       <div className="flex gap-2 mt-2">
@@ -955,7 +965,7 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
                       <div className="flex gap-2 mt-2">
                         <button
                           type="button"
-                          onClick={() => removeExistingMedia('certificate')}
+                          onClick={() => removeExistingMedia("certificate")}
                           className="flex-1 flex items-center justify-center gap-2 p-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors text-sm"
                         >
                           <X size={14} />
@@ -975,8 +985,12 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
                       <div className="flex items-center gap-2 p-3 bg-gray-100 rounded-lg">
                         <FileText size={24} className="text-blue-600" />
                         <div className="flex-1">
-                          <p className="text-sm font-medium text-gray-900">فایل PDF بیمه نامه</p>
-                          <p className="text-xs text-gray-500">برای تغییر، فایل جدید انتخاب کنید</p>
+                          <p className="text-sm font-medium text-gray-900">
+                            فایل PDF بیمه نامه
+                          </p>
+                          <p className="text-xs text-gray-500">
+                            برای تغییر، فایل جدید انتخاب کنید
+                          </p>
                         </div>
                       </div>
                       <div className="flex gap-2 mt-2">
@@ -1000,7 +1014,7 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
                       <div className="flex gap-2 mt-2">
                         <button
                           type="button"
-                          onClick={() => removeExistingMedia('insurance')}
+                          onClick={() => removeExistingMedia("insurance")}
                           className="flex-1 flex items-center justify-center gap-2 p-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors text-sm"
                         >
                           <X size={14} />
@@ -1021,10 +1035,9 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
                         {pet ? "هنوز رسانه‌ای آپلود نشده" : "شروع کنید"}
                       </h4>
                       <p className="text-gray-500">
-                        {pet 
+                        {pet
                           ? "برای شروع، عکس اصلی پت، گالری عکس‌ها، ویدیوها و اسناد را آپلود کنید"
-                          : "برای شروع، عکس اصلی پت، گالری عکس‌ها، ویدیوها و اسناد را آپلود کنید"
-                        }
+                          : "برای شروع، عکس اصلی پت، گالری عکس‌ها، ویدیوها و اسناد را آپلود کنید"}
                       </p>
                     </div>
                   </div>
@@ -1039,7 +1052,7 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
                   📝 اطلاعات فرم فعلی
                 </h4>
                 <p className="text-sm text-blue-600">
-                  در حال ویرایش اطلاعات پت "{pet.namePet || "نامشخص"}" هستید. 
+                  در حال ویرایش اطلاعات پت "{pet.namePet || "نامشخص"}" هستید.
                   تغییرات خود را در فیلدهای زیر اعمال کنید.
                 </p>
               </div>
@@ -1048,9 +1061,14 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
             {/* Basic Information */}
             <div className="grid grid-cols-1 gap-6">
               <div>
-                <h3 className="text-lg font-semibold text-[var(--main-color)] mb-4">مشخصات حیوان خانگی</h3>
+                <h3 className="text-lg font-semibold text-[var(--main-color)] mb-4">
+                  مشخصات حیوان خانگی
+                </h3>
                 <div className="mb-4">
-                  <label className="block text-sm font-medium text-gray-700 mb-1"> شماره بیمه</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    {" "}
+                    شماره بیمه
+                  </label>
                   <input
                     type="text"
                     value={formData.insuranceNumber || ""}
@@ -1061,8 +1079,10 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
                 </div>
                 <div className="space-y-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">عکس شناسایی پت</label>
-                    
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      عکس شناسایی پت
+                    </label>
+
                     {!selectedIdentificationImage ? (
                       <label className="flex items-center justify-between gap-3 w-full border-2 border-dashed border-gray-300 hover:border-[var(--main-color)] rounded-xl p-3 cursor-pointer transition-colors">
                         <div className="flex items-center gap-3">
@@ -1071,13 +1091,22 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
                           </span>
                           <div className="text-sm text-gray-600">
                             <div className="font-semibold">انتخاب عکس</div>
-                            <div className="text-xs text-gray-500">حداکثر حجم پیشنهادی 5MB</div>
+                            <div className="text-xs text-gray-500">
+                              حداکثر حجم پیشنهادی 5MB
+                            </div>
                           </div>
                         </div>
                         <input
                           type="file"
                           accept="image/*"
-                          onChange={(e) => handleFileSelect(e.target.files?.[0] || null, 'identificationImage', setSelectedIdentificationImage, setIdentificationImagePreview)}
+                          onChange={(e) =>
+                            handleFileSelect(
+                              e.target.files?.[0] || null,
+                              "identificationImage",
+                              setSelectedIdentificationImage,
+                              setIdentificationImagePreview
+                            )
+                          }
                           className="hidden"
                         />
                       </label>
@@ -1089,19 +1118,32 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
                               📷
                             </span>
                             <div className="text-sm">
-                              <div className="font-semibold text-gray-900">{selectedIdentificationImage.name}</div>
-                              <div className="text-xs text-gray-500">{formatFileSize(selectedIdentificationImage.size)}</div>
+                              <div className="font-semibold text-gray-900">
+                                {selectedIdentificationImage.name}
+                              </div>
+                              <div className="text-xs text-gray-500">
+                                {formatFileSize(
+                                  selectedIdentificationImage.size
+                                )}
+                              </div>
                             </div>
                           </div>
                           <button
                             type="button"
-                            onClick={() => handleFileSelect(null, 'identificationImage', setSelectedIdentificationImage, setIdentificationImagePreview)}
+                            onClick={() =>
+                              handleFileSelect(
+                                null,
+                                "identificationImage",
+                                setSelectedIdentificationImage,
+                                setIdentificationImagePreview
+                              )
+                            }
                             className="text-red-500 hover:text-red-700 transition-colors p-1"
                           >
                             <X size={16} />
                           </button>
                         </div>
-                        
+
                         {identificationImagePreview && (
                           <div className="mt-3">
                             <img
@@ -1116,11 +1158,15 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">نام پت *</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      نام پت <span className="text-red-600">*</span>
+                    </label>
                     <input
                       type="text"
                       value={formData.namePet || ""}
-                      onChange={(e) => handleInputChange("namePet", e.target.value)}
+                      onChange={(e) =>
+                        handleInputChange("namePet", e.target.value)
+                      }
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--main-color)] focus:border-transparent"
                       required
                       placeholder="نام پت را وارد کنید"
@@ -1128,10 +1174,14 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">نوع پت <span className="text-red-500">*</span></label>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      نوع پت <span className="text-red-500">*</span>
+                    </label>
                     <select
                       value={formData.typePet || "DOG"}
-                      onChange={(e) => handleInputChange("typePet", e.target.value)}
+                      onChange={(e) =>
+                        handleInputChange("typePet", e.target.value)
+                      }
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--main-color)] focus:border-transparent"
                       required
                     >
@@ -1140,18 +1190,24 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
                     </select>
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">نام نژاد </label>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      نام نژاد <span className="text-red-600">*</span>
+                    </label>
                     <input
                       type="text"
                       value={formData.blood || ""}
-                      onChange={(e) => handleInputChange("blood", e.target.value)}
+                      onChange={(e) =>
+                        handleInputChange("blood", e.target.value)
+                      }
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--main-color)] focus:border-transparent"
                       required
                       placeholder="نام نژاد را وارد کنید"
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">جنسیت پت *</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      جنسیت پت <span className="text-red-600">*</span>
+                    </label>
                     <select
                       value={formData.sex || "MEN"}
                       onChange={(e) => handleInputChange("sex", e.target.value)}
@@ -1162,21 +1218,26 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
                     </select>
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">تاریخ تولد پت</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      تاریخ تولد پت <span className="text-red-600">*</span>
+                    </label>
                     <DatePicker
+                      required
                       calendar={persian}
                       locale={persian_fa}
                       value={
                         formData.birthDate
                           ? new DateObject({
-                            date: formData.birthDate,
-                            calendar: gregorian,
-                            format: "YYYY-MM-DD",
-                          }).convert(persian)
+                              date: formData.birthDate,
+                              calendar: gregorian,
+                              format: "YYYY-MM-DD",
+                            }).convert(persian)
                           : undefined
                       }
                       onChange={(value: any) => {
-                        const dateValue = Array.isArray(value) ? value[0] : value;
+                        const dateValue = Array.isArray(value)
+                          ? value[0]
+                          : value;
                         if (!dateValue) {
                           handleInputChange("birthDate", "");
                           return;
@@ -1184,7 +1245,10 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
                         const gregorianDate = (dateValue as DateObject)
                           .convert(gregorian)
                           .format("YYYY-MM-DD");
-                        handleInputChange("birthDate", toEnglishDigits(gregorianDate));
+                        handleInputChange(
+                          "birthDate",
+                          toEnglishDigits(gregorianDate)
+                        );
                       }}
                       calendarPosition="bottom-right"
                       inputClass="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--main-color)] focus:border-transparent"
@@ -1193,31 +1257,46 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">شماره شناسنامه پت</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      شماره شناسنامه پت
+                    </label>
                     <input
                       type="text"
                       value={formData.birthCertificateNumberPet || ""}
-                      onChange={(e) => handleInputChange("birthCertificateNumberPet", e.target.value)}
+                      onChange={(e) =>
+                        handleInputChange(
+                          "birthCertificateNumberPet",
+                          e.target.value
+                        )
+                      }
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--main-color)] focus:border-transparent"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">کد میکروچیپ پت</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      کد میکروچیپ پت
+                    </label>
                     <input
                       type="text"
                       placeholder="اختیاری"
                       value={formData.microChipCode || ""}
-                      onChange={(e) => handleInputChange("microChipCode", e.target.value)}
+                      onChange={(e) =>
+                        handleInputChange("microChipCode", e.target.value)
+                      }
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--main-color)] focus:border-transparent"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">رنگ پت</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      رنگ پت
+                    </label>
                     <select
                       value={formData.colorPet || "UNKNOWN"}
-                      onChange={(e) => handleInputChange("colorPet", e.target.value)}
+                      onChange={(e) =>
+                        handleInputChange("colorPet", e.target.value)
+                      }
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--main-color)] focus:border-transparent"
                     >
                       <option value="RED">قرمز</option>
@@ -1238,65 +1317,102 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">ویژگی بارز ظاهری</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      ویژگی بارز ظاهری
+                    </label>
                     <textarea
                       value={formData.distinctiveFeature || ""}
-                      onChange={(e) => handleInputChange("distinctiveFeature", e.target.value)}
+                      onChange={(e) =>
+                        handleInputChange("distinctiveFeature", e.target.value)
+                      }
                       rows={3}
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--main-color)] focus:border-transparent"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">وزن پت</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      وزن پت
+                    </label>
                     <input
                       type="number"
                       step="0.1"
                       min="0"
                       value={formData.weightPet || ""}
-                      onChange={(e) => handleInputChange("weightPet", parseFloat(e.target.value) || 0)}
+                      onChange={(e) =>
+                        handleInputChange(
+                          "weightPet",
+                          parseFloat(e.target.value) || 0
+                        )
+                      }
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--main-color)] focus:border-transparent"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">قد پت</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      قد پت
+                    </label>
                     <input
                       type="number"
                       step="0.1"
                       min="0"
                       value={formData.heightPet || ""}
-                      onChange={(e) => handleInputChange("heightPet", parseFloat(e.target.value) || 0)}
+                      onChange={(e) =>
+                        handleInputChange(
+                          "heightPet",
+                          parseFloat(e.target.value) || 0
+                        )
+                      }
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--main-color)] focus:border-transparent"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">نام دامپزشک صادر کننده شناسنامه</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      نام دامپزشک صادر کننده شناسنامه
+                    </label>
                     <input
                       type="text"
                       value={formData.issuingVeterinarian || ""}
-                      onChange={(e) => handleInputChange("issuingVeterinarian", e.target.value)}
+                      onChange={(e) =>
+                        handleInputChange("issuingVeterinarian", e.target.value)
+                      }
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--main-color)] focus:border-transparent"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">نظام دامپزشکی صادر کننده شناسنامه</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      نظام دامپزشکی صادر کننده شناسنامه
+                    </label>
                     <input
                       type="text"
                       value={formData.issuingMedicalSystem || ""}
-                      onChange={(e) => handleInputChange("issuingMedicalSystem", e.target.value)}
+                      onChange={(e) =>
+                        handleInputChange(
+                          "issuingMedicalSystem",
+                          e.target.value
+                        )
+                      }
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--main-color)] focus:border-transparent"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">تلفن و آدرس دامپزشک <span className="text-red-500">*</span></label>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      تلفن و آدرس دامپزشک{" "}
+                      <span className="text-red-500">*</span>
+                    </label>
                     <input
                       type="tel"
                       value={formData.phoneNumberVeterinarian || ""}
-                      onChange={(e) => handlePhoneNumberChange("phoneNumberVeterinarian", e.target.value)}
+                      onChange={(e) =>
+                        handlePhoneNumberChange(
+                          "phoneNumberVeterinarian",
+                          e.target.value
+                        )
+                      }
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--main-color)] focus:border-transparent"
                       required
                       placeholder="مثال: 9152944444 (اجباری)"
@@ -1304,7 +1420,9 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
                     <input
                       type="text"
                       value={formData.addressVeterinarian || ""}
-                      onChange={(e) => handleInputChange("addressVeterinarian", e.target.value)}
+                      onChange={(e) =>
+                        handleInputChange("addressVeterinarian", e.target.value)
+                      }
                       className="w-full mt-2 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--main-color)] focus:border-transparent"
                       placeholder="آدرس دامپزشک"
                     />
@@ -1312,158 +1430,213 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
                 </div>
               </div>
 
-
               {/* Owner Information */}
               <div>
-                <h3 className="text-lg font-semibold text-[var(--main-color)] mb-4">مشخصات سرپرست پت</h3>
+                <h3 className="text-lg font-semibold text-[var(--main-color)] mb-4">
+                  مشخصات سرپرست پت
+                </h3>
                 <div className="grid grid-cols-1 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">نام و نام خانوادگی</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      نام و نام خانوادگی
+                    </label>
                     <input
                       type="text"
                       value={formData.nameHead || ""}
-                      onChange={(e) => handleInputChange("nameHead", e.target.value)}
+                      onChange={(e) =>
+                        handleInputChange("nameHead", e.target.value)
+                      }
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--main-color)] focus:border-transparent"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">کد ملی</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      کد ملی
+                    </label>
                     <input
                       type="text"
                       value={formData.nationalCodeHead || ""}
-                      onChange={(e) => handleInputChange("nationalCodeHead", e.target.value)}
+                      onChange={(e) =>
+                        handleInputChange("nationalCodeHead", e.target.value)
+                      }
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--main-color)] focus:border-transparent"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">موبایل <span className="text-red-500">*</span></label>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      موبایل <span className="text-red-500">*</span>
+                    </label>
                     <input
                       type="tel"
                       value={formData.mobile1Head || ""}
-                      onChange={(e) => handlePhoneNumberChange("mobile1Head", e.target.value)}
+                      onChange={(e) =>
+                        handlePhoneNumberChange("mobile1Head", e.target.value)
+                      }
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--main-color)] focus:border-transparent"
                       required
                       placeholder="مثال: 9123456789 (اجباری)"
                     />
                   </div>
 
-
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">تلفن ثابت</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      تلفن ثابت
+                    </label>
                     <input
                       type="tel"
                       value={formData.telHead || ""}
-                      onChange={(e) => handlePhoneNumberChange("telHead", e.target.value)}
+                      onChange={(e) =>
+                        handlePhoneNumberChange("telHead", e.target.value)
+                      }
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--main-color)] focus:border-transparent"
                       placeholder="مثال: 2112345678"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">استان محل سکونت</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      استان محل سکونت
+                    </label>
                     <input
                       type="text"
                       value={formData.stateHead || ""}
-                      onChange={(e) => handleInputChange("stateHead", e.target.value)}
+                      onChange={(e) =>
+                        handleInputChange("stateHead", e.target.value)
+                      }
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--main-color)] focus:border-transparent"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">شهر محل سکونت</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      شهر محل سکونت
+                    </label>
                     <input
                       type="text"
                       value={formData.cityHead || ""}
-                      onChange={(e) => handleInputChange("cityHead", e.target.value)}
+                      onChange={(e) =>
+                        handleInputChange("cityHead", e.target.value)
+                      }
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--main-color)] focus:border-transparent"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">آدرس پستی محل سکونت</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      آدرس پستی محل سکونت
+                    </label>
                     <input
                       type="text"
                       value={formData.addressHead || ""}
-                      onChange={(e) => handleInputChange("addressHead", e.target.value)}
+                      onChange={(e) =>
+                        handleInputChange("addressHead", e.target.value)
+                      }
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--main-color)] focus:border-transparent"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">کد پستی محل سکونت</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      کد پستی محل سکونت
+                    </label>
                     <input
                       type="text"
                       value={formData.postalCodeHead || ""}
-                      onChange={(e) => handleInputChange("postalCodeHead", e.target.value)}
+                      onChange={(e) =>
+                        handleInputChange("postalCodeHead", e.target.value)
+                      }
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--main-color)] focus:border-transparent"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">آدرس ایمیل</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      آدرس ایمیل
+                    </label>
                     <input
                       type="email"
                       value={formData.emailHead || ""}
                       placeholder="ایمیل اختیاری"
-                      onChange={(e) => handleInputChange("emailHead", e.target.value)}
+                      onChange={(e) =>
+                        handleInputChange("emailHead", e.target.value)
+                      }
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--main-color)] focus:border-transparent"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">اکانت تلگرام</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      اکانت تلگرام
+                    </label>
                     <input
                       type="text"
                       value={formData.telegramHead || ""}
-                      onChange={(e) => handleInputChange("telegramHead", e.target.value)}
+                      onChange={(e) =>
+                        handleInputChange("telegramHead", e.target.value)
+                      }
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--main-color)] focus:border-transparent"
                       placeholder="مثال: @username (اختیاری)"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">اکانت واتساپ</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      اکانت واتساپ
+                    </label>
                     <input
                       type="tel"
                       value={formData.whatsAppHead || ""}
-                      onChange={(e) => handlePhoneNumberChange("whatsAppHead", e.target.value)}
+                      onChange={(e) =>
+                        handlePhoneNumberChange("whatsAppHead", e.target.value)
+                      }
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--main-color)] focus:border-transparent"
                       placeholder="مثال: 9123456789 (اختیاری)"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">اکانت اینستگرام</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      اکانت اینستگرام
+                    </label>
                     <input
                       type="text"
                       value={formData.instagramHead || ""}
-                      onChange={(e) => handleInputChange("instagramHead", e.target.value)}
+                      onChange={(e) =>
+                        handleInputChange("instagramHead", e.target.value)
+                      }
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--main-color)] focus:border-transparent"
                       placeholder="اختیاری"
-
                     />
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">اکانت یوتیوب</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      اکانت یوتیوب
+                    </label>
                     <input
                       placeholder="اختیاری"
                       type="text"
                       value={formData.youtubeHead || ""}
-                      onChange={(e) => handleInputChange("youtubeHead", e.target.value)}
+                      onChange={(e) =>
+                        handleInputChange("youtubeHead", e.target.value)
+                      }
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--main-color)] focus:border-transparent"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">اکانت لینکدین</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      اکانت لینکدین
+                    </label>
                     <input
                       placeholder="اختیاری"
                       type="text"
                       value={formData.linkedinHead || ""}
-                      onChange={(e) => handleInputChange("linkedinHead", e.target.value)}
+                      onChange={(e) =>
+                        handleInputChange("linkedinHead", e.target.value)
+                      }
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--main-color)] focus:border-transparent"
                     />
                   </div>
@@ -1473,31 +1646,50 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
 
             {/* Health Information */}
             <div>
-              <h3 className="text-lg font-semibold text-[var(--main-color)] mb-4">ویژگی و اطلاعات سلامتی</h3>
+              <h3 className="text-lg font-semibold text-[var(--main-color)] mb-4">
+                ویژگی و اطلاعات سلامتی
+              </h3>
 
               <div className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">نام دامپزشک </label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    نام دامپزشک{" "}
+                  </label>
                   <input
                     type="text"
                     value={formData.generalVeterinarian || ""}
-                    onChange={(e) => handleInputChange("generalVeterinarian", e.target.value)}
+                    onChange={(e) =>
+                      handleInputChange("generalVeterinarian", e.target.value)
+                    }
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--main-color)] focus:border-transparent"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">آدرس و شماره تلفن دامپزشک عمومی</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    آدرس و شماره تلفن دامپزشک عمومی{" "}
+                    <span className="text-red-600">*</span>
+                  </label>
                   <input
                     type="text"
                     value={formData.addressGeneralVeterinarian || ""}
-                    onChange={(e) => handleInputChange("addressGeneralVeterinarian", e.target.value)}
+                    onChange={(e) =>
+                      handleInputChange(
+                        "addressGeneralVeterinarian",
+                        e.target.value
+                      )
+                    }
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--main-color)] focus:border-transparent"
                   />
                   <input
                     type="tel"
                     value={formData.phoneNumberGeneralVeterinarian || ""}
-                    onChange={(e) => handlePhoneNumberChange("phoneNumberGeneralVeterinarian", e.target.value)}
+                    onChange={(e) =>
+                      handlePhoneNumberChange(
+                        "phoneNumberGeneralVeterinarian",
+                        e.target.value
+                      )
+                    }
                     className="w-full mt-2 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--main-color)] focus:border-transparent"
                     required
                     placeholder="مثال: 2112345678 (اجباری)"
@@ -1505,28 +1697,43 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">نوع تغذیه</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    نوع تغذیه <span className="text-red-500">*</span>
+                  </label>
+
                   <input
                     type="text"
                     value={formData.typeFeeding || ""}
-                    onChange={(e) => handleInputChange("typeFeeding", e.target.value)}
+                    required
+                    onChange={(e) =>
+                      handleInputChange("typeFeeding", e.target.value)
+                    }
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--main-color)] focus:border-transparent"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">تعداد وعده های غذایی روزانه</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    تعداد وعده های غذایی روزانه
+                  </label>
                   <input
                     type="number"
                     min="0"
                     value={formData.numberMeal || ""}
-                    onChange={(e) => handleInputChange("numberMeal", parseInt(e.target.value) || 0)}
+                    onChange={(e) =>
+                      handleInputChange(
+                        "numberMeal",
+                        parseInt(e.target.value) || 0
+                      )
+                    }
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--main-color)] focus:border-transparent"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">رژیم غذایی</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    رژیم غذایی
+                  </label>
                   <textarea
                     value={formData.diet || ""}
                     onChange={(e) => handleInputChange("diet", e.target.value)}
@@ -1536,40 +1743,59 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">مواردممنوع تغذیه</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    مواردممنوع تغذیه
+                  </label>
                   <textarea
                     value={formData.prohibitedFoodItems || ""}
-                    onChange={(e) => handleInputChange("prohibitedFoodItems", e.target.value)}
+                    onChange={(e) =>
+                      handleInputChange("prohibitedFoodItems", e.target.value)
+                    }
                     rows={3}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--main-color)] focus:border-transparent"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">داروهای مصرفی دائم</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    داروهای مصرفی دائم
+                  </label>
                   <textarea
                     value={formData.regularlyUsedMedications || ""}
-                    onChange={(e) => handleInputChange("regularlyUsedMedications", e.target.value)}
+                    onChange={(e) =>
+                      handleInputChange(
+                        "regularlyUsedMedications",
+                        e.target.value
+                      )
+                    }
                     rows={3}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--main-color)] focus:border-transparent"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">داروهای ممنوعه</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    داروهای ممنوعه
+                  </label>
                   <textarea
                     value={formData.prohibitedDrugs || ""}
-                    onChange={(e) => handleInputChange("prohibitedDrugs", e.target.value)}
+                    onChange={(e) =>
+                      handleInputChange("prohibitedDrugs", e.target.value)
+                    }
                     rows={3}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--main-color)] focus:border-transparent"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">تشویقی مورد علاقه</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    تشویقی مورد علاقه
+                  </label>
                   <textarea
                     value={formData.favoriteEncouragement || ""}
-                    onChange={(e) => handleInputChange("favoriteEncouragement", e.target.value)}
+                    onChange={(e) =>
+                      handleInputChange("favoriteEncouragement", e.target.value)
+                    }
                     rows={3}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--main-color)] focus:border-transparent"
                   />
@@ -1581,7 +1807,9 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
                   <input
                     type="checkbox"
                     checked={formData.isSterile || false}
-                    onChange={(e) => handleInputChange("isSterile", e.target.checked)}
+                    onChange={(e) =>
+                      handleInputChange("isSterile", e.target.checked)
+                    }
                     className="mr-2"
                   />
                   <span className="text-sm text-gray-700">پت عقیم است</span>
@@ -1591,62 +1819,88 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
                   <input
                     type="checkbox"
                     checked={formData.vaccineRabiel || false}
-                    onChange={(e) => handleInputChange("vaccineRabiel", e.target.checked)}
+                    onChange={(e) =>
+                      handleInputChange("vaccineRabiel", e.target.checked)
+                    }
                     className="mr-2"
                   />
-                  <span className="text-sm text-gray-700">وضعیت واکسن Rabiel </span>
+                  <span className="text-sm text-gray-700">
+                    وضعیت واکسن Rabiel{" "}
+                  </span>
                 </label>
 
                 <label className="flex items-center">
                   <input
                     type="checkbox"
                     checked={formData.vaccineLDHPPi || false}
-                    onChange={(e) => handleInputChange("vaccineLDHPPi", e.target.checked)}
+                    onChange={(e) =>
+                      handleInputChange("vaccineLDHPPi", e.target.checked)
+                    }
                     className="mr-2"
                   />
-                  <span className="text-sm text-gray-700">وضعیت واکسنLDHPPi</span>
+                  <span className="text-sm text-gray-700">
+                    وضعیت واکسنLDHPPi
+                  </span>
                 </label>
 
                 <label className="flex items-center">
                   <input
                     type="checkbox"
                     checked={formData.vaccineRCP || false}
-                    onChange={(e) => handleInputChange("vaccineRCP", e.target.checked)}
+                    onChange={(e) =>
+                      handleInputChange("vaccineRCP", e.target.checked)
+                    }
                     className="mr-2"
                   />
-                  <span className="text-sm text-gray-700">وضعیت واکسنR.C.P</span>
+                  <span className="text-sm text-gray-700">
+                    وضعیت واکسنR.C.P
+                  </span>
                 </label>
               </div>
             </div>
             {/* Behavioral Information */}
             <div>
-              <h3 className="text-lg font-semibold text-[var(--main-color)] mb-4">اطلاعات و ویژگی های رفتاری شخصیتی</h3>
+              <h3 className="text-lg font-semibold text-[var(--main-color)] mb-4">
+                اطلاعات و ویژگی های رفتاری شخصیتی
+              </h3>
               <div className="grid grid-cols-1 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">عادت های رفتاری</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    عادت های رفتاری
+                  </label>
                   <textarea
                     value={formData.behavioralHabits || ""}
-                    onChange={(e) => handleInputChange("behavioralHabits", e.target.value)}
+                    onChange={(e) =>
+                      handleInputChange("behavioralHabits", e.target.value)
+                    }
                     rows={3}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--main-color)] focus:border-transparent"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">مهارت ها واستعدادها</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    مهارت ها واستعدادها
+                  </label>
                   <textarea
                     value={formData.susceptibility || ""}
-                    onChange={(e) => handleInputChange("susceptibility", e.target.value)}
+                    onChange={(e) =>
+                      handleInputChange("susceptibility", e.target.value)
+                    }
                     rows={3}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--main-color)] focus:border-transparent"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">حساسیت ها</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    حساسیت ها
+                  </label>
                   <textarea
                     value={formData.sensitivities || ""}
-                    onChange={(e) => handleInputChange("sensitivities", e.target.value)}
+                    onChange={(e) =>
+                      handleInputChange("sensitivities", e.target.value)
+                    }
                     rows={3}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--main-color)] focus:border-transparent"
                   />
@@ -1656,39 +1910,52 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
                   <input
                     type="checkbox"
                     checked={formData.connectOtherPets || false}
-                    onChange={(e) => handleInputChange("connectOtherPets", e.target.checked)}
+                    onChange={(e) =>
+                      handleInputChange("connectOtherPets", e.target.checked)
+                    }
                     className="mr-2"
                   />
-                  <span className="text-sm text-gray-700">با پت دیگری اقامت دارد</span>
+                  <span className="text-sm text-gray-700">
+                    با پت دیگری اقامت دارد
+                  </span>
                 </label>
 
                 <label className="flex items-center">
                   <input
                     type="checkbox"
                     checked={formData.connectWithBaby || false}
-                    onChange={(e) => handleInputChange("connectWithBaby", e.target.checked)}
+                    onChange={(e) =>
+                      handleInputChange("connectWithBaby", e.target.checked)
+                    }
                     className="mr-2"
                   />
-                  <span className="text-sm text-gray-700">پت شما با کودکان ارتباط دارد</span>
+                  <span className="text-sm text-gray-700">
+                    پت شما با کودکان ارتباط دارد
+                  </span>
                 </label>
               </div>
             </div>
 
             {/* Digital Links and Documents */}
             <div>
-              <h3 className="text-lg font-semibold text-[var(--main-color)] mb-4">لینک و اسناد دیجیتال</h3>
-              
+              <h3 className="text-lg font-semibold text-[var(--main-color)] mb-4">
+                لینک و اسناد دیجیتال
+              </h3>
+
               {/* Media Upload Help */}
               <div className="mb-4 p-3 bg-yellow-50 rounded-lg border border-yellow-200">
                 <p className="text-sm text-yellow-700">
-                  💡 <strong>نکته:</strong> برای تغییر رسانه‌های موجود، ابتدا آنها را از بخش "پروفایل فعلی پت" حذف کنید، 
-                  سپس فایل‌های جدید را انتخاب کنید. فایل‌های جدید جایگزین فایل‌های قبلی خواهند شد.
+                  💡 <strong>نکته:</strong> برای تغییر رسانه‌های موجود، ابتدا
+                  آنها را از بخش "پروفایل فعلی پت" حذف کنید، سپس فایل‌های جدید
+                  را انتخاب کنید. فایل‌های جدید جایگزین فایل‌های قبلی خواهند شد.
                 </p>
               </div>
               <div className="grid grid-cols-1 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">فایل PDF شناسنامه</label>
-                  
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    فایل PDF شناسنامه
+                  </label>
+
                   {!selectedCertificatePDF ? (
                     <label className="flex items-center justify-between gap-3 w-full border-2 border-dashed border-gray-300 hover:border-[var(--main-color)] rounded-xl p-3 cursor-pointer transition-colors">
                       <div className="flex items-center gap-3">
@@ -1697,13 +1964,21 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
                         </span>
                         <div className="text-sm text-gray-600">
                           <div className="font-semibold">انتخاب فایل PDF</div>
-                          <div className="text-xs text-gray-500">فقط PDF - حداکثر 10MB</div>
+                          <div className="text-xs text-gray-500">
+                            فقط PDF - حداکثر 10MB
+                          </div>
                         </div>
                       </div>
                       <input
                         type="file"
                         accept="application/pdf"
-                        onChange={(e) => handleFileSelect(e.target.files?.[0] || null, 'pdf', setSelectedCertificatePDF)}
+                        onChange={(e) =>
+                          handleFileSelect(
+                            e.target.files?.[0] || null,
+                            "pdf",
+                            setSelectedCertificatePDF
+                          )
+                        }
                         className="hidden"
                       />
                     </label>
@@ -1715,23 +1990,35 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
                             📄
                           </span>
                           <div className="text-sm">
-                            <div className="font-semibold text-gray-900">{selectedCertificatePDF.name}</div>
-                            <div className="text-xs text-gray-500">{formatFileSize(selectedCertificatePDF.size)}</div>
+                            <div className="font-semibold text-gray-900">
+                              {selectedCertificatePDF.name}
+                            </div>
+                            <div className="text-xs text-gray-500">
+                              {formatFileSize(selectedCertificatePDF.size)}
+                            </div>
                           </div>
                         </div>
                         <button
                           type="button"
-                          onClick={() => handleFileSelect(null, 'pdf', setSelectedCertificatePDF)}
+                          onClick={() =>
+                            handleFileSelect(
+                              null,
+                              "pdf",
+                              setSelectedCertificatePDF
+                            )
+                          }
                           className="text-red-500 hover:text-red-700 transition-colors p-1"
                         >
                           <X size={16} />
                         </button>
                       </div>
-                      
+
                       <div className="mt-3">
                         <div className="flex items-center gap-2 p-3 bg-gray-100 rounded-lg">
                           <span className="text-lg">📄</span>
-                          <span className="text-sm text-gray-600">فایل PDF شناسنامه انتخاب شده</span>
+                          <span className="text-sm text-gray-600">
+                            فایل PDF شناسنامه انتخاب شده
+                          </span>
                         </div>
                       </div>
                     </div>
@@ -1739,8 +2026,10 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">فایل PDF بیمه نامه</label>
-                  
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    فایل PDF بیمه نامه
+                  </label>
+
                   {!selectedInsurancePDF ? (
                     <label className="flex items-center justify-between gap-3 w-full border-2 border-dashed border-gray-300 hover:border-[var(--main-color)] rounded-xl p-3 cursor-pointer transition-colors">
                       <div className="flex items-center gap-3">
@@ -1749,13 +2038,21 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
                         </span>
                         <div className="text-sm text-gray-600">
                           <div className="font-semibold">انتخاب فایل PDF</div>
-                          <div className="text-xs text-gray-500">فقط PDF - حداکثر 10MB</div>
+                          <div className="text-xs text-gray-500">
+                            فقط PDF - حداکثر 10MB
+                          </div>
                         </div>
                       </div>
                       <input
                         type="file"
                         accept="application/pdf"
-                        onChange={(e) => handleFileSelect(e.target.files?.[0] || null, 'pdf', setSelectedInsurancePDF)}
+                        onChange={(e) =>
+                          handleFileSelect(
+                            e.target.files?.[0] || null,
+                            "pdf",
+                            setSelectedInsurancePDF
+                          )
+                        }
                         className="hidden"
                       />
                     </label>
@@ -1767,23 +2064,35 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
                             📄
                           </span>
                           <div className="text-sm">
-                            <div className="font-semibold text-gray-900">{selectedInsurancePDF.name}</div>
-                            <div className="text-xs text-gray-500">{formatFileSize(selectedInsurancePDF.size)}</div>
+                            <div className="font-semibold text-gray-900">
+                              {selectedInsurancePDF.name}
+                            </div>
+                            <div className="text-xs text-gray-500">
+                              {formatFileSize(selectedInsurancePDF.size)}
+                            </div>
                           </div>
                         </div>
                         <button
                           type="button"
-                          onClick={() => handleFileSelect(null, 'pdf', setSelectedInsurancePDF)}
+                          onClick={() =>
+                            handleFileSelect(
+                              null,
+                              "pdf",
+                              setSelectedInsurancePDF
+                            )
+                          }
                           className="text-red-500 hover:text-red-700 transition-colors p-1"
                         >
                           <X size={16} />
                         </button>
                       </div>
-                      
+
                       <div className="mt-3">
                         <div className="flex items-center gap-2 p-3 bg-gray-100 rounded-lg">
                           <span className="text-lg">📄</span>
-                          <span className="text-sm text-gray-600">فایل PDF بیمه نامه انتخاب شده</span>
+                          <span className="text-sm text-gray-600">
+                            فایل PDF بیمه نامه انتخاب شده
+                          </span>
                         </div>
                       </div>
                     </div>
@@ -1792,8 +2101,10 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
 
                 {/* Pet Images Gallery */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">عکس های پت</label>
-                  
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    عکس های پت
+                  </label>
+
                   {/* Upload Button */}
                   <label className="flex items-center justify-between gap-3 w-full border-2 border-dashed border-gray-300 hover:border-[var(--main-color)] rounded-xl p-3 cursor-pointer transition-colors mb-4">
                     <div className="flex items-center gap-3">
@@ -1802,14 +2113,19 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
                       </span>
                       <div className="text-sm text-gray-600">
                         <div className="font-semibold">انتخاب عکس‌ها</div>
-                        <div className="text-xs text-gray-500">می‌توانید چندین عکس انتخاب کنید - حداکثر حجم هر عکس 5MB</div>
+                        <div className="text-xs text-gray-500">
+                          می‌توانید چندین عکس انتخاب کنید - حداکثر حجم هر عکس
+                          5MB
+                        </div>
                       </div>
                     </div>
                     <input
                       type="file"
                       accept="image/*"
                       multiple
-                      onChange={(e) => handleGalleryFileSelect(e.target.files, 'petImage')}
+                      onChange={(e) =>
+                        handleGalleryFileSelect(e.target.files, "petImage")
+                      }
                       className="hidden"
                     />
                   </label>
@@ -1818,20 +2134,25 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
                   {selectedPetImages.length > 0 && (
                     <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                       {selectedPetImages.map((file, index) => (
-                        <div key={index} className="relative border-2 border-[var(--main-color)]/20 rounded-xl p-3 bg-[var(--main-color)]/5">
+                        <div
+                          key={index}
+                          className="relative border-2 border-[var(--main-color)]/20 rounded-xl p-3 bg-[var(--main-color)]/5"
+                        >
                           <div className="flex items-center justify-between mb-2">
                             <div className="text-xs text-gray-600 truncate flex-1">
                               {file.name}
                             </div>
                             <button
                               type="button"
-                              onClick={() => removeFileFromGallery(index, 'petImage')}
+                              onClick={() =>
+                                removeFileFromGallery(index, "petImage")
+                              }
                               className="text-red-500 hover:text-red-700 transition-colors p-1 ml-2"
                             >
                               <X size={14} />
                             </button>
                           </div>
-                          
+
                           {petImagePreviews[index] && (
                             <div className="aspect-square">
                               <img
@@ -1841,7 +2162,7 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
                               />
                             </div>
                           )}
-                          
+
                           <div className="text-xs text-gray-500 mt-2">
                             {formatFileSize(file.size)}
                           </div>
@@ -1853,8 +2174,10 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
 
                 {/* Videos Gallery */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">ویدئو (ها) پت</label>
-                  
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    ویدئو (ها) پت
+                  </label>
+
                   {/* Upload Button */}
                   <label className="flex items-center justify-between gap-3 w-full border-2 border-dashed border-gray-300 hover:border-[var(--main-color)] rounded-xl p-3 cursor-pointer transition-colors mb-4">
                     <div className="flex items-center gap-3">
@@ -1863,14 +2186,19 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
                       </span>
                       <div className="text-sm text-gray-600">
                         <div className="font-semibold">انتخاب ویدیوها</div>
-                        <div className="text-xs text-gray-500">می‌توانید چندین ویدیو انتخاب کنید - حداکثر حجم هر ویدیو 20MB</div>
+                        <div className="text-xs text-gray-500">
+                          می‌توانید چندین ویدیو انتخاب کنید - حداکثر حجم هر
+                          ویدیو 20MB
+                        </div>
                       </div>
                     </div>
                     <input
                       type="file"
                       accept="video/*"
                       multiple
-                      onChange={(e) => handleGalleryFileSelect(e.target.files, 'video')}
+                      onChange={(e) =>
+                        handleGalleryFileSelect(e.target.files, "video")
+                      }
                       className="hidden"
                     />
                   </label>
@@ -1879,20 +2207,25 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
                   {selectedVideos.length > 0 && (
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       {selectedVideos.map((file, index) => (
-                        <div key={index} className="relative border-2 border-[var(--main-color)]/20 rounded-xl p-3 bg-[var(--main-color)]/5">
+                        <div
+                          key={index}
+                          className="relative border-2 border-[var(--main-color)]/20 rounded-xl p-3 bg-[var(--main-color)]/5"
+                        >
                           <div className="flex items-center justify-between mb-2">
                             <div className="text-xs text-gray-600 truncate flex-1">
                               {file.name}
                             </div>
                             <button
                               type="button"
-                              onClick={() => removeFileFromGallery(index, 'video')}
+                              onClick={() =>
+                                removeFileFromGallery(index, "video")
+                              }
                               className="text-red-500 hover:text-red-700 transition-colors p-1 ml-2"
                             >
                               <X size={14} />
                             </button>
                           </div>
-                          
+
                           {videoPreviews[index] && (
                             <div className="aspect-video">
                               <video
@@ -1902,7 +2235,7 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
                               />
                             </div>
                           )}
-                          
+
                           <div className="text-xs text-gray-500 mt-2">
                             {formatFileSize(file.size)}
                           </div>
@@ -1911,40 +2244,59 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
                     </div>
                   )}
                 </div>
-
               </div>
             </div>
 
             {/* Consultations - Only visible to admin */}
             {userPayload?.role === "admin" && (
               <div>
-                <h3 className="text-lg font-semibold text-[var(--main-color)] mb-4">مشاوره ها</h3>
+                <h3 className="text-lg font-semibold text-[var(--main-color)] mb-4">
+                  مشاوره ها
+                </h3>
                 <div className="grid grid-cols-1 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">مشاوره متخصص تغذیه</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      مشاوره متخصص تغذیه
+                    </label>
                     <textarea
                       value={formData.nutritionalCounseling || ""}
-                      onChange={(e) => handleInputChange("nutritionalCounseling", e.target.value)}
+                      onChange={(e) =>
+                        handleInputChange(
+                          "nutritionalCounseling",
+                          e.target.value
+                        )
+                      }
                       rows={3}
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--main-color)] focus:border-transparent"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">مشاوره دامپزشک متخصص</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      مشاوره دامپزشک متخصص
+                    </label>
                     <textarea
                       value={formData.expertVeterinaryCounseling || ""}
-                      onChange={(e) => handleInputChange("expertVeterinaryCounseling", e.target.value)}
+                      onChange={(e) =>
+                        handleInputChange(
+                          "expertVeterinaryCounseling",
+                          e.target.value
+                        )
+                      }
                       rows={3}
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--main-color)] focus:border-transparent"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">مشاوره تربیت پت</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      مشاوره تربیت پت
+                    </label>
                     <textarea
                       value={formData.trainingAdvice || ""}
-                      onChange={(e) => handleInputChange("trainingAdvice", e.target.value)}
+                      onChange={(e) =>
+                        handleInputChange("trainingAdvice", e.target.value)
+                      }
                       rows={3}
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--main-color)] focus:border-transparent"
                     />
@@ -1955,7 +2307,7 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
 
             {/* Form Actions */}
             <div className="w-full flex justify-between gap-3 pt-6 border-t">
-               {/* <button
+              {/* <button
                 type="button"
                 onClick={() => {
                   setFormData({
@@ -2039,7 +2391,7 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
                   ) : (
                     <Save size={16} />
                   )}
-                  {loading ? "در حال ذخیره..." : (pet ? "ثبت" : "ذخیره")}
+                  {loading ? "در حال ذخیره..." : pet ? "ثبت" : "ذخیره"}
                 </button>
               </div>
             </div>

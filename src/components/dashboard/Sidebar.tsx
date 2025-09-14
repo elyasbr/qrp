@@ -1,5 +1,25 @@
-"use client"
-import { AlignJustify, Info, Phone, SquareX, User, LogOut, FileText, ChevronDown, ChevronLeft, Home, Settings, BarChart3, Users, Calendar, Shield, HelpCircle, Cat, SquareChevronRight, PawPrint } from "lucide-react";
+"use client";
+import {
+  AlignJustify,
+  Info,
+  Phone,
+  SquareX,
+  User,
+  LogOut,
+  FileText,
+  ChevronDown,
+  ChevronLeft,
+  Home,
+  Settings,
+  BarChart3,
+  Users,
+  Calendar,
+  Shield,
+  HelpCircle,
+  Cat,
+  SquareChevronRight,
+  PawPrint,
+} from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 import Image from "next/image";
@@ -24,8 +44,8 @@ const userNavItems: NavItem[] = [
     label: "گزارش",
     icon: <FileText />,
     subItems: [
-      { href: "/dashboard/animals", label: "لیست پت ها ", icon: <PawPrint /> }
-    ]
+      { href: "/dashboard/animals", label: "لیست پت ها ", icon: <PawPrint /> },
+    ],
   },
 ];
 
@@ -33,14 +53,16 @@ const adminNavItems: NavItem[] = [
   { href: "/dashboard", label: "داشبورد ادمین", icon: <Home /> },
   { href: "/dashboard/profile", label: "پروفایل", icon: <User /> },
   {
-    label: "مدیریت کاربران", icon: <Users />, subItems: [
+    label: "مدیریت کاربران",
+    icon: <Users />,
+    subItems: [
       { href: "/dashboard/users", label: "لیست کاربران", icon: <Users /> },
-    ]
+    ],
   },
   {
-    label: "گزارشات", icon: <BarChart3 />, subItems: [
-      { href: "/dashboard/animals", label: "لیست پت", icon: <Cat /> }
-    ]
+    label: "گزارشات",
+    icon: <BarChart3 />,
+    subItems: [{ href: "/dashboard/animals", label: "لیست پت", icon: <Cat /> }],
   },
   { href: "/dashboard/settings", label: "تنظیمات", icon: <Settings /> },
   { href: "/help", label: "راهنما", icon: <HelpCircle /> },
@@ -75,9 +97,9 @@ export default function Sidebar() {
   };
 
   const toggleExpanded = (label: string) => {
-    setExpandedItems(prev =>
+    setExpandedItems((prev) =>
       prev.includes(label)
-        ? prev.filter(item => item !== label)
+        ? prev.filter((item) => item !== label)
         : [...prev, label]
     );
   };
@@ -97,7 +119,9 @@ export default function Sidebar() {
       {/* Overlay */}
       <div
         className={`fixed inset-0 z-40 md:hidden transition-opacity duration-300 backdrop-blur-sm ${
-          open ? "opacity-100 bg-black/30 pointer-events-auto" : "opacity-0 pointer-events-none"
+          open
+            ? "opacity-100 bg-black/30 pointer-events-auto"
+            : "opacity-0 pointer-events-none"
         }`}
         onClick={() => setOpen(false)}
       />
@@ -105,7 +129,7 @@ export default function Sidebar() {
       {/* Sidebar */}
       <aside
         className={`
-    fixed top-0 right-0 h-full w-64 bg-white shadow-xl rounded-l-2xl transform-gpu will-change-transform transition-all duration-500 ease-out z-50
+    fixed top-0 right-0 w-64 bg-gray-50 min-h-screen shadow-xl rounded-l-2xl transform-gpu will-change-transform transition-all duration-500 ease-out z-50
     md:relative md:translate-x-0 md:opacity-100 md:z-auto md:shadow-none md:rounded-none
     ${open ? "translate-x-0 opacity-100" : "translate-x-full opacity-0"}
   `}
@@ -115,7 +139,12 @@ export default function Sidebar() {
           <div className="flex justify-between items-center p-4 md:hidden border-b border-gray-200">
             <div className="text-[var(--main-color)] font-extrabold text-xl font-Morabba">
               <Link href="/">
-                <Image alt="logo" src="/images/logo.jpg" width={100} height={100} />
+                <Image
+                  alt="logo"
+                  src="/images/logo.jpg"
+                  width={100}
+                  height={100}
+                />
               </Link>
             </div>
             <button onClick={() => setOpen(false)} className="text-gray-600">
@@ -124,7 +153,7 @@ export default function Sidebar() {
           </div>
 
           {/* Desktop logo */}
-          <div className="hidden md:block text-center p-6 border-b border-gray-200">
+          <div className="hidden md:block text-center bg-transparent p-6 border-b border-gray-200">
             <Link href="/">
               <Image
                 alt="logo"
@@ -138,7 +167,13 @@ export default function Sidebar() {
 
           {/* Navigation + Logout */}
           <nav className="flex flex-col flex-1">
-            <div className={`p-4 flex-1 transition-all duration-300 ${open ? "opacity-100 translate-y-0" : "opacity-0 translate-y-2 md:opacity-100 md:translate-y-0"}`}>
+            <div
+              className={`p-4 flex-1 transition-all duration-300 ${
+                open
+                  ? "opacity-100 translate-y-0"
+                  : "opacity-0 translate-y-2 md:opacity-100 md:translate-y-0"
+              }`}
+            >
               {navItems.map((item) => (
                 <div key={item.label}>
                   {item.href ? (
@@ -149,7 +184,9 @@ export default function Sidebar() {
                       onClick={() => setOpen(false)}
                     >
                       <span className="text-md">{item.icon}</span>
-                      <span className="text-sm font-semibold">{item.label}</span>
+                      <span className="text-sm font-semibold">
+                        {item.label}
+                      </span>
                     </Link>
                   ) : (
                     // Nested navigation item
@@ -160,7 +197,9 @@ export default function Sidebar() {
                       >
                         <div className="flex items-center gap-3">
                           <span className="text-md">{item.icon}</span>
-                          <span className="text-sm font-semibold">{item.label}</span>
+                          <span className="text-sm font-semibold">
+                            {item.label}
+                          </span>
                         </div>
                         {isExpanded(item.label) ? (
                           <ChevronDown size={16} />
@@ -179,8 +218,12 @@ export default function Sidebar() {
                               className="flex items-center  gap-3 text-gray-800 hover:bg-gray-50 p-2 rounded-lg transition-all text-sm"
                               onClick={() => setOpen(false)}
                             >
-                              {subItem.icon && <span className="text-sm">{subItem.icon}</span>}
-                              <span className="text-sm font-medium">{subItem.label}</span>
+                              {subItem.icon && (
+                                <span className="text-sm">{subItem.icon}</span>
+                              )}
+                              <span className="text-sm font-medium">
+                                {subItem.label}
+                              </span>
                             </Link>
                           ))}
                         </div>
@@ -205,7 +248,6 @@ export default function Sidebar() {
           </nav>
         </div>
       </aside>
-
     </>
   );
 }

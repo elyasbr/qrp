@@ -1,22 +1,29 @@
 "use client";
 import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
-import { preRegisterMobile, acceptRegisterMobile } from "@/services/api/userService";
+import {
+  preRegisterMobile,
+  acceptRegisterMobile,
+} from "@/services/api/userService";
 import { useRouter } from "next/navigation";
 import { extractAndTranslateError } from "@/utils/errorTranslations";
 import { useSnackbar } from "@/hooks/useSnackbar";
 import Snackbar from "@/components/common/Snackbar";
+import { LucideLoader2 } from "lucide-react";
 
 export default function SignUp({ title = "ثبت نام" }: { title?: string }) {
   const phoneLength = 11;
   const codeLength = 6;
 
   const [step, setStep] = useState<"phone" | "code">("phone");
-  const [phoneDigits, setPhoneDigits] = useState<string[]>(Array(phoneLength).fill(""));
+  const [phoneDigits, setPhoneDigits] = useState<string[]>(
+    Array(phoneLength).fill("")
+  );
   const [code, setCode] = useState<string[]>(Array(codeLength).fill(""));
   const phoneInputRefs = useRef<Array<HTMLInputElement | null>>([]);
   const codeInputRefs = useRef<Array<HTMLInputElement | null>>([]);
   const [isProcessing, setIsProcessing] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
   const { showError, showSuccess, snackbar, hideSnackbar } = useSnackbar();
 
@@ -49,9 +56,12 @@ export default function SignUp({ title = "ثبت نام" }: { title?: string }) 
     const errorData = errorResponse?.data || error?.data || error;
     const messageObj = errorData?.message || {};
     const errorCode = messageObj?.code || errorData?.code || error?.code;
-    const errorMsg = messageObj?.msg || errorData?.msg || errorData?.message || error?.message;
-    const errorText = errorData?.error || errorData?.text || errorData?.details || "";
-    const errorString = typeof error === 'string' ? error : JSON.stringify(error);
+    const errorMsg =
+      messageObj?.msg || errorData?.msg || errorData?.message || error?.message;
+    const errorText =
+      errorData?.error || errorData?.text || errorData?.details || "";
+    const errorString =
+      typeof error === "string" ? error : JSON.stringify(error);
 
     const errorCodeStr = String(errorCode || "");
     const errorMsgStr = String(errorMsg || "");
@@ -81,20 +91,26 @@ export default function SignUp({ title = "ثبت نام" }: { title?: string }) 
     }
   }, [step]);
 
-  const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>, idx: number) => {
+  const handlePhoneChange = (
+    e: React.ChangeEvent<HTMLInputElement>,
+    idx: number
+  ) => {
     const val = e.target.value.replace(/\D/g, "").slice(-1);
     if (!val && e.target.value !== "") return;
-    
+
     const newDigits = [...phoneDigits];
     newDigits[idx] = val || "";
     setPhoneDigits(newDigits);
-    
+
     if (val && idx < phoneLength - 1) {
       phoneInputRefs.current[idx + 1]?.focus();
     }
   };
 
-  const handlePhoneKeyDown = (e: React.KeyboardEvent<HTMLInputElement>, idx: number) => {
+  const handlePhoneKeyDown = (
+    e: React.KeyboardEvent<HTMLInputElement>,
+    idx: number
+  ) => {
     if (e.key === "Backspace") {
       e.preventDefault();
       const newDigits = [...phoneDigits];
@@ -121,31 +137,43 @@ export default function SignUp({ title = "ثبت نام" }: { title?: string }) 
     }
   };
 
-  const handlePhonePaste = (e: React.ClipboardEvent<HTMLInputElement>, idx: number) => {
+  const handlePhonePaste = (
+    e: React.ClipboardEvent<HTMLInputElement>,
+    idx: number
+  ) => {
     e.preventDefault();
-    const pasted = e.clipboardData.getData("text").replace(/\D/g, "").slice(0, phoneLength - idx);
+    const pasted = e.clipboardData
+      .getData("text")
+      .replace(/\D/g, "")
+      .slice(0, phoneLength - idx);
     if (!pasted) return;
-    
+
     const newDigits = [...phoneDigits];
     pasted.split("").forEach((digit, i) => (newDigits[idx + i] = digit));
     setPhoneDigits(newDigits);
-    
+
     const nextIndex = Math.min(idx + pasted.length, phoneLength - 1);
     phoneInputRefs.current[nextIndex]?.focus();
   };
 
-  const handleCodeChange = (e: React.ChangeEvent<HTMLInputElement>, index: number) => {
+  const handleCodeChange = (
+    e: React.ChangeEvent<HTMLInputElement>,
+    index: number
+  ) => {
     const val = e.target.value.replace(/\D/g, "").slice(-1);
     const newCode = [...code];
     newCode[index] = val || "";
     setCode(newCode);
-    
+
     if (val && index < codeLength - 1) {
       codeInputRefs.current[index + 1]?.focus();
     }
   };
 
-  const handleCodeKeyDown = (e: React.KeyboardEvent<HTMLInputElement>, index: number) => {
+  const handleCodeKeyDown = (
+    e: React.KeyboardEvent<HTMLInputElement>,
+    index: number
+  ) => {
     if (e.key === "Backspace") {
       e.preventDefault();
       if (code[index]) {
@@ -169,32 +197,41 @@ export default function SignUp({ title = "ثبت نام" }: { title?: string }) 
     }
   };
 
-  const handleCodePaste = (e: React.ClipboardEvent<HTMLInputElement>, index: number) => {
+  const handleCodePaste = (
+    e: React.ClipboardEvent<HTMLInputElement>,
+    index: number
+  ) => {
     e.preventDefault();
-    const pasted = e.clipboardData.getData("text").replace(/\D/g, "").slice(0, codeLength - index);
+    const pasted = e.clipboardData
+      .getData("text")
+      .replace(/\D/g, "")
+      .slice(0, codeLength - index);
     if (!pasted) return;
-    
+
     const newCode = [...code];
     pasted.split("").forEach((digit, i) => (newCode[index + i] = digit));
     setCode(newCode);
-    
+
     const nextIndex = Math.min(index + pasted.length, codeLength - 1);
     codeInputRefs.current[nextIndex]?.focus();
   };
 
   const handleSendCode = async () => {
+    setIsLoading(true);
     if (!phoneValid) {
       showError("لطفا شماره موبایل معتبر وارد کنید.");
       return;
     }
-    
+
     setIsProcessing(true);
-    
+
     try {
       const mobile = formatMobile(phoneDigits);
       await preRegisterMobile(mobile);
       setStep("code");
+      setIsLoading(false);
     } catch (err: any) {
+      setIsLoading(false);
       if (isDuplicateMobileError(err)) {
         showError("این شماره قبلا ثبت نام کرده است.");
         setTimeout(() => router.push("/signin"), 2000);
@@ -202,6 +239,7 @@ export default function SignUp({ title = "ثبت نام" }: { title?: string }) 
         showError(extractAndTranslateError(err));
       }
     } finally {
+      setIsLoading(false);
       setIsProcessing(false);
     }
   };
@@ -211,10 +249,10 @@ export default function SignUp({ title = "ثبت نام" }: { title?: string }) 
       showError("کد وارد شده نامعتبر است.");
       return;
     }
-    
+
     if (isProcessing) return;
     setIsProcessing(true);
-    
+
     try {
       const mobile = formatMobile(phoneDigits);
       await acceptRegisterMobile(mobile, code.join(""));
@@ -273,12 +311,19 @@ export default function SignUp({ title = "ثبت نام" }: { title?: string }) 
                 onClick={handleSendCode}
                 disabled={!phoneValid || isProcessing}
                 className={`w-full py-3 rounded-lg text-white font-semibold transition ${
-                  phoneValid && !isProcessing 
-                    ? "bg-[var(--main-color)] hover:bg-[var(--main-color-dark)] cursor-pointer" 
+                  phoneValid && !isProcessing
+                    ? "bg-[var(--main-color)] hover:bg-[var(--main-color-dark)] cursor-pointer"
                     : "bg-gray-400 cursor-not-allowed"
                 }`}
               >
-                {isProcessing ? "در حال ارسال..." : "دریافت کد تایید"}
+                {isLoading ? (
+                  <div className="flex gap-2 justify-center">
+                    <LucideLoader2 className="size-6 animate-spin" />
+                    <p>در حال ارسال...</p>
+                  </div>
+                ) : (
+                  "دریافت کد تایید"
+                )}
               </button>
             </div>
           )}
@@ -311,8 +356,8 @@ export default function SignUp({ title = "ثبت نام" }: { title?: string }) 
                 onClick={handleVerifyCode}
                 disabled={!codeValid || isProcessing}
                 className={`w-full py-3 rounded-lg text-white font-semibold transition ${
-                  codeValid && !isProcessing 
-                    ? "bg-[var(--main-color)] hover:bg-[var(--main-color-dark)] cursor-pointer" 
+                  codeValid && !isProcessing
+                    ? "bg-[var(--main-color)] hover:bg-[var(--main-color-dark)] cursor-pointer"
                     : "bg-gray-400 cursor-not-allowed"
                 }`}
               >
@@ -346,7 +391,7 @@ export default function SignUp({ title = "ثبت نام" }: { title?: string }) 
         duration={snackbar.duration}
         isOpen={snackbar.isOpen}
         onClose={hideSnackbar}
-        position="top-center"
+        position="top-right"
       />
     </>
   );
