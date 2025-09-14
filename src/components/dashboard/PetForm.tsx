@@ -1667,7 +1667,7 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    آدرس و شماره تلفن دامپزشک عمومی{" "}
+                    آدرس و شماره تلفن دامپزشک
                     <span className="text-red-600">*</span>
                   </label>
                   <input
