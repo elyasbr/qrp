@@ -142,12 +142,9 @@ export default function QRPublic({ pet, isLoading, error }: QRPublicProps) {
             <div className="bg-white rounded-lg ring-1 ring-gray-200 p-4">
               <h3 className="text-md font-bold text-[var(--main-color)] mb-3">ویژگی و اطلاعات سلامتی</h3>
               <div className="grid grid-cols-2 gap-y-2 text-sm">
-                <span className="text-gray-500">دامپزشک عمومی</span><span className="text-gray-900">{pet.generalVeterinarian}</span>
-                <span className="text-gray-500">آدرس دامپزشک عمومی</span><span className="text-gray-900">{pet.addressGeneralVeterinarian}</span>
-                <span className="text-gray-500">تلفن دامپزشک عمومی</span><span className="text-gray-900">{pet.phoneNumberGeneralVeterinarian}</span>
-                <span className="text-gray-500">دامپزشک متخصص</span><span className="text-gray-900">{pet.specialistVeterinarian}</span>
-                <span className="text-gray-500">آدرس دامپزشک متخصص</span><span className="text-gray-900">{pet.addressSpecialistVeterinarian}</span>
-                <span className="text-gray-500">تلفن دامپزشک متخصص</span><span className="text-gray-900">{pet.phoneNumberSpecialistVeterinarian}</span>
+                <span className="text-gray-500">دامپزشک</span><span className="text-gray-900">{pet.generalVeterinarian}</span>
+                <span className="text-gray-500">آدرس دامپزشک</span><span className="text-gray-900">{pet.addressGeneralVeterinarian}</span>
+                <span className="text-gray-500">تلفن دامپزشک</span><span className="text-gray-900">{pet.phoneNumberGeneralVeterinarian}</span>
                 <span className="text-gray-500">پت عقیم است</span><span className="text-gray-900">{pet.isSterile ? "بله" : "خیر"}</span>
                 <span className="text-gray-500">واکسن Rabiel</span><span className="text-gray-900">{pet.vaccineRabiel ? "دارد" : "ندارد"}</span>
                 <span className="text-gray-500">واکسن LDHPPi</span><span className="text-gray-900">{pet.vaccineLDHPPi ? "دارد" : "ندارد"}</span>
@@ -426,23 +423,6 @@ export default function QRPublic({ pet, isLoading, error }: QRPublicProps) {
               </div>
             </div>
 
-            <div className="p-4 bg-gray-50 rounded-lg">
-              <h3 className="font-semibold text-gray-800 mb-3">دامپزشک متخصص</h3>
-              <div className="space-y-2">
-                <div className="flex items-center gap-2">
-                  <User className="text-gray-500" size={16} />
-                  <span className="text-gray-700">{pet.specialistVeterinarian}</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <MapPin className="text-gray-500" size={16} />
-                  <span className="text-gray-700">{pet.addressSpecialistVeterinarian}</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Phone className="text-gray-500" size={16} />
-                  <span className="text-gray-700">{pet.phoneNumberSpecialistVeterinarian}</span>
-                </div>
-              </div>
-            </div>
           </div>
         </div>
 

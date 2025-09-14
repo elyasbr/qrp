@@ -199,29 +199,17 @@ function PetViewModal({ pet, onClose }: { pet: Pet; onClose: () => void }) {
                   ویژگی و اطلاعات سلامتی
                 </h3>
                 <div className="grid grid-cols-2 gap-y-2 text-sm">
-                  <span className="text-gray-500">دامپزشک عمومی</span>
+                  <span className="text-gray-500">دامپزشک</span>
                   <span className="text-gray-900">
                     {pet.generalVeterinarian}
                   </span>
-                  <span className="text-gray-500">آدرس دامپزشک عمومی</span>
+                  <span className="text-gray-500">آدرس دامپزشک</span>
                   <span className="text-gray-900">
                     {pet.addressGeneralVeterinarian}
                   </span>
-                  <span className="text-gray-500">تلفن دامپزشک عمومی</span>
+                  <span className="text-gray-500">تلفن دامپزشک</span>
                   <span className="text-gray-900">
                     {pet.phoneNumberGeneralVeterinarian}
-                  </span>
-                  <span className="text-gray-500">دامپزشک متخصص</span>
-                  <span className="text-gray-900">
-                    {pet.specialistVeterinarian}
-                  </span>
-                  <span className="text-gray-500">آدرس دامپزشک متخصص</span>
-                  <span className="text-gray-900">
-                    {pet.addressSpecialistVeterinarian}
-                  </span>
-                  <span className="text-gray-500">تلفن دامپزشک متخصص</span>
-                  <span className="text-gray-900">
-                    {pet.phoneNumberSpecialistVeterinarian}
                   </span>
                   <span className="text-gray-500">پت عقیم است</span>
                   <span className="text-gray-900">
