@@ -25,7 +25,7 @@ import {
 import { uploadFile } from "@/services/api/uploadService";
 import { useSnackbar } from "@/hooks/useSnackbar";
 import { useAuth } from "@/hooks/useAuth";
-import { useForm } from "react-hook-form";
+import { Controller, useForm } from "react-hook-form";
 
 interface PetFormProps {
   pet?: Pet | null;
@@ -35,12 +35,7 @@ interface PetFormProps {
 
 export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
   const { userPayload } = useAuth();
-  const {
-    register,
-    handleSubmit,
-    watch,
-    formState: { errors },
-  } = useForm();
+
   const [formData, setFormData] = useState<Partial<Pet>>({
     namePet: "",
     typePet: "DOG",
@@ -97,6 +92,105 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
     expertVeterinaryCounseling: "",
     trainingAdvice: "",
   });
+
+  const {
+    register,
+    handleSubmit,
+    control,
+    reset,
+    formState: { errors },
+  } = useForm<Partial<Pet>>({
+    defaultValues: {
+      namePet: formData.namePet,
+      typePet: formData.typePet ?? "DOG",
+      breedName: formData.breedName ?? "",
+      blood: formData.blood ?? "",
+      sex: formData.sex ?? "MEN",
+      birthDate: formData.birthDate ?? "",
+      birthCertificateNumberPet: formData.birthCertificateNumberPet ?? "",
+      microChipCode: formData.microChipCode ?? "",
+      insuranceNumber: formData.insuranceNumber ?? "",
+      colorPet: formData.colorPet ?? "UNKNOWN",
+      distinctiveFeature: formData.distinctiveFeature ?? "",
+      weightPet: formData.weightPet ?? 0,
+      heightPet: formData.heightPet ?? 0,
+      issuingVeterinarian: formData.issuingVeterinarian ?? "",
+      addressVeterinarian: formData.addressVeterinarian ?? "",
+      phoneNumberVeterinarian: formData.phoneNumberVeterinarian ?? "",
+      issuingMedicalSystem: formData.issuingMedicalSystem ?? "",
+      nameHead: formData.nameHead ?? "",
+      nationalCodeHead: formData.nationalCodeHead ?? "",
+      mobile1Head: formData.mobile1Head ?? "",
+      telHead: formData.telHead ?? "",
+      iso3Head: formData.iso3Head ?? "",
+      stateHead: formData.stateHead ?? "",
+      cityHead: formData.cityHead ?? "",
+      addressHead: formData.addressHead ?? "",
+      postalCodeHead: formData.postalCodeHead ?? "",
+      emailHead: formData.emailHead ?? "",
+      telegramHead: formData.telegramHead ?? "",
+      youtubeHead: formData.youtubeHead ?? "",
+      instagramHead: formData.instagramHead ?? "",
+      whatsAppHead: formData.whatsAppHead ?? "",
+      linkedinHead: formData.linkedinHead ?? "",
+      generalVeterinarian: formData.generalVeterinarian ?? "",
+      addressGeneralVeterinarian: formData.addressGeneralVeterinarian ?? "",
+      phoneNumberGeneralVeterinarian:
+        formData.phoneNumberGeneralVeterinarian ?? "",
+      isSterile: formData.isSterile ?? false,
+      vaccineRabiel: formData.vaccineRabiel ?? false,
+      vaccineLDHPPi: formData.vaccineLDHPPi ?? false,
+      vaccineRCP: formData.vaccineRCP ?? false,
+      typeFeeding: formData.typeFeeding ?? "",
+      numberMeal: formData.numberMeal ?? 0,
+      diet: formData.diet ?? "",
+      prohibitedFoodItems: formData.prohibitedFoodItems ?? "",
+      regularlyUsedMedications: formData.regularlyUsedMedications ?? "",
+      prohibitedDrugs: formData.prohibitedDrugs ?? "",
+      favoriteEncouragement: formData.favoriteEncouragement ?? "",
+      behavioralHabits: formData.behavioralHabits ?? "",
+      susceptibility: formData.susceptibility ?? "",
+      sensitivities: formData.sensitivities ?? "",
+      connectOtherPets: formData.connectOtherPets ?? false,
+      connectWithBaby: formData.connectWithBaby ?? false,
+      nutritionalCounseling: formData.nutritionalCounseling ?? "",
+      expertVeterinaryCounseling: formData.expertVeterinaryCounseling ?? "",
+      trainingAdvice: formData.trainingAdvice ?? "",
+    },
+  });
+
+  // Initialize form with pet data if editing
+  useEffect(() => {
+    if (pet && pet.petId) {
+      getPetById(pet.petId).then((data) => {
+        setFormData((prev) => ({
+          ...prev,
+          ...data,
+        }));
+        // Load existing pet media
+        if (data.photoPet) {
+          setExistingPetPhoto(data.photoPet);
+        }
+        if (data.galleriesPhoto && data.galleriesPhoto.length > 0) {
+          setExistingPetImages(data.galleriesPhoto);
+        }
+        if (data.galleriesVideo && data.galleriesVideo.length > 0) {
+          setExistingPetVideos(data.galleriesVideo);
+        }
+        if (data.certificatePdfPet) {
+          setExistingCertificatePDF(data.certificatePdfPet);
+        }
+        if (data.insurancePdfPet) {
+          setExistingInsurancePDF(data.insurancePdfPet);
+        }
+        // This is the key fix: reset the form with the fetched data
+        reset(data); // 🎯 Pass the fetched data directly to reset()
+      });
+    } else {
+      // If no pet is being edited, reset to default empty values
+      reset({});
+    }
+  }, [pet, reset]);
 
   const [loading, setLoading] = useState(false);
   const { showError, showSuccess } = useSnackbar();
@@ -380,35 +474,6 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
     return `+98${cleaned}`;
   };
 
-  // Initialize form with pet data if editing
-  useEffect(() => {
-    if (pet && pet.petId) {
-      getPetById(pet.petId).then((data) => {
-        setFormData((prev) => ({
-          ...prev,
-          ...data,
-        }));
-
-        // Load existing pet media
-        if (data.photoPet) {
-          setExistingPetPhoto(data.photoPet);
-        }
-        if (data.galleriesPhoto && data.galleriesPhoto.length > 0) {
-          setExistingPetImages(data.galleriesPhoto);
-        }
-        if (data.galleriesVideo && data.galleriesVideo.length > 0) {
-          setExistingPetVideos(data.galleriesVideo);
-        }
-        if (data.certificatePdfPet) {
-          setExistingCertificatePDF(data.certificatePdfPet);
-        }
-        if (data.insurancePdfPet) {
-          setExistingInsurancePDF(data.insurancePdfPet);
-        }
-      });
-    }
-  }, [pet]);
-
   const handleInputChange = (field: keyof Pet, value: any) => {
     setFormData((prev) => ({
       ...prev,
@@ -445,8 +510,41 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
     return missingFields;
   };
 
-  const onSubmit = async () => {
-    // console.log("STEP 1: handleSubmit triggered");
+  const updateField = (field: keyof Pet, value: any) => {
+    setFormData((prev) => ({
+      ...prev,
+      [field]: value,
+    }));
+  };
+
+  function cleanData<T extends Record<string, any>>(data: T): Partial<T> {
+    //@ts-expect-error
+    return Object.fromEntries(
+      Object.entries(data).filter(([_, value]) => {
+        if (typeof value === "string") {
+          const trimmed = value.trim();
+          return trimmed !== "" && trimmed.toLowerCase() !== "undefined";
+        }
+        if (typeof value === "number") {
+          return !Number.isNaN(value); // keeps 0, negatives, positives, excludes NaN
+        }
+        if (typeof value === "boolean") return true; // keep all booleans
+        if (value === null || value === undefined) return false; // remove null/undefined
+        return true; // keep other types (objects, arrays, etc.)
+      })
+    );
+  }
+
+  const onSubmit = async (data: Pet) => {
+    console.log("STEP 1: handleSubmit triggered");
+
+    console.log(data);
+
+    setFormData(cleanData(data));
+
+    console.log("form data", formData);
+
+    // updateField(data)
 
     if (loading) {
       // console.log("STEP 2: Already loading, exit");
@@ -522,16 +620,9 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
       };
 
       // Filter out empty values
-      const submitData = Object.fromEntries(
-        Object.entries(rawData).filter(([_, value]) => {
-          // keep booleans and numbers (even 0 / false) but remove empty strings or null/undefined
-          if (typeof value === "string") return value.trim() !== "";
-          if (value === null || value === undefined) return false;
-          return true;
-        })
-      );
+      const submitData = cleanData(rawData);
 
-      // console.log("STEP 5: submitData prepared", submitData);
+      console.log("STEP 5: submitData prepared", submitData);
 
       if (selectedIdentificationImage) {
         // console.log("STEP 6: Uploading identification image");
@@ -653,6 +744,7 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
       ];
 
       for (const field of criticalFields) {
+        //@ts-expect-error
         const value = submitData[field as keyof typeof submitData];
         if (
           !value ||
@@ -660,7 +752,7 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
           value === "undefined" ||
           value === "null"
         ) {
-          console.log("STEP 34: Missing critical field", field);
+          // console.log("STEP 34: Missing critical field", field);
           setLoading(false);
           return;
         }
@@ -707,6 +799,7 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
           </div>
 
           {/* Form */}
+          {/* @ts-expect-error */}
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
             {/* Pet Profile Display Section */}
             <div className="bg-gray-50 rounded-lg p-6 border border-gray-200">
@@ -1225,38 +1318,41 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
                     <label className="block text-sm font-medium text-gray-700 mb-1">
                       تاریخ تولد پت <span className="text-red-600">*</span>
                     </label>
-                    <DatePicker
-                      required
-                      calendar={persian}
-                      locale={persian_fa}
-                      value={
-                        formData.birthDate
-                          ? new DateObject({
-                              date: formData.birthDate,
-                              calendar: gregorian,
-                              format: "YYYY-MM-DD",
-                            }).convert(persian)
-                          : undefined
-                      }
-                      onChange={(value: any) => {
-                        const dateValue = Array.isArray(value)
-                          ? value[0]
-                          : value;
-                        if (!dateValue) {
-                          handleInputChange("birthDate", "");
-                          return;
-                        }
-                        const gregorianDate = (dateValue as DateObject)
-                          .convert(gregorian)
-                          .format("YYYY-MM-DD");
-                        handleInputChange(
-                          "birthDate",
-                          toEnglishDigits(gregorianDate)
-                        );
-                      }}
-                      calendarPosition="bottom-right"
-                      inputClass="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--main-color)] focus:border-transparent"
-                      placeholder="تاریخ تولد را انتخاب کنید"
+                    <Controller
+                      control={control}
+                      name="birthDate"
+                      render={({ field }) => (
+                        <DatePicker
+                          required
+                          calendar={persian}
+                          locale={persian_fa}
+                          value={
+                            field.value
+                              ? new DateObject({
+                                  date: field.value,
+                                  calendar: gregorian,
+                                  format: "YYYY-MM-DD",
+                                }).convert(persian)
+                              : undefined
+                          }
+                          onChange={(value: any) => {
+                            const dateValue = Array.isArray(value)
+                              ? value[0]
+                              : value;
+                            if (!dateValue) {
+                              field.onChange("");
+                              return;
+                            }
+                            const gregorianDate = (dateValue as DateObject)
+                              .convert(gregorian)
+                              .format("YYYY-MM-DD");
+                            field.onChange(toEnglishDigits(gregorianDate));
+                          }}
+                          calendarPosition="bottom-right"
+                          inputClass="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                          placeholder="تاریخ تولد را انتخاب کنید"
+                        />
+                      )}
                     />
                   </div>
                   <div>
@@ -1316,27 +1412,45 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
-                      وزن پت
+                      وزن پت <span className="text-red-600">*</span>
                     </label>
                     <input
                       type="number"
                       step="0.1"
                       min="0"
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--main-color)] focus:border-transparent"
-                      {...register("weightPet", { valueAsNumber: true })}
+                      {...register("weightPet", {
+                        valueAsNumber: true,
+                        required: "وزن پت اجباری است!",
+                      })}
                     />
+                    {errors.weightPet && (
+                      <p className="mt-1 text-sm text-red-500">
+                        {/* @ts-ignore */}
+                        {errors.weightPet.message}
+                      </p>
+                    )}
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
-                      قد پت
+                      قد پت <span className="text-red-600">*</span>
                     </label>
                     <input
                       type="number"
                       step="0.1"
                       min="0"
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--main-color)] focus:border-transparent"
-                      {...register("heightPet", { valueAsNumber: true })}
+                      {...register("heightPet", {
+                        valueAsNumber: true,
+                        required: "قد پت اجباری است!",
+                      })}
                     />
+                    {errors.heightPet && (
+                      <p className="mt-1 text-sm text-red-500">
+                        {/* @ts-ignore */}
+                        {errors.heightPet.message}
+                      </p>
+                    )}
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -1371,6 +1485,7 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
                       {...register("phoneNumberVeterinarian", {
                         required: true,
                         validate: (value) =>
+                          //@ts-ignore
                           /^\d{10,}$/.test(value) || "شماره تلفن معتبر نیست",
                       })}
                       onChange={(e) =>
@@ -1418,9 +1533,18 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
                     </label>
                     <input
                       type="text"
-                      minLength={12}
+                      minLength={10}
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--main-color)] focus:border-transparent"
-                      {...register("nationalCodeHead")}
+                      {...register("nationalCodeHead", {
+                        minLength: {
+                          value: 10,
+                          message: "کد ملی باید 10 رقمی باشد",
+                        },
+                        maxLength: {
+                          value: 10,
+                          message: "کد ملی باید 10 رقمی باشد",
+                        },
+                      })}
                     />
                   </div>
                   <div>
@@ -1435,6 +1559,7 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
                       {...register("mobile1Head", {
                         required: true,
                         validate: (value) =>
+                          //@ts-ignore
                           /^\d{10,}$/.test(value) || "شماره موبایل معتبر نیست",
                       })}
                       onChange={(e) =>
@@ -1632,14 +1757,24 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    تعداد وعده های غذایی روزانه
+                    تعداد وعده های غذایی روزانه{" "}
+                    <span className="text-red-600">*</span>
                   </label>
                   <input
                     type="number"
                     min="0"
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--main-color)] focus:border-transparent"
-                    {...register("numberMeal", { valueAsNumber: true })}
+                    {...register("numberMeal", {
+                      valueAsNumber: true,
+                      required: "تعداد وعده های غذایی روزانه اجباری است!",
+                    })}
                   />
+                  {errors.numberMeal && (
+                    <p className="mt-1 text-sm text-red-500">
+                      {/* @ts-ignore */}
+                      {errors.numberMeal.message}
+                    </p>
+                  )}
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
