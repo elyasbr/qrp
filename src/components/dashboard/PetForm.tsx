@@ -25,6 +25,7 @@ import {
 import { uploadFile } from "@/services/api/uploadService";
 import { useSnackbar } from "@/hooks/useSnackbar";
 import { useAuth } from "@/hooks/useAuth";
+import { useForm } from "react-hook-form";
 
 interface PetFormProps {
   pet?: Pet | null;
@@ -34,6 +35,12 @@ interface PetFormProps {
 
 export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
   const { userPayload } = useAuth();
+  const {
+    register,
+    handleSubmit,
+    watch,
+    formState: { errors },
+  } = useForm();
   const [formData, setFormData] = useState<Partial<Pet>>({
     namePet: "",
     typePet: "DOG",
@@ -438,8 +445,7 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
     return missingFields;
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const onSubmit = async () => {
     // console.log("STEP 1: handleSubmit triggered");
 
     if (loading) {
@@ -679,6 +685,10 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
     }
   };
 
+  // const onSubmit = (data: FormData) => {
+  //   console.log("Form Submitted ✅", data);
+  // };
+
   return (
     <div className="fixed inset-0 bg-white/30 backdrop-blur-sm flex items-center justify-center p-2 z-50">
       <div className="bg-white rounded-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto ring-3 ring-[var(--main-color)]">
@@ -697,14 +707,13 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
           </div>
 
           {/* Form */}
-          <form onSubmit={handleSubmit} className="space-y-6">
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
             {/* Pet Profile Display Section */}
             <div className="bg-gray-50 rounded-lg p-6 border border-gray-200">
               <h3 className="text-lg font-semibold text-[var(--main-color)] mb-4 flex items-center gap-2">
                 <Camera size={20} />
                 {pet ? "پروفایل فعلی پت" : "آپلود رسانه‌های پت"}
               </h3>
-
               {/* Pet Info Summary when editing */}
               {pet && (
                 <div className="mb-6 p-4 bg-white rounded-lg border border-gray-200">
@@ -747,7 +756,6 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
                   </div>
                 </div>
               )}
-
               {existingPetPhoto ||
               existingPetImages.length > 0 ||
               existingPetVideos.length > 0 ||
@@ -803,7 +811,6 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
                       </p>
                     </div>
                   )}
-
                   {/* Pet Images Gallery */}
                   {existingPetImages.length > 0 && (
                     <div className="bg-white rounded-lg p-4 border border-gray-200">
@@ -864,7 +871,6 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
                       </p>
                     </div>
                   )}
-
                   {/* Pet Videos */}
                   {existingPetVideos.length > 0 && (
                     <div className="bg-white rounded-lg p-4 border border-gray-200">
@@ -925,7 +931,6 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
                       </p>
                     </div>
                   )}
-
                   {/* Certificate PDF */}
                   {existingCertificatePDF && (
                     <div className="bg-white rounded-lg p-4 border border-gray-200">
@@ -974,7 +979,6 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
                       </div>
                     </div>
                   )}
-
                   {/* Insurance PDF */}
                   {existingInsurancePDF && (
                     <div className="bg-white rounded-lg p-4 border border-gray-200">
@@ -1044,7 +1048,6 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
                 </div>
               )}
             </div>
-
             {/* Current Form Data Summary when editing */}
             {pet && (
               <div className="bg-blue-50 rounded-lg p-4 border border-blue-200">
@@ -1057,7 +1060,6 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
                 </p>
               </div>
             )}
-
             {/* Basic Information */}
             <div className="grid grid-cols-1 gap-6">
               <div>
@@ -1071,10 +1073,9 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
                   </label>
                   <input
                     type="text"
-                    value={formData.insuranceNumber || ""}
                     readOnly
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg bg-gray-50 text-gray-700"
-                    placeholder=""
+                    {...register("insuranceNumber")}
                   />
                 </div>
                 <div className="space-y-4">
@@ -1082,7 +1083,6 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
                     <label className="block text-sm font-medium text-gray-700 mb-1">
                       عکس شناسایی پت
                     </label>
-
                     {!selectedIdentificationImage ? (
                       <label className="flex items-center justify-between gap-3 w-full border-2 border-dashed border-gray-300 hover:border-[var(--main-color)] rounded-xl p-3 cursor-pointer transition-colors">
                         <div className="flex items-center gap-3">
@@ -1143,7 +1143,6 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
                             <X size={16} />
                           </button>
                         </div>
-
                         {identificationImagePreview && (
                           <div className="mt-3">
                             <img
@@ -1156,38 +1155,38 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
                       </div>
                     )}
                   </div>
-
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
                       نام پت <span className="text-red-600">*</span>
                     </label>
                     <input
                       type="text"
-                      value={formData.namePet || ""}
-                      onChange={(e) =>
-                        handleInputChange("namePet", e.target.value)
-                      }
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--main-color)] focus:border-transparent"
-                      required
                       placeholder="نام پت را وارد کنید"
+                      {...register("namePet", { required: true })}
                     />
+                    {errors.namePet && (
+                      <p className="mt-1 text-sm text-red-500">
+                        نام پت اجباری است
+                      </p>
+                    )}
                   </div>
-
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
                       نوع پت <span className="text-red-500">*</span>
                     </label>
                     <select
-                      value={formData.typePet || "DOG"}
-                      onChange={(e) =>
-                        handleInputChange("typePet", e.target.value)
-                      }
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--main-color)] focus:border-transparent"
-                      required
+                      {...register("typePet", { required: true })}
                     >
                       <option value="DOG">سگ</option>
                       <option value="CAT">گربه</option>
                     </select>
+                    {errors.typePet && (
+                      <p className="mt-1 text-sm text-red-500">
+                        نوع پت اجباری است
+                      </p>
+                    )}
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -1195,27 +1194,32 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
                     </label>
                     <input
                       type="text"
-                      value={formData.blood || ""}
-                      onChange={(e) =>
-                        handleInputChange("blood", e.target.value)
-                      }
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--main-color)] focus:border-transparent"
-                      required
                       placeholder="نام نژاد را وارد کنید"
+                      {...register("blood", { required: true })}
                     />
+                    {errors.blood && (
+                      <p className="mt-1 text-sm text-red-500">
+                        نام نژاد اجباری است
+                      </p>
+                    )}
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
                       جنسیت پت <span className="text-red-600">*</span>
                     </label>
                     <select
-                      value={formData.sex || "MEN"}
-                      onChange={(e) => handleInputChange("sex", e.target.value)}
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--main-color)] focus:border-transparent"
+                      {...register("sex", { required: true })}
                     >
                       <option value="MEN">نر</option>
                       <option value="WOMEN">ماده</option>
                     </select>
+                    {errors.sex && (
+                      <p className="mt-1 text-sm text-red-500">
+                        جنسیت پت اجباری است
+                      </p>
+                    )}
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -1255,24 +1259,16 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
                       placeholder="تاریخ تولد را انتخاب کنید"
                     />
                   </div>
-
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
                       شماره شناسنامه پت
                     </label>
                     <input
                       type="text"
-                      value={formData.birthCertificateNumberPet || ""}
-                      onChange={(e) =>
-                        handleInputChange(
-                          "birthCertificateNumberPet",
-                          e.target.value
-                        )
-                      }
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--main-color)] focus:border-transparent"
+                      {...register("birthCertificateNumberPet")}
                     />
                   </div>
-
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
                       کد میکروچیپ پت
@@ -1280,24 +1276,17 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
                     <input
                       type="text"
                       placeholder="اختیاری"
-                      value={formData.microChipCode || ""}
-                      onChange={(e) =>
-                        handleInputChange("microChipCode", e.target.value)
-                      }
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--main-color)] focus:border-transparent"
+                      {...register("microChipCode")}
                     />
                   </div>
-
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
                       رنگ پت
                     </label>
                     <select
-                      value={formData.colorPet || "UNKNOWN"}
-                      onChange={(e) =>
-                        handleInputChange("colorPet", e.target.value)
-                      }
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--main-color)] focus:border-transparent"
+                      {...register("colorPet")}
                     >
                       <option value="RED">قرمز</option>
                       <option value="BLUE">آبی</option>
@@ -1315,21 +1304,16 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
                       <option value="UNKNOWN">نامشخص</option>
                     </select>
                   </div>
-
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
                       ویژگی بارز ظاهری
                     </label>
                     <textarea
-                      value={formData.distinctiveFeature || ""}
-                      onChange={(e) =>
-                        handleInputChange("distinctiveFeature", e.target.value)
-                      }
                       rows={3}
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--main-color)] focus:border-transparent"
+                      {...register("distinctiveFeature")}
                     />
                   </div>
-
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
                       وزن پت
@@ -1338,17 +1322,10 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
                       type="number"
                       step="0.1"
                       min="0"
-                      value={formData.weightPet || ""}
-                      onChange={(e) =>
-                        handleInputChange(
-                          "weightPet",
-                          parseFloat(e.target.value) || 0
-                        )
-                      }
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--main-color)] focus:border-transparent"
+                      {...register("weightPet", { valueAsNumber: true })}
                     />
                   </div>
-
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
                       قد پت
@@ -1357,48 +1334,30 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
                       type="number"
                       step="0.1"
                       min="0"
-                      value={formData.heightPet || ""}
-                      onChange={(e) =>
-                        handleInputChange(
-                          "heightPet",
-                          parseFloat(e.target.value) || 0
-                        )
-                      }
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--main-color)] focus:border-transparent"
+                      {...register("heightPet", { valueAsNumber: true })}
                     />
                   </div>
-
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
                       نام دامپزشک صادر کننده شناسنامه
                     </label>
                     <input
                       type="text"
-                      value={formData.issuingVeterinarian || ""}
-                      onChange={(e) =>
-                        handleInputChange("issuingVeterinarian", e.target.value)
-                      }
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--main-color)] focus:border-transparent"
+                      {...register("issuingVeterinarian")}
                     />
                   </div>
-
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
                       نظام دامپزشکی صادر کننده شناسنامه
                     </label>
                     <input
                       type="text"
-                      value={formData.issuingMedicalSystem || ""}
-                      onChange={(e) =>
-                        handleInputChange(
-                          "issuingMedicalSystem",
-                          e.target.value
-                        )
-                      }
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--main-color)] focus:border-transparent"
+                      {...register("issuingMedicalSystem")}
                     />
                   </div>
-
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
                       تلفن و آدرس دامپزشک{" "}
@@ -1406,30 +1365,37 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
                     </label>
                     <input
                       type="tel"
-                      value={formData.phoneNumberVeterinarian || ""}
+                      minLength={10}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--main-color)] focus:border-transparent"
+                      placeholder="مثال: 9152944444 (اجباری)"
+                      {...register("phoneNumberVeterinarian", {
+                        required: true,
+                        validate: (value) =>
+                          /^\d{10,}$/.test(value) || "شماره تلفن معتبر نیست",
+                      })}
                       onChange={(e) =>
                         handlePhoneNumberChange(
                           "phoneNumberVeterinarian",
                           e.target.value
                         )
                       }
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--main-color)] focus:border-transparent"
-                      required
-                      placeholder="مثال: 9152944444 (اجباری)"
                     />
+                    {errors.phoneNumberVeterinarian && (
+                      <p className="mt-1 text-sm text-red-500">
+                        {/* @ts-ignore */}
+                        {errors.phoneNumberVeterinarian.message ||
+                          "تلفن دامپزشک اجباری است"}
+                      </p>
+                    )}
                     <input
                       type="text"
-                      value={formData.addressVeterinarian || ""}
-                      onChange={(e) =>
-                        handleInputChange("addressVeterinarian", e.target.value)
-                      }
                       className="w-full mt-2 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--main-color)] focus:border-transparent"
                       placeholder="آدرس دامپزشک"
+                      {...register("addressVeterinarian")}
                     />
                   </div>
                 </div>
               </div>
-
               {/* Owner Information */}
               <div>
                 <h3 className="text-lg font-semibold text-[var(--main-color)] mb-4">
@@ -1442,175 +1408,147 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
                     </label>
                     <input
                       type="text"
-                      value={formData.nameHead || ""}
-                      onChange={(e) =>
-                        handleInputChange("nameHead", e.target.value)
-                      }
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--main-color)] focus:border-transparent"
+                      {...register("nameHead")}
                     />
                   </div>
-
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
                       کد ملی
                     </label>
                     <input
                       type="text"
-                      value={formData.nationalCodeHead || ""}
-                      onChange={(e) =>
-                        handleInputChange("nationalCodeHead", e.target.value)
-                      }
+                      minLength={12}
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--main-color)] focus:border-transparent"
+                      {...register("nationalCodeHead")}
                     />
                   </div>
-
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
                       موبایل <span className="text-red-500">*</span>
                     </label>
                     <input
                       type="tel"
-                      value={formData.mobile1Head || ""}
+                      minLength={10}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--main-color)] focus:border-transparent"
+                      placeholder="مثال: 9123456789 (اجباری)"
+                      {...register("mobile1Head", {
+                        required: true,
+                        validate: (value) =>
+                          /^\d{10,}$/.test(value) || "شماره موبایل معتبر نیست",
+                      })}
                       onChange={(e) =>
                         handlePhoneNumberChange("mobile1Head", e.target.value)
                       }
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--main-color)] focus:border-transparent"
-                      required
-                      placeholder="مثال: 9123456789 (اجباری)"
                     />
+                    {errors.mobile1Head && (
+                      <p className="mt-1 text-sm text-red-500">
+                        {/* @ts-ignore */}
+                        {errors.mobile1Head.message || "موبایل اجباری است"}
+                      </p>
+                    )}
                   </div>
-
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
                       تلفن ثابت
                     </label>
                     <input
                       type="tel"
-                      value={formData.telHead || ""}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--main-color)] focus:border-transparent"
+                      placeholder="مثال: 2112345678"
+                      {...register("telHead")}
                       onChange={(e) =>
                         handlePhoneNumberChange("telHead", e.target.value)
                       }
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--main-color)] focus:border-transparent"
-                      placeholder="مثال: 2112345678"
                     />
                   </div>
-
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
                       استان محل سکونت
                     </label>
                     <input
                       type="text"
-                      value={formData.stateHead || ""}
-                      onChange={(e) =>
-                        handleInputChange("stateHead", e.target.value)
-                      }
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--main-color)] focus:border-transparent"
+                      {...register("stateHead")}
                     />
                   </div>
-
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
                       شهر محل سکونت
                     </label>
                     <input
                       type="text"
-                      value={formData.cityHead || ""}
-                      onChange={(e) =>
-                        handleInputChange("cityHead", e.target.value)
-                      }
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--main-color)] focus:border-transparent"
+                      {...register("cityHead")}
                     />
                   </div>
-
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
                       آدرس پستی محل سکونت
                     </label>
                     <input
                       type="text"
-                      value={formData.addressHead || ""}
-                      onChange={(e) =>
-                        handleInputChange("addressHead", e.target.value)
-                      }
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--main-color)] focus:border-transparent"
+                      {...register("addressHead")}
                     />
                   </div>
-
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
                       کد پستی محل سکونت
                     </label>
                     <input
                       type="text"
-                      value={formData.postalCodeHead || ""}
-                      onChange={(e) =>
-                        handleInputChange("postalCodeHead", e.target.value)
-                      }
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--main-color)] focus:border-transparent"
+                      {...register("postalCodeHead")}
                     />
                   </div>
-
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
                       آدرس ایمیل
                     </label>
                     <input
                       type="email"
-                      value={formData.emailHead || ""}
                       placeholder="ایمیل اختیاری"
-                      onChange={(e) =>
-                        handleInputChange("emailHead", e.target.value)
-                      }
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--main-color)] focus:border-transparent"
+                      {...register("emailHead")}
                     />
                   </div>
-
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
                       اکانت تلگرام
                     </label>
                     <input
                       type="text"
-                      value={formData.telegramHead || ""}
-                      onChange={(e) =>
-                        handleInputChange("telegramHead", e.target.value)
-                      }
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--main-color)] focus:border-transparent"
                       placeholder="مثال: @username (اختیاری)"
+                      {...register("telegramHead")}
                     />
                   </div>
-
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
                       اکانت واتساپ
                     </label>
                     <input
                       type="tel"
-                      value={formData.whatsAppHead || ""}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--main-color)] focus:border-transparent"
+                      placeholder="مثال: 9123456789 (اختیاری)"
+                      {...register("whatsAppHead")}
                       onChange={(e) =>
                         handlePhoneNumberChange("whatsAppHead", e.target.value)
                       }
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--main-color)] focus:border-transparent"
-                      placeholder="مثال: 9123456789 (اختیاری)"
                     />
                   </div>
-
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
                       اکانت اینستگرام
                     </label>
                     <input
                       type="text"
-                      value={formData.instagramHead || ""}
-                      onChange={(e) =>
-                        handleInputChange("instagramHead", e.target.value)
-                      }
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--main-color)] focus:border-transparent"
                       placeholder="اختیاری"
+                      {...register("instagramHead")}
                     />
                   </div>
-
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
                       اکانت یوتیوب
@@ -1618,14 +1556,10 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
                     <input
                       placeholder="اختیاری"
                       type="text"
-                      value={formData.youtubeHead || ""}
-                      onChange={(e) =>
-                        handleInputChange("youtubeHead", e.target.value)
-                      }
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--main-color)] focus:border-transparent"
+                      {...register("youtubeHead")}
                     />
                   </div>
-
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
                       اکانت لینکدین
@@ -1633,23 +1567,18 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
                     <input
                       placeholder="اختیاری"
                       type="text"
-                      value={formData.linkedinHead || ""}
-                      onChange={(e) =>
-                        handleInputChange("linkedinHead", e.target.value)
-                      }
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--main-color)] focus:border-transparent"
+                      {...register("linkedinHead")}
                     />
                   </div>
                 </div>
               </div>
             </div>
-
             {/* Health Information */}
             <div>
               <h3 className="text-lg font-semibold text-[var(--main-color)] mb-4">
                 ویژگی و اطلاعات سلامتی
               </h3>
-
               <div className="space-y-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -1657,14 +1586,10 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
                   </label>
                   <input
                     type="text"
-                    value={formData.generalVeterinarian || ""}
-                    onChange={(e) =>
-                      handleInputChange("generalVeterinarian", e.target.value)
-                    }
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--main-color)] focus:border-transparent"
+                    {...register("generalVeterinarian")}
                   />
                 </div>
-
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
                     آدرس و شماره تلفن دامپزشک
@@ -1672,46 +1597,39 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
                   </label>
                   <input
                     type="text"
-                    value={formData.addressGeneralVeterinarian || ""}
-                    onChange={(e) =>
-                      handleInputChange(
-                        "addressGeneralVeterinarian",
-                        e.target.value
-                      )
-                    }
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--main-color)] focus:border-transparent"
+                    {...register("addressGeneralVeterinarian")}
                   />
                   <input
                     type="tel"
-                    value={formData.phoneNumberGeneralVeterinarian || ""}
-                    onChange={(e) =>
-                      handlePhoneNumberChange(
-                        "phoneNumberGeneralVeterinarian",
-                        e.target.value
-                      )
-                    }
+                    minLength={10}
                     className="w-full mt-2 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--main-color)] focus:border-transparent"
-                    required
                     placeholder="مثال: 2112345678 (اجباری)"
+                    {...register("phoneNumberGeneralVeterinarian", {
+                      required: true,
+                    })}
                   />
+                  {errors.phoneNumberGeneralVeterinarian && (
+                    <p className="mt-1 text-sm text-red-500">
+                      شماره تلفن دامپزشک اجباری است
+                    </p>
+                  )}
                 </div>
-
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
                     نوع تغذیه <span className="text-red-500">*</span>
                   </label>
-
                   <input
                     type="text"
-                    value={formData.typeFeeding || ""}
-                    required
-                    onChange={(e) =>
-                      handleInputChange("typeFeeding", e.target.value)
-                    }
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--main-color)] focus:border-transparent"
+                    {...register("typeFeeding", { required: true })}
                   />
+                  {errors.typeFeeding && (
+                    <p className="mt-1 text-sm text-red-500">
+                      نوع تغذیه اجباری است
+                    </p>
+                  )}
                 </div>
-
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
                     تعداد وعده های غذایی روزانه
@@ -1719,138 +1637,95 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
                   <input
                     type="number"
                     min="0"
-                    value={formData.numberMeal || ""}
-                    onChange={(e) =>
-                      handleInputChange(
-                        "numberMeal",
-                        parseInt(e.target.value) || 0
-                      )
-                    }
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--main-color)] focus:border-transparent"
+                    {...register("numberMeal", { valueAsNumber: true })}
                   />
                 </div>
-
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
                     رژیم غذایی
                   </label>
                   <textarea
-                    value={formData.diet || ""}
-                    onChange={(e) => handleInputChange("diet", e.target.value)}
                     rows={3}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--main-color)] focus:border-transparent"
+                    {...register("diet")}
                   />
                 </div>
-
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
                     مواردممنوع تغذیه
                   </label>
                   <textarea
-                    value={formData.prohibitedFoodItems || ""}
-                    onChange={(e) =>
-                      handleInputChange("prohibitedFoodItems", e.target.value)
-                    }
                     rows={3}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--main-color)] focus:border-transparent"
+                    {...register("prohibitedFoodItems")}
                   />
                 </div>
-
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
                     داروهای مصرفی دائم
                   </label>
                   <textarea
-                    value={formData.regularlyUsedMedications || ""}
-                    onChange={(e) =>
-                      handleInputChange(
-                        "regularlyUsedMedications",
-                        e.target.value
-                      )
-                    }
                     rows={3}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--main-color)] focus:border-transparent"
+                    {...register("regularlyUsedMedications")}
                   />
                 </div>
-
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
                     داروهای ممنوعه
                   </label>
                   <textarea
-                    value={formData.prohibitedDrugs || ""}
-                    onChange={(e) =>
-                      handleInputChange("prohibitedDrugs", e.target.value)
-                    }
                     rows={3}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--main-color)] focus:border-transparent"
+                    {...register("prohibitedDrugs")}
                   />
                 </div>
-
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
                     تشویقی مورد علاقه
                   </label>
                   <textarea
-                    value={formData.favoriteEncouragement || ""}
-                    onChange={(e) =>
-                      handleInputChange("favoriteEncouragement", e.target.value)
-                    }
                     rows={3}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--main-color)] focus:border-transparent"
+                    {...register("favoriteEncouragement")}
                   />
                 </div>
               </div>
-
               <div className="mt-4 space-y-2">
                 <label className="flex items-center">
                   <input
                     type="checkbox"
-                    checked={formData.isSterile || false}
-                    onChange={(e) =>
-                      handleInputChange("isSterile", e.target.checked)
-                    }
                     className="mr-2"
+                    {...register("isSterile")}
                   />
                   <span className="text-sm text-gray-700">پت عقیم است</span>
                 </label>
-
                 <label className="flex items-center">
                   <input
                     type="checkbox"
-                    checked={formData.vaccineRabiel || false}
-                    onChange={(e) =>
-                      handleInputChange("vaccineRabiel", e.target.checked)
-                    }
                     className="mr-2"
+                    {...register("vaccineRabiel")}
                   />
                   <span className="text-sm text-gray-700">
                     وضعیت واکسن Rabiel{" "}
                   </span>
                 </label>
-
                 <label className="flex items-center">
                   <input
                     type="checkbox"
-                    checked={formData.vaccineLDHPPi || false}
-                    onChange={(e) =>
-                      handleInputChange("vaccineLDHPPi", e.target.checked)
-                    }
                     className="mr-2"
+                    {...register("vaccineLDHPPi")}
                   />
                   <span className="text-sm text-gray-700">
                     وضعیت واکسنLDHPPi
                   </span>
                 </label>
-
                 <label className="flex items-center">
                   <input
                     type="checkbox"
-                    checked={formData.vaccineRCP || false}
-                    onChange={(e) =>
-                      handleInputChange("vaccineRCP", e.target.checked)
-                    }
                     className="mr-2"
+                    {...register("vaccineRCP")}
                   />
                   <span className="text-sm text-gray-700">
                     وضعیت واکسنR.C.P
@@ -1869,65 +1744,46 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
                     عادت های رفتاری
                   </label>
                   <textarea
-                    value={formData.behavioralHabits || ""}
-                    onChange={(e) =>
-                      handleInputChange("behavioralHabits", e.target.value)
-                    }
                     rows={3}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--main-color)] focus:border-transparent"
+                    {...register("behavioralHabits")}
                   />
                 </div>
-
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
                     مهارت ها واستعدادها
                   </label>
                   <textarea
-                    value={formData.susceptibility || ""}
-                    onChange={(e) =>
-                      handleInputChange("susceptibility", e.target.value)
-                    }
                     rows={3}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--main-color)] focus:border-transparent"
+                    {...register("susceptibility")}
                   />
                 </div>
-
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
                     حساسیت ها
                   </label>
                   <textarea
-                    value={formData.sensitivities || ""}
-                    onChange={(e) =>
-                      handleInputChange("sensitivities", e.target.value)
-                    }
                     rows={3}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--main-color)] focus:border-transparent"
+                    {...register("sensitivities")}
                   />
                 </div>
-
                 <label className="flex items-center">
                   <input
                     type="checkbox"
-                    checked={formData.connectOtherPets || false}
-                    onChange={(e) =>
-                      handleInputChange("connectOtherPets", e.target.checked)
-                    }
                     className="mr-2"
+                    {...register("connectOtherPets")}
                   />
                   <span className="text-sm text-gray-700">
                     با پت دیگری اقامت دارد
                   </span>
                 </label>
-
                 <label className="flex items-center">
                   <input
                     type="checkbox"
-                    checked={formData.connectWithBaby || false}
-                    onChange={(e) =>
-                      handleInputChange("connectWithBaby", e.target.checked)
-                    }
                     className="mr-2"
+                    {...register("connectWithBaby")}
                   />
                   <span className="text-sm text-gray-700">
                     پت شما با کودکان ارتباط دارد
@@ -1935,13 +1791,11 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
                 </label>
               </div>
             </div>
-
             {/* Digital Links and Documents */}
             <div>
               <h3 className="text-lg font-semibold text-[var(--main-color)] mb-4">
                 لینک و اسناد دیجیتال
               </h3>
-
               {/* Media Upload Help */}
               <div className="mb-4 p-3 bg-yellow-50 rounded-lg border border-yellow-200">
                 <p className="text-sm text-yellow-700">
@@ -1955,7 +1809,6 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
                   <label className="block text-sm font-medium text-gray-700 mb-1">
                     فایل PDF شناسنامه
                   </label>
-
                   {!selectedCertificatePDF ? (
                     <label className="flex items-center justify-between gap-3 w-full border-2 border-dashed border-gray-300 hover:border-[var(--main-color)] rounded-xl p-3 cursor-pointer transition-colors">
                       <div className="flex items-center gap-3">
@@ -2012,7 +1865,6 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
                           <X size={16} />
                         </button>
                       </div>
-
                       <div className="mt-3">
                         <div className="flex items-center gap-2 p-3 bg-gray-100 rounded-lg">
                           <span className="text-lg">📄</span>
@@ -2024,12 +1876,10 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
                     </div>
                   )}
                 </div>
-
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
                     فایل PDF بیمه نامه
                   </label>
-
                   {!selectedInsurancePDF ? (
                     <label className="flex items-center justify-between gap-3 w-full border-2 border-dashed border-gray-300 hover:border-[var(--main-color)] rounded-xl p-3 cursor-pointer transition-colors">
                       <div className="flex items-center gap-3">
@@ -2086,7 +1936,6 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
                           <X size={16} />
                         </button>
                       </div>
-
                       <div className="mt-3">
                         <div className="flex items-center gap-2 p-3 bg-gray-100 rounded-lg">
                           <span className="text-lg">📄</span>
@@ -2098,13 +1947,11 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
                     </div>
                   )}
                 </div>
-
                 {/* Pet Images Gallery */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
                     عکس های پت
                   </label>
-
                   {/* Upload Button */}
                   <label className="flex items-center justify-between gap-3 w-full border-2 border-dashed border-gray-300 hover:border-[var(--main-color)] rounded-xl p-3 cursor-pointer transition-colors mb-4">
                     <div className="flex items-center gap-3">
@@ -2129,7 +1976,6 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
                       className="hidden"
                     />
                   </label>
-
                   {/* Gallery Display */}
                   {selectedPetImages.length > 0 && (
                     <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
@@ -2152,7 +1998,6 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
                               <X size={14} />
                             </button>
                           </div>
-
                           {petImagePreviews[index] && (
                             <div className="aspect-square">
                               <img
@@ -2162,7 +2007,6 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
                               />
                             </div>
                           )}
-
                           <div className="text-xs text-gray-500 mt-2">
                             {formatFileSize(file.size)}
                           </div>
@@ -2171,13 +2015,11 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
                     </div>
                   )}
                 </div>
-
                 {/* Videos Gallery */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
                     ویدئو (ها) پت
                   </label>
-
                   {/* Upload Button */}
                   <label className="flex items-center justify-between gap-3 w-full border-2 border-dashed border-gray-300 hover:border-[var(--main-color)] rounded-xl p-3 cursor-pointer transition-colors mb-4">
                     <div className="flex items-center gap-3">
@@ -2202,7 +2044,6 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
                       className="hidden"
                     />
                   </label>
-
                   {/* Gallery Display */}
                   {selectedVideos.length > 0 && (
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -2225,7 +2066,6 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
                               <X size={14} />
                             </button>
                           </div>
-
                           {videoPreviews[index] && (
                             <div className="aspect-video">
                               <video
@@ -2235,7 +2075,6 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
                               />
                             </div>
                           )}
-
                           <div className="text-xs text-gray-500 mt-2">
                             {formatFileSize(file.size)}
                           </div>
@@ -2246,7 +2085,6 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
                 </div>
               </div>
             </div>
-
             {/* Consultations - Only visible to admin */}
             {userPayload?.role === "admin" && (
               <div>
@@ -2259,120 +2097,36 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
                       مشاوره متخصص تغذیه
                     </label>
                     <textarea
-                      value={formData.nutritionalCounseling || ""}
-                      onChange={(e) =>
-                        handleInputChange(
-                          "nutritionalCounseling",
-                          e.target.value
-                        )
-                      }
                       rows={3}
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--main-color)] focus:border-transparent"
+                      {...register("nutritionalCounseling")}
                     />
                   </div>
-
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
                       مشاوره دامپزشک متخصص
                     </label>
                     <textarea
-                      value={formData.expertVeterinaryCounseling || ""}
-                      onChange={(e) =>
-                        handleInputChange(
-                          "expertVeterinaryCounseling",
-                          e.target.value
-                        )
-                      }
                       rows={3}
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--main-color)] focus:border-transparent"
+                      {...register("expertVeterinaryCounseling")}
                     />
                   </div>
-
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
                       مشاوره تربیت پت
                     </label>
                     <textarea
-                      value={formData.trainingAdvice || ""}
-                      onChange={(e) =>
-                        handleInputChange("trainingAdvice", e.target.value)
-                      }
                       rows={3}
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--main-color)] focus:border-transparent"
+                      {...register("trainingAdvice")}
                     />
                   </div>
                 </div>
               </div>
             )}
-
             {/* Form Actions */}
             <div className="w-full flex justify-between gap-3 pt-6 border-t">
-              {/* <button
-                type="button"
-                onClick={() => {
-                  setFormData({
-                    namePet: "سگ تست",
-                    typePet: "DOG",
-                    breedName: "نژاد تست",
-                    blood: "A+",
-                    sex: "MEN",
-                    colorPet: "BLACK",
-                    weightPet: 15,
-                    heightPet: 45,
-                    birthDate: "2020-01-01",
-                    microChipCode: "MC123456789",
-                    birthCertificateNumberPet: "BC123456",
-                    issuingVeterinarian: "دکتر رضایی",
-                    addressVeterinarian: "تهران، خیابان ولیعصر، پلاک 123",
-                    phoneNumberVeterinarian: "+989152944444",
-                    issuingMedicalSystem: "سیستم پزشکی تهران",
-                    nameHead: "احمد احمدی",
-                    nationalCodeHead: "1234567890",
-                    mobile1Head: "+989123456789",
-                    telHead: "+982112345678",
-                    iso3Head: "IRN",
-                    stateHead: "تهران",
-                    cityHead: "تهران",
-                    addressHead: "تهران، خیابان ولیعصر، پلاک 456",
-                    postalCodeHead: "1234567890",
-                    emailHead: "test@example.com",
-                    telegramHead: "@testuser",
-                    youtubeHead: "testchannel",
-                    instagramHead: "@testuser",
-                    whatsAppHead: "+989123456789",
-                    linkedinHead: "testuser",
-                    generalVeterinarian: "دکتر احمدی",
-                    addressGeneralVeterinarian: "تهران، خیابان ولیعصر، پلاک 789",
-                    phoneNumberGeneralVeterinarian: "+982112345678",
-                    specialistVeterinarian: "دکتر محمدی",
-                    addressSpecialistVeterinarian: "تهران، خیابان ولیعصر، پلاک 101",
-                    phoneNumberSpecialistVeterinarian: "+982112345678",
-                    isSterile: false,
-                    vaccineRabiel: true,
-                    vaccineLDHPPi: true,
-                    vaccineRCP: true,
-                    typeFeeding: "خشک",
-                    numberMeal: 2,
-                    diet: "غذای مخصوص سگ",
-                    prohibitedFoodItems: "شکلات، پیاز، سیر",
-                    distinctiveFeature: "لکه سفید روی پیشانی",
-                    regularlyUsedMedications: "هیچ دارویی مصرف نمی‌شود",
-                    prohibitedDrugs: "هیچ دارویی منع نشده",
-                    favoriteEncouragement: "اسباب بازی توپ",
-                    behavioralHabits: "دوستانه و بازیگوش",
-                    susceptibility: "هیچ حساسیتی ندارد",
-                    sensitivities: "هیچ حساسیتی ندارد",
-                    connectOtherPets: true,
-                    connectWithBaby: true,
-                    nutritionalCounseling: "مشاوره تغذیه استاندارد برای سگ",
-                    expertVeterinaryCounseling: "مشاوره دامپزشکی استاندارد",
-                    trainingAdvice: "مشاوره آموزش استاندارد"
-                  });
-                }}
-                className="px-4 py-2 text-blue-600 bg-blue-50 hover:bg-blue-100 rounded-lg transition-colors"
-              >
-                پر کردن داده‌های تست
-              </button>  */}
               <div className="flex justify-end gap-3 w-full">
                 <button
                   type="button"
