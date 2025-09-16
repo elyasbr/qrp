@@ -746,7 +746,8 @@ export default function SignIn({
     setIsProcessing(true);
     try {
       setSettingRole(true);
-      const roleToSend = role?.rowId || role?.slug || role;
+      const roleToSend = role?.rowId;
+      localStorage.setItem("role", role?.slug);
       const roleResponse = await setRole(roleToSend);
       setSettingRole(false);
 

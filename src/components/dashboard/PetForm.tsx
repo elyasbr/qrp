@@ -781,6 +781,13 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
   //   console.log("Form Submitted ✅", data);
   // };
 
+  const [role, setRole] = useState("");
+
+  useEffect(() => {
+    //@ts-ignore
+    setRole(localStorage.getItem("role"));
+  }, []);
+
   return (
     <div className="fixed inset-0 bg-white/30 backdrop-blur-sm flex items-center justify-center p-2 z-50">
       <div className="bg-white rounded-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto ring-3 ring-[var(--main-color)]">
@@ -1166,7 +1173,7 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
                   </label>
                   <input
                     type="text"
-                    readOnly
+                    readOnly={role === "user"}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg bg-gray-50 text-gray-700"
                     {...register("insuranceNumber")}
                   />
@@ -1486,7 +1493,8 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
                         required: true,
                         validate: (value) =>
                           //@ts-ignore
-                          /^\d{10,}$/.test(value) || "شماره تلفن معتبر نیست",
+                          /^(\d{10,}|\+\d{10,})$/.test(value) ||
+                          "شماره تلفن معتبر نیست",
                       })}
                       onChange={(e) =>
                         handlePhoneNumberChange(
@@ -1560,7 +1568,8 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
                         required: true,
                         validate: (value) =>
                           //@ts-ignore
-                          /^\d{10,}$/.test(value) || "شماره موبایل معتبر نیست",
+                          /^(\d{10,}|\+\d{10,})$/.test(value) ||
+                          "شماره موبایل معتبر نیست",
                       })}
                       onChange={(e) =>
                         handlePhoneNumberChange("mobile1Head", e.target.value)

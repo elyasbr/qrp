@@ -855,7 +855,7 @@ export default function PetList() {
             {filteredPets.map((pet, index) => (
               <div
                 key={index}
-                className="bg-white md:min-w-[320px] rounded-lg shadow-sm overflow-hidden hover:shadow-md transition-shadow"
+                className="bg-white md:min-w-[320px] md:max-w-[320px] w-full rounded-lg shadow-sm overflow-hidden hover:shadow-md transition-shadow"
               >
                 {/* Pet Info */}
                 <div className="p-4">
