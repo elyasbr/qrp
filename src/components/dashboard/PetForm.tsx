@@ -1943,13 +1943,14 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
                 لینک و اسناد دیجیتال
               </h3>
               {/* Media Upload Help */}
-              <div className="mb-4 p-3 bg-yellow-50 rounded-lg border border-yellow-200">
+              {/*               <div className="mb-4 p-3 bg-yellow-50 rounded-lg border border-yellow-200">
                 <p className="text-sm text-yellow-700">
                   💡 <strong>نکته:</strong> برای تغییر رسانه‌های موجود، ابتدا
                   آنها را از بخش "پروفایل فعلی پت" حذف کنید، سپس فایل‌های جدید
                   را انتخاب کنید. فایل‌های جدید جایگزین فایل‌های قبلی خواهند شد.
-                </p>
-              </div>
+                </p> 
+              </div> */}
+
               <div className="grid grid-cols-1 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -2114,7 +2115,7 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
                     </div>
                     <input
                       type="file"
-                      accept="image/*"
+                      accept=".jpg"
                       multiple
                       onChange={(e) =>
                         handleGalleryFileSelect(e.target.files, "petImage")
