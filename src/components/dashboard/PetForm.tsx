@@ -714,7 +714,7 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
         existingPetVideos !== pet.galleryVideo &&
         existingPetVideos.length > 0
       ) {
-        // console.log("STEP 21: Using pet.galleriesVideo");
+        // console.log("STEP 21: Using pet.galleryVideo");
         submitData.galleryVideo = pet.galleryVideo;
       } else {
         // console.log("STEP 22: No videos, empty array");
