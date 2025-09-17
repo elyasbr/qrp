@@ -662,7 +662,7 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
             "pet image"
           );
           console.log(imageFileIds);
-          submitData.galleriesPhoto = imageFileIds;
+          submitData.galleryPhoto = imageFileIds;
           // console.log("STEP 12: Pet images uploaded");
         } catch (err) {
           // console.log("STEP 13: Pet images upload failed");
@@ -671,7 +671,7 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
         }
       } else if (existingPetImages.length > 0) {
         console.log("STEP 14: Using existingPetImages");
-        submitData.galleriesPhoto = existingPetImages;
+        submitData.galleryPhoto = existingPetImages;
         //@ts-ignore
       } else if (
         pet &&
@@ -680,7 +680,7 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
         existingPetImages !== pet.galleryPhoto &&
         existingPetImages.length > 0
       ) {
-        console.log("STEP 15: Using pet.galleriesPhoto");
+        console.log("STEP 15: Using pet.galleryPhoto");
         console.log("existingPetImages", existingPetImages);
         submitData.galleryPhoto = pet.galleryPhoto;
       } else {
