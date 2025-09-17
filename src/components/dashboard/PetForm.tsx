@@ -676,16 +676,16 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
       } else if (
         pet &&
         //@ts-ignore
-        pet.galleriesPhoto?.length > 0 &&
-        existingPetImages !== pet.galleriesPhoto &&
+        pet.galleryPhoto?.length > 0 &&
+        existingPetImages !== pet.galleryPhoto &&
         existingPetImages.length > 0
       ) {
         console.log("STEP 15: Using pet.galleriesPhoto");
         console.log("existingPetImages", existingPetImages);
-        submitData.galleriesPhoto = pet.galleriesPhoto;
+        submitData.galleryPhoto = pet.galleryPhoto;
       } else {
         console.log("STEP 16: No pet images, empty array");
-        submitData.galleriesPhoto = [];
+        submitData.galleryPhoto = [];
       }
 
       if (selectedVideos.length > 0) {
@@ -696,7 +696,7 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
             false,
             "video"
           );
-          submitData.galleriesVideo = videoFileIds;
+          submitData.galleryVideo = videoFileIds;
           // console.log("STEP 18: Videos uploaded");
         } catch (err) {
           // console.log("STEP 19: Videos upload failed");
@@ -705,20 +705,20 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
         }
       } else if (existingPetVideos.length > 0) {
         // console.log("STEP 20: Using existingPetVideos");
-        submitData.galleriesVideo = existingPetVideos;
+        submitData.galleryVideo = existingPetVideos;
         // @ts-ignore
       } else if (
         pet &&
         //@ts-ignore
-        pet.galleriesVideo?.length > 0 &&
-        existingPetVideos !== pet.galleriesVideo &&
+        pet.galleryVideo?.length > 0 &&
+        existingPetVideos !== pet.galleryVideo &&
         existingPetVideos.length > 0
       ) {
         // console.log("STEP 21: Using pet.galleriesVideo");
-        submitData.galleriesVideo = pet.galleriesVideo;
+        submitData.galleryVideo = pet.galleryVideo;
       } else {
         // console.log("STEP 22: No videos, empty array");
-        submitData.galleriesVideo = [];
+        submitData.galleryVideo = [];
       }
 
       if (selectedCertificatePDF) {
