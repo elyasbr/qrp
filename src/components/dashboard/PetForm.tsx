@@ -98,6 +98,7 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
     handleSubmit,
     control,
     reset,
+    setValue,
     formState: { errors },
   } = useForm<Partial<Pet>>({
     defaultValues: {
@@ -518,20 +519,21 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
   };
 
   function cleanData<T extends Record<string, any>>(data: T): Partial<T> {
-    //@ts-expect-error
     return Object.fromEntries(
-      Object.entries(data).filter(([_, value]) => {
-        if (typeof value === "string") {
-          const trimmed = value.trim();
-          return trimmed !== "" && trimmed.toLowerCase() !== "undefined";
-        }
-        if (typeof value === "number") {
-          return !Number.isNaN(value); // keeps 0, negatives, positives, excludes NaN
-        }
-        if (typeof value === "boolean") return true; // keep all booleans
-        if (value === null || value === undefined) return false; // remove null/undefined
-        return true; // keep other types (objects, arrays, etc.)
-      })
+      Object.entries(data)
+        .filter(([_, value]) => {
+          if (typeof value === "string") {
+            return value.trim() !== ""; // ❌ only remove empty strings
+          }
+          if (value === null || value === undefined) return false;
+          return true; // keep everything else
+        })
+        .map(([key, value]) => {
+          // if (typeof value === "string") {
+          //   return [key, value.trim()]; // keep trimmed version
+          // }
+          return [key, value];
+        })
     );
   }
 
@@ -540,11 +542,9 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
 
     console.log(data);
 
-    setFormData(cleanData(data));
+    setFormData(data);
 
-    console.log("form data", formData);
-
-    // updateField(data)
+    // console.log("form data", formData);
 
     if (loading) {
       // console.log("STEP 2: Already loading, exit");
@@ -621,12 +621,12 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
       };
 
       // Filter out empty values
-      const submitData = cleanData(rawData);
+      const submitData = data;
 
       console.log("STEP 5: submitData prepared", submitData);
 
       if (selectedIdentificationImage) {
-        // console.log("STEP 6: Uploading identification image");
+        console.log("STEP 6: Uploading identification image");
         try {
           const imgRes = await uploadFile(selectedIdentificationImage, false);
           submitData.photoPet = imgRes.fileId;
@@ -637,8 +637,9 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
           return;
         }
       } else if (existingPetPhoto) {
-        // console.log("STEP 9: Using existingPetPhoto");
-        submitData.photoPet = existingPetPhoto;
+        console.log("STEP 9: Using existingPetPhoto");
+        console.log(existingPetPhoto);
+        // submitData.photoPet = existingPetPhoto;
       } else if (pet && pet.photoPet) {
         // console.log("STEP 10: Using pet.photoPet");
         submitData.photoPet = pet.photoPet;
@@ -652,6 +653,7 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
             false,
             "pet image"
           );
+          console.log(imageFileIds);
           submitData.galleryPhoto = imageFileIds;
           // console.log("STEP 12: Pet images uploaded");
         } catch (err) {
@@ -901,7 +903,10 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
                       <div className="flex gap-2 mt-2">
                         <button
                           type="button"
-                          onClick={() => removeExistingMedia("photo")}
+                          onClick={() => {
+                            removeExistingMedia("photo");
+                            setValue("photoPet", "", { shouldValidate: true });
+                          }}
                           className="flex-1 flex items-center justify-center gap-2 p-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors text-sm"
                         >
                           <X size={14} />
@@ -2294,6 +2299,7 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
                   )}
                   {loading ? "در حال ذخیره..." : pet ? "ثبت" : "ذخیره"}
                 </button>
+                <button onClick={() => console.log()}>log</button>
               </div>
             </div>
           </form>
