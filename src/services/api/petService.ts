@@ -80,8 +80,8 @@ export interface Pet {
   photoPet?: string;
   insurancePdfPet?: string;
   certificatePdfPet?: string;
-  galleriesPhoto?: string[];
-  galleriesVideo?: string[];
+  galleryPhoto?: string[];
+  galleryVideo?: string[];
 }
 
 // Pagination request interface
@@ -214,3 +214,4 @@ export const getAllPets = async (): Promise<Pet[]> => {
     );
   }
 };
+
