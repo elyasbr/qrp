@@ -527,7 +527,7 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
             return value.trim() !== ""; // remove empty strings
           }
           if (value === null || value === undefined) return false;
-          if (Array.isArray(value) && value.length === 0) return false; // remove empty arrays
+          // if (Array.isArray(value) && value.length === 0) return false; // remove empty arrays
           return true; // keep everything else
         })
         .map(([key, value]) => {
@@ -2321,7 +2321,6 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
                   )}
                   {loading ? "در حال ذخیره..." : pet ? "ثبت" : "ذخیره"}
                 </button>
-                <button onClick={() => console.log()}>log</button>
               </div>
             </div>
           </form>
