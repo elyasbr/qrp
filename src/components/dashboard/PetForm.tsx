@@ -570,6 +570,7 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
         distinctiveFeature: String(formData.distinctiveFeature),
         weightPet: Number(formData.weightPet),
         heightPet: Number(formData.heightPet),
+        insuranceNumber: String(formData.insuranceNumber),
         issuingVeterinarian: String(formData.issuingVeterinarian),
         addressVeterinarian: String(formData.addressVeterinarian),
         phoneNumberVeterinarian: formatPhoneNumber(
@@ -760,7 +761,8 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
 
       if (pet) {
         // console.log("STEP 35: Updating pet");
-        await updatePet(pet.petId || "", submitData as unknown as Pet);
+        const isAdmin = role === "admin";
+        await updatePet(pet.petId || "", submitData as unknown as Pet, isAdmin);
       } else {
         // console.log("STEP 36: Creating pet");
         await createPet(submitData as unknown as Pet);

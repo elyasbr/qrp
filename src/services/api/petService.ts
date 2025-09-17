@@ -154,11 +154,12 @@ export const getPetByIdPublic = async (dataPetId: string): Promise<Pet> => {
 // Update Pet
 export const updatePet = async (
   dataPetId: string,
-  petData: Pet
+  petData: Pet,
+  isAdmin: boolean
 ): Promise<Pet> => {
   try {
     const response = await api.put<{ statusCode: number; result: Pet }>(
-      `/pet/${dataPetId}`,
+      isAdmin ? `/pet/company/${dataPetId}` : `/pet/${dataPetId}`,
       petData
     );
     return response.data.result;
