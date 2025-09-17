@@ -519,13 +519,15 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
   };
 
   function cleanData<T extends Record<string, any>>(data: T): Partial<T> {
+    //@ts-ignore
     return Object.fromEntries(
       Object.entries(data)
         .filter(([_, value]) => {
           if (typeof value === "string") {
-            return value.trim() !== ""; // ❌ only remove empty strings
+            return value.trim() !== ""; // remove empty strings
           }
           if (value === null || value === undefined) return false;
+          if (Array.isArray(value) && value.length === 0) return false; // remove empty arrays
           return true; // keep everything else
         })
         .map(([key, value]) => {
@@ -623,7 +625,7 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
       // Filter out empty values
       const submitData = data;
 
-      console.log("STEP 5: submitData prepared", submitData);
+      console.log("STEP 5: submitData prepared", data);
 
       if (selectedIdentificationImage) {
         console.log("STEP 6: Uploading identification image");
@@ -640,8 +642,14 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
         console.log("STEP 9: Using existingPetPhoto");
         console.log(existingPetPhoto);
         // submitData.photoPet = existingPetPhoto;
-      } else if (pet && pet.photoPet) {
-        // console.log("STEP 10: Using pet.photoPet");
+      } else if (
+        pet &&
+        pet.photoPet &&
+        pet.photoPet !== existingPetPhoto &&
+        existingPetPhoto != null
+      ) {
+        console.log("STEP 10: Using pet.photoPet");
+        console.log(existingPetPhoto);
         submitData.photoPet = pet.photoPet;
       }
 
@@ -654,7 +662,7 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
             "pet image"
           );
           console.log(imageFileIds);
-          submitData.galleryPhoto = imageFileIds;
+          submitData.galleriesPhoto = imageFileIds;
           // console.log("STEP 12: Pet images uploaded");
         } catch (err) {
           // console.log("STEP 13: Pet images upload failed");
@@ -662,15 +670,22 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
           return;
         }
       } else if (existingPetImages.length > 0) {
-        // console.log("STEP 14: Using existingPetImages");
-        submitData.galleryPhoto = existingPetImages;
+        console.log("STEP 14: Using existingPetImages");
+        submitData.galleriesPhoto = existingPetImages;
         //@ts-ignore
-      } else if (pet && pet.galleriesPhoto?.length > 0) {
-        // console.log("STEP 15: Using pet.galleriesPhoto");
-        submitData.galleryPhoto = pet.galleriesPhoto;
+      } else if (
+        pet &&
+        //@ts-ignore
+        pet.galleriesPhoto?.length > 0 &&
+        existingPetImages !== pet.galleriesPhoto &&
+        existingPetImages.length > 0
+      ) {
+        console.log("STEP 15: Using pet.galleriesPhoto");
+        console.log("existingPetImages", existingPetImages);
+        submitData.galleriesPhoto = pet.galleriesPhoto;
       } else {
-        // console.log("STEP 16: No pet images, empty array");
-        submitData.galleryPhoto = [];
+        console.log("STEP 16: No pet images, empty array");
+        submitData.galleriesPhoto = [];
       }
 
       if (selectedVideos.length > 0) {
@@ -681,7 +696,7 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
             false,
             "video"
           );
-          submitData.galleryVideo = videoFileIds;
+          submitData.galleriesVideo = videoFileIds;
           // console.log("STEP 18: Videos uploaded");
         } catch (err) {
           // console.log("STEP 19: Videos upload failed");
@@ -690,14 +705,20 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
         }
       } else if (existingPetVideos.length > 0) {
         // console.log("STEP 20: Using existingPetVideos");
-        submitData.galleryVideo = existingPetVideos;
+        submitData.galleriesVideo = existingPetVideos;
         // @ts-ignore
-      } else if (pet && pet.galleriesVideo?.length > 0) {
+      } else if (
+        pet &&
+        //@ts-ignore
+        pet.galleriesVideo?.length > 0 &&
+        existingPetVideos !== pet.galleriesVideo &&
+        existingPetVideos.length > 0
+      ) {
         // console.log("STEP 21: Using pet.galleriesVideo");
-        submitData.galleryVideo = pet.galleriesVideo;
+        submitData.galleriesVideo = pet.galleriesVideo;
       } else {
         // console.log("STEP 22: No videos, empty array");
-        submitData.galleryVideo = [];
+        submitData.galleriesVideo = [];
       }
 
       if (selectedCertificatePDF) {
@@ -747,7 +768,6 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
       ];
 
       for (const field of criticalFields) {
-        //@ts-expect-error
         const value = submitData[field as keyof typeof submitData];
         if (
           !value ||
@@ -764,7 +784,9 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
       if (pet) {
         // console.log("STEP 35: Updating pet");
         const isAdmin = role === "admin";
-        await updatePet(pet.petId || "", submitData as unknown as Pet, isAdmin);
+        const finalData = cleanData(submitData);
+        console.log("sendign thsi data:", finalData);
+        await updatePet(pet.petId || "", finalData as unknown as Pet, isAdmin);
       } else {
         // console.log("STEP 36: Creating pet");
         await createPet(submitData as unknown as Pet);
