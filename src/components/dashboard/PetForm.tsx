@@ -1200,7 +1200,7 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
                         </div>
                         <input
                           type="file"
-                          accept="image/*"
+                          accept=".jpg"
                           onChange={(e) =>
                             handleFileSelect(
                               e.target.files?.[0] || null,
