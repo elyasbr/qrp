@@ -292,17 +292,17 @@ export default function QRPublic({ pet, isLoading, error }: QRPublicProps) {
                   )}
 
                   {/* Gallery Photos Section */}
-                  {(pet?.galleriesPhoto?.length ?? 0) > 0 && (
+                  {(pet?.galleryPhoto?.length ?? 0) > 0 && (
                     <div className="space-y-3">
                       <h4 className="font-semibold text-gray-800 mb-3 flex items-center gap-2">
                         <ImageIcon className="text-[var(--main-color)]" size={18} />
                         گالری عکس‌ها
                         <span className="bg-gray-100 text-gray-600 text-xs px-2 py-1 rounded-full">
-                          {pet?.galleriesPhoto?.length}
+                          {pet?.galleryPhoto?.length}
                         </span>
                       </h4>
                       <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                        {pet?.galleriesPhoto?.map((photo, index) => (
+                        {pet?.galleryPhoto?.map((photo, index) => (
                           <div key={index} className="group relative bg-white border border-gray-200 rounded-xl overflow-hidden hover:shadow-lg transition-all duration-200">
                             <div className="aspect-square relative">
                               <img
@@ -343,17 +343,17 @@ export default function QRPublic({ pet, isLoading, error }: QRPublicProps) {
                   )}
 
                   {/* Gallery Videos Section */}
-                  {(pet?.galleriesVideo?.length ?? 0) > 0 && (
+                  {(pet?.galleryVideo?.length ?? 0) > 0 && (
                     <div className="space-y-3">
                       <h4 className="font-semibold text-gray-800 mb-3 flex items-center gap-2">
                         <Video className="text-[var(--main-color)]" size={18} />
                         گالری ویدیوها
                         <span className="bg-gray-100 text-gray-600 text-xs px-2 py-1 rounded-full">
-                          {pet?.galleriesVideo?.length}
+                          {pet?.galleryVideo?.length}
                         </span>
                       </h4>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        {pet?.galleriesVideo?.map((video, index) => (
+                        {pet?.galleryVideo?.map((video, index) => (
                           <div key={index} className="group relative bg-white border border-gray-200 rounded-xl overflow-hidden hover:shadow-lg transition-all duration-200">
                             <div className="aspect-video relative">
                               <video
@@ -386,7 +386,7 @@ export default function QRPublic({ pet, isLoading, error }: QRPublicProps) {
                   )}
 
                   {/* No files message */}
-                  {!pet?.certificatePdfPet && !pet?.insurancePdfPet && (pet?.galleriesPhoto?.length ?? 0) === 0 && (pet?.galleriesVideo?.length ?? 0) === 0 && (
+                  {!pet?.certificatePdfPet && !pet?.insurancePdfPet && (pet?.galleryPhoto?.length ?? 0) === 0 && (pet?.galleryVideo?.length ?? 0) === 0 && (
                     <div className="text-center py-12">
                       <div className="p-4 bg-gray-50 rounded-full w-16 h-16 mx-auto mb-4 flex items-center justify-center">
                         <FileText size={32} className="text-gray-300" />
