@@ -172,11 +172,11 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
         if (data.photoPet) {
           setExistingPetPhoto(data.photoPet);
         }
-        if (data.galleriesPhoto && data.galleriesPhoto.length > 0) {
-          setExistingPetImages(data.galleriesPhoto);
+        if (data.galleryPhoto && data.galleryPhoto.length > 0) {
+          setExistingPetImages(data.galleryPhoto);
         }
-        if (data.galleriesVideo && data.galleriesVideo.length > 0) {
-          setExistingPetVideos(data.galleriesVideo);
+        if (data.galleryVideo && data.galleryVideo.length > 0) {
+          setExistingPetVideos(data.galleryVideo);
         }
         if (data.certificatePdfPet) {
           setExistingCertificatePDF(data.certificatePdfPet);
