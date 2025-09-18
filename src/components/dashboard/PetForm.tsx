@@ -178,11 +178,11 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
         if (data.galleryVideo && data.galleryVideo.length > 0) {
           setExistingPetVideos(data.galleryVideo);
         }
-        if (data.certificatePdfPet) {
-          setExistingCertificatePDF(data.certificatePdfPet);
+        if (data.certificatePdf) {
+          setExistingCertificatePDF(data.certificatePdf);
         }
-        if (data.insurancePdfPet) {
-          setExistingInsurancePDF(data.insurancePdfPet);
+        if (data.insurancePdf) {
+          setExistingInsurancePDF(data.insurancePdf);
         }
         // This is the key fix: reset the form with the fetched data
         reset(data); // 🎯 Pass the fetched data directly to reset()
@@ -725,7 +725,7 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
         // console.log("STEP 23: Uploading certificate PDF");
         try {
           const certRes = await uploadFile(selectedCertificatePDF, true);
-          submitData.certificatePdfPet = certRes.fileId;
+          submitData.certificatePdf = certRes.fileId;
           // console.log("STEP 24: Certificate PDF uploaded");
         } catch (err) {
           // console.log("STEP 25: Certificate PDF upload failed");
@@ -734,17 +734,17 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
         }
       } else if (existingCertificatePDF) {
         // console.log("STEP 26: Using existingCertificatePDF");
-        submitData.certificatePdfPet = existingCertificatePDF;
-      } else if (pet && pet.certificatePdfPet) {
+        submitData.certificatePdf = existingCertificatePDF;
+      } else if (pet && pet.certificatePdf) {
         // console.log("STEP 27: Using pet.certificatePdfPet");
-        submitData.certificatePdfPet = pet.certificatePdfPet;
+        submitData.certificatePdf = pet.certificatePdf;
       }
 
       if (selectedInsurancePDF) {
         // console.log("STEP 28: Uploading insurance PDF");
         try {
           const insRes = await uploadFile(selectedInsurancePDF, true);
-          submitData.insurancePdfPet = insRes.fileId;
+          submitData.insurancePdf = insRes.fileId;
           // console.log("STEP 29: Insurance PDF uploaded");
         } catch (err) {
           // console.log("STEP 30: Insurance PDF upload failed");
@@ -753,10 +753,10 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
         }
       } else if (existingInsurancePDF) {
         // console.log("STEP 31: Using existingInsurancePDF");
-        submitData.insurancePdfPet = existingInsurancePDF;
-      } else if (pet && pet.insurancePdfPet) {
+        submitData.insurancePdf = existingInsurancePDF;
+      } else if (pet && pet.insurancePdf) {
         // console.log("STEP 32: Using pet.insurancePdfPet");
-        submitData.insurancePdfPet = pet.insurancePdfPet;
+        submitData.insurancePdf = pet.insurancePdf;
       }
 
       // console.log("STEP 33: Checking critical fields");
@@ -1290,7 +1290,7 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
                     </label>
                     <input
                       type="text"
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--main-color)] focus:border-transparent"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg     focus:border-transparent"
                       placeholder="نام پت را وارد کنید"
                       {...register("namePet", { required: true })}
                     />
@@ -1305,7 +1305,7 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
                       نوع پت <span className="text-red-500">*</span>
                     </label>
                     <select
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--main-color)] focus:border-transparent"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg     focus:border-transparent"
                       {...register("typePet", { required: true })}
                     >
                       <option value="DOG">سگ</option>
@@ -1323,7 +1323,7 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
                     </label>
                     <input
                       type="text"
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--main-color)] focus:border-transparent"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg     focus:border-transparent"
                       placeholder="نام نژاد را وارد کنید"
                       {...register("blood", { required: true })}
                     />
@@ -1338,7 +1338,7 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
                       جنسیت پت <span className="text-red-600">*</span>
                     </label>
                     <select
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--main-color)] focus:border-transparent"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg     focus:border-transparent"
                       {...register("sex", { required: true })}
                     >
                       <option value="MEN">نر</option>
@@ -1385,7 +1385,7 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
                             field.onChange(toEnglishDigits(gregorianDate));
                           }}
                           calendarPosition="bottom-right"
-                          inputClass="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                          inputClass="w-full px-3 py-2 border border-gray-300 rounded-lg   focus:ring-blue-500 focus:border-transparent"
                           placeholder="تاریخ تولد را انتخاب کنید"
                         />
                       )}
@@ -1397,7 +1397,7 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
                     </label>
                     <input
                       type="text"
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--main-color)] focus:border-transparent"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg     focus:border-transparent"
                       {...register("birthCertificateNumberPet")}
                     />
                   </div>
@@ -1408,7 +1408,7 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
                     <input
                       type="text"
                       placeholder="اختیاری"
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--main-color)] focus:border-transparent"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg     focus:border-transparent"
                       {...register("microChipCode")}
                     />
                   </div>
@@ -1417,7 +1417,7 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
                       رنگ پت
                     </label>
                     <select
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--main-color)] focus:border-transparent"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg     focus:border-transparent"
                       {...register("colorPet")}
                     >
                       <option value="RED">قرمز</option>
@@ -1442,7 +1442,7 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
                     </label>
                     <textarea
                       rows={3}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--main-color)] focus:border-transparent"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg     focus:border-transparent"
                       {...register("distinctiveFeature")}
                     />
                   </div>
@@ -1454,7 +1454,7 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
                       type="number"
                       step="0.1"
                       min="0"
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--main-color)] focus:border-transparent"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg     focus:border-transparent"
                       {...register("weightPet", {
                         valueAsNumber: true,
                         required: "وزن پت اجباری است!",
@@ -1475,7 +1475,7 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
                       type="number"
                       step="0.1"
                       min="0"
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--main-color)] focus:border-transparent"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg     focus:border-transparent"
                       {...register("heightPet", {
                         valueAsNumber: true,
                         required: "قد پت اجباری است!",
@@ -1494,7 +1494,7 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
                     </label>
                     <input
                       type="text"
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--main-color)] focus:border-transparent"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg     focus:border-transparent"
                       {...register("issuingVeterinarian")}
                     />
                   </div>
@@ -1504,7 +1504,7 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
                     </label>
                     <input
                       type="text"
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--main-color)] focus:border-transparent"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg     focus:border-transparent"
                       {...register("issuingMedicalSystem")}
                     />
                   </div>
@@ -1516,7 +1516,7 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
                     <input
                       type="tel"
                       minLength={10}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--main-color)] focus:border-transparent"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg     focus:border-transparent"
                       placeholder="مثال: 9152944444 (اجباری)"
                       {...register("phoneNumberVeterinarian", {
                         required: true,
@@ -1541,7 +1541,7 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
                     )}
                     <input
                       type="text"
-                      className="w-full mt-2 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--main-color)] focus:border-transparent"
+                      className="w-full mt-2 px-3 py-2 border border-gray-300 rounded-lg     focus:border-transparent"
                       placeholder="آدرس دامپزشک"
                       {...register("addressVeterinarian")}
                     />
@@ -1560,7 +1560,7 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
                     </label>
                     <input
                       type="text"
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--main-color)] focus:border-transparent"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg     focus:border-transparent"
                       {...register("nameHead")}
                     />
                   </div>
@@ -1571,7 +1571,7 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
                     <input
                       type="text"
                       minLength={10}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--main-color)] focus:border-transparent"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg     focus:border-transparent"
                       {...register("nationalCodeHead", {
                         minLength: {
                           value: 10,
@@ -1591,7 +1591,7 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
                     <input
                       type="tel"
                       minLength={10}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--main-color)] focus:border-transparent"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg     focus:border-transparent"
                       placeholder="مثال: 9123456789 (اجباری)"
                       {...register("mobile1Head", {
                         required: true,
@@ -1617,7 +1617,7 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
                     </label>
                     <input
                       type="tel"
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--main-color)] focus:border-transparent"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg     focus:border-transparent"
                       placeholder="مثال: 2112345678"
                       {...register("telHead")}
                       onChange={(e) =>
@@ -1631,7 +1631,7 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
                     </label>
                     <input
                       type="text"
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--main-color)] focus:border-transparent"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg     focus:border-transparent"
                       {...register("stateHead")}
                     />
                   </div>
@@ -1641,7 +1641,7 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
                     </label>
                     <input
                       type="text"
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--main-color)] focus:border-transparent"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg     focus:border-transparent"
                       {...register("cityHead")}
                     />
                   </div>
@@ -1651,7 +1651,7 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
                     </label>
                     <input
                       type="text"
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--main-color)] focus:border-transparent"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg     focus:border-transparent"
                       {...register("addressHead")}
                     />
                   </div>
@@ -1661,7 +1661,7 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
                     </label>
                     <input
                       type="text"
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--main-color)] focus:border-transparent"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg     focus:border-transparent"
                       {...register("postalCodeHead")}
                     />
                   </div>
@@ -1672,7 +1672,7 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
                     <input
                       type="email"
                       placeholder="ایمیل اختیاری"
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--main-color)] focus:border-transparent"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg     focus:border-transparent"
                       {...register("emailHead")}
                     />
                   </div>
@@ -1682,7 +1682,7 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
                     </label>
                     <input
                       type="text"
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--main-color)] focus:border-transparent"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg     focus:border-transparent"
                       placeholder="مثال: @username (اختیاری)"
                       {...register("telegramHead")}
                     />
@@ -1693,7 +1693,7 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
                     </label>
                     <input
                       type="tel"
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--main-color)] focus:border-transparent"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg     focus:border-transparent"
                       placeholder="مثال: 9123456789 (اختیاری)"
                       {...register("whatsAppHead")}
                       onChange={(e) =>
@@ -1707,7 +1707,7 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
                     </label>
                     <input
                       type="text"
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--main-color)] focus:border-transparent"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg     focus:border-transparent"
                       placeholder="اختیاری"
                       {...register("instagramHead")}
                     />
@@ -1719,7 +1719,7 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
                     <input
                       placeholder="اختیاری"
                       type="text"
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--main-color)] focus:border-transparent"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg     focus:border-transparent"
                       {...register("youtubeHead")}
                     />
                   </div>
@@ -1730,7 +1730,7 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
                     <input
                       placeholder="اختیاری"
                       type="text"
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--main-color)] focus:border-transparent"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg     focus:border-transparent"
                       {...register("linkedinHead")}
                     />
                   </div>
@@ -1749,7 +1749,7 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
                   </label>
                   <input
                     type="text"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--main-color)] focus:border-transparent"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg     focus:border-transparent"
                     {...register("generalVeterinarian")}
                   />
                 </div>
@@ -1760,13 +1760,13 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
                   </label>
                   <input
                     type="text"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--main-color)] focus:border-transparent"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg     focus:border-transparent"
                     {...register("addressGeneralVeterinarian")}
                   />
                   <input
                     type="tel"
                     minLength={10}
-                    className="w-full mt-2 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--main-color)] focus:border-transparent"
+                    className="w-full mt-2 px-3 py-2 border border-gray-300 rounded-lg     focus:border-transparent"
                     placeholder="مثال: 2112345678 (اجباری)"
                     {...register("phoneNumberGeneralVeterinarian", {
                       required: true,
@@ -1784,7 +1784,7 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
                   </label>
                   <input
                     type="text"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--main-color)] focus:border-transparent"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg     focus:border-transparent"
                     {...register("typeFeeding", { required: true })}
                   />
                   {errors.typeFeeding && (
@@ -1801,7 +1801,7 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
                   <input
                     type="number"
                     min="0"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--main-color)] focus:border-transparent"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg     focus:border-transparent"
                     {...register("numberMeal", {
                       valueAsNumber: true,
                       required: "تعداد وعده های غذایی روزانه اجباری است!",
@@ -1820,7 +1820,7 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
                   </label>
                   <textarea
                     rows={3}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--main-color)] focus:border-transparent"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg     focus:border-transparent"
                     {...register("diet")}
                   />
                 </div>
@@ -1830,7 +1830,7 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
                   </label>
                   <textarea
                     rows={3}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--main-color)] focus:border-transparent"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg     focus:border-transparent"
                     {...register("prohibitedFoodItems")}
                   />
                 </div>
@@ -1840,7 +1840,7 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
                   </label>
                   <textarea
                     rows={3}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--main-color)] focus:border-transparent"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg     focus:border-transparent"
                     {...register("regularlyUsedMedications")}
                   />
                 </div>
@@ -1850,7 +1850,7 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
                   </label>
                   <textarea
                     rows={3}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--main-color)] focus:border-transparent"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg     focus:border-transparent"
                     {...register("prohibitedDrugs")}
                   />
                 </div>
@@ -1860,7 +1860,7 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
                   </label>
                   <textarea
                     rows={3}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--main-color)] focus:border-transparent"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg     focus:border-transparent"
                     {...register("favoriteEncouragement")}
                   />
                 </div>
@@ -1918,7 +1918,7 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
                   </label>
                   <textarea
                     rows={3}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--main-color)] focus:border-transparent"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg     focus:border-transparent"
                     {...register("behavioralHabits")}
                   />
                 </div>
@@ -1928,7 +1928,7 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
                   </label>
                   <textarea
                     rows={3}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--main-color)] focus:border-transparent"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg     focus:border-transparent"
                     {...register("susceptibility")}
                   />
                 </div>
@@ -1938,7 +1938,7 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
                   </label>
                   <textarea
                     rows={3}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--main-color)] focus:border-transparent"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg     focus:border-transparent"
                     {...register("sensitivities")}
                   />
                 </div>
@@ -2259,46 +2259,58 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
                 </div>
               </div>
             </div>
-            {/* Consultations - Only visible to admin */}
-            {userPayload?.role === "admin" && (
-              <div>
-                <h3 className="text-lg font-semibold text-[var(--main-color)] mb-4">
-                  مشاوره ها
-                </h3>
-                <div className="grid grid-cols-1 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      مشاوره متخصص تغذیه
-                    </label>
-                    <textarea
-                      rows={3}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--main-color)] focus:border-transparent"
-                      {...register("nutritionalCounseling")}
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      مشاوره دامپزشک متخصص
-                    </label>
-                    <textarea
-                      rows={3}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--main-color)] focus:border-transparent"
-                      {...register("expertVeterinaryCounseling")}
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      مشاوره تربیت پت
-                    </label>
-                    <textarea
-                      rows={3}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--main-color)] focus:border-transparent"
-                      {...register("trainingAdvice")}
-                    />
-                  </div>
+            {/* Consultations */}
+            <div>
+              <h3 className="text-lg font-semibold text-[var(--main-color)] mb-4">
+                مشاوره ها
+              </h3>
+              <div className="grid grid-cols-1 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    مشاوره متخصص تغذیه
+                  </label>
+                  <textarea
+                    rows={3}
+                    readOnly={role === "user"}
+                    className={`w-full px-3 py-2 border border-gray-300 rounded-lg focus:border-transparent ${
+                      role === "user"
+                        ? "opacity-85 cursor-not-allowed outline-none focus:outline-none"
+                        : ""
+                    }`}
+                    {...register("nutritionalCounseling")}
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    مشاوره دامپزشک متخصص
+                  </label>
+                  <textarea
+                    rows={3}
+                    readOnly={role === "user"}
+                    className={`w-full px-3 py-2 border border-gray-300 rounded-lg     focus:border-transparent ${
+                      role === "user"
+                        ? "opacity-85 cursor-not-allowed outline-none focus:outline-none"
+                        : ""
+                    }`}
+                    {...register("expertVeterinaryCounseling")}
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    مشاوره تربیت پت
+                  </label>
+                  <textarea
+                    rows={3}
+                    readOnly={role === "user"}
+                    className={`w-full px-3 py-2 border border-gray-300 rounded-lg     focus:border-transparent ${
+                      role === "user"
+                        ? "opacity-85 cursor-not-allowed outline-none focus:outline-none"
+                        : ""
+                    }`}
+                  />
                 </div>
               </div>
-            )}
+            </div>
             {/* Form Actions */}
             <div className="w-full flex justify-between gap-3 pt-6 border-t">
               <div className="flex justify-end gap-3 w-full">

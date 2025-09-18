@@ -4,6 +4,15 @@ import api, { publicApi } from "./api";
 // Pet interface based on the API schema
 export interface Pet {
   petId?: string;
+
+  // Media
+  photoPet?: string;
+  insurancePdf?: string;
+  certificatePdf?: string;
+  galleryPhoto?: string[];
+  galleryVideo?: string[];
+
+  // Pet info
   namePet: string;
   typePet: string;
   breedName?: string;
@@ -31,57 +40,60 @@ export interface Pet {
   distinctiveFeature: string;
   weightPet: number;
   heightPet: number;
+  isSterile?: boolean;
+
+  // Veterinarian info
   issuingVeterinarian: string;
   addressVeterinarian: string;
   phoneNumberVeterinarian: string;
   issuingMedicalSystem: string;
+  generalVeterinarian?: string;
+  addressGeneralVeterinarian?: string;
+  phoneNumberGeneralVeterinarian?: string;
+
+  // Head of family info
   nameHead: string;
   nationalCodeHead: string;
   mobile1Head: string;
-  mobile2Head: string;
+  mobile2Head?: string;
   telHead: string;
   iso3Head: string;
   stateHead: string;
   cityHead: string;
-  addressHead: string;
-  postalCodeHead: string;
-  emailHead: string;
-  telegramHead: string;
-  youtubeHead: string;
-  instagramHead: string;
-  whatsAppHead: string;
-  linkedinHead: string;
-  generalVeterinarian: string;
-  addressGeneralVeterinarian: string;
-  phoneNumberGeneralVeterinarian: string;
-  isSterile: boolean;
-  vaccineRabiel: boolean;
-  vaccineLDHPPi: boolean;
-  vaccineRCP: boolean;
-  typeFeeding: string;
-  numberMeal: number;
-  diet: string;
-  prohibitedFoodItems: string;
-  regularlyUsedMedications: string;
-  prohibitedDrugs: string;
-  favoriteEncouragement: string;
-  behavioralHabits: string;
-  susceptibility: string;
-  sensitivities: string;
-  connectOtherPets: boolean;
-  connectWithBaby: boolean;
-  insurancePDF: string;
-  nutritionalCounseling: string;
-  expertVeterinaryCounseling: string;
-  trainingAdvice: string;
+  addressHead?: string;
+  postalCodeHead?: string;
+  emailHead?: string;
+  telegramHead?: string;
+  youtubeHead?: string;
+  instagramHead?: string;
+  whatsAppHead?: string;
+  linkedinHead?: string;
+
+  // Medical & feeding info
+  vaccineRabiel?: boolean;
+  vaccineLDHPPi?: boolean;
+  vaccineRCP?: boolean;
+  typeFeeding?: string;
+  numberMeal?: number;
+  diet?: string;
+  prohibitedFoodItems?: string;
+  regularlyUsedMedications?: string;
+  prohibitedDrugs?: string;
+  favoriteEncouragement?: string;
+  behavioralHabits?: string;
+  susceptibility?: string;
+  sensitivities?: string;
+  connectOtherPets?: boolean;
+  connectWithBaby?: boolean;
+
+  // Counseling / Advice
+  nutritionalCounseling?: string;
+  expertVeterinaryCounseling?: string;
+  trainingAdvice?: string;
+
+  // Media (legacy fields, optional)
   imageUrl?: string;
   videoUrl?: string;
-  // New fields for file IDs
-  photoPet?: string;
-  insurancePdfPet?: string;
-  certificatePdfPet?: string;
-  galleryPhoto?: string[];
-  galleryVideo?: string[];
 }
 
 // Pagination request interface
@@ -214,4 +226,3 @@ export const getAllPets = async (): Promise<Pet[]> => {
     );
   }
 };
-
