@@ -401,7 +401,7 @@ function PetViewModal({ pet, onClose }: { pet: Pet; onClose: () => void }) {
                 {!filesLoading && !filesError && (
                   <div className="space-y-6">
                     {/* PDF Documents Section */}
-                    {(pet?.certificatePdfPet || pet?.insurancePdfPet) && (
+                    {(pet?.certificatePdf || pet?.insurancePdf) && (
                       <div className="space-y-3">
                         <h4 className="font-semibold text-gray-800 mb-3 flex items-center gap-2">
                           <FileText
@@ -411,7 +411,7 @@ function PetViewModal({ pet, onClose }: { pet: Pet; onClose: () => void }) {
                           اسناد رسمی
                         </h4>
 
-                        {pet?.certificatePdfPet && (
+                        {pet?.certificatePdf && (
                           <div className="group relative bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-xl p-4 hover:shadow-md transition-all duration-200">
                             <div className="flex items-center justify-between">
                               <div className="flex items-center gap-3">
@@ -429,13 +429,13 @@ function PetViewModal({ pet, onClose }: { pet: Pet; onClose: () => void }) {
                                     سند رسمی شناسایی حیوان خانگی
                                   </p>
                                   <p className="text-xs text-gray-400 mt-1">
-                                    {pet?.certificatePdfPet}
+                                    {pet?.certificatePdf}
                                   </p>
                                 </div>
                               </div>
                               <div className="flex items-center gap-2">
                                 <a
-                                  href={`${process.env.NEXT_PUBLIC_UPLOAD_BASE_URL}/file-manager/preview/${pet?.certificatePdfPet}`}
+                                  href={`${process.env.NEXT_PUBLIC_UPLOAD_BASE_URL}/file-manager/preview/${pet?.certificatePdf}`}
                                   target="_blank"
                                   rel="noopener noreferrer"
                                   className="p-2 text-blue-600 hover:bg-blue-100 rounded-lg transition-colors"
@@ -444,7 +444,7 @@ function PetViewModal({ pet, onClose }: { pet: Pet; onClose: () => void }) {
                                   <Play size={16} />
                                 </a>
                                 <a
-                                  href={`${process.env.NEXT_PUBLIC_UPLOAD_BASE_URL}/download/${pet?.certificatePdfPet}`}
+                                  href={`${process.env.NEXT_PUBLIC_UPLOAD_BASE_URL}/download/${pet?.certificatePdf}`}
                                   className="flex items-center gap-1 bg-blue-600 text-white px-3 py-2 rounded-lg hover:bg-blue-700 transition-colors"
                                 >
                                   <Download size={16} />
@@ -455,7 +455,7 @@ function PetViewModal({ pet, onClose }: { pet: Pet; onClose: () => void }) {
                           </div>
                         )}
 
-                        {pet?.insurancePdfPet && (
+                        {pet?.insurancePdf && (
                           <div className="group relative bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 rounded-xl p-4 hover:shadow-md transition-all duration-200">
                             <div className="flex items-center justify-between">
                               <div className="flex items-center gap-3">
@@ -473,13 +473,13 @@ function PetViewModal({ pet, onClose }: { pet: Pet; onClose: () => void }) {
                                     سند بیمه حیوان خانگی
                                   </p>
                                   <p className="text-xs text-gray-400 mt-1">
-                                    {pet?.insurancePdfPet}
+                                    {pet?.insurancePdf}
                                   </p>
                                 </div>
                               </div>
                               <div className="flex items-center gap-2">
                                 <a
-                                  href={`${process.env.NEXT_PUBLIC_UPLOAD_BASE_URL}/file-manager/preview/${pet?.insurancePdfPet}`}
+                                  href={`${process.env.NEXT_PUBLIC_UPLOAD_BASE_URL}/file-manager/preview/${pet?.insurancePdf}`}
                                   target="_blank"
                                   rel="noopener noreferrer"
                                   className="p-2 text-green-600 hover:bg-green-100 rounded-lg transition-colors"
@@ -488,7 +488,7 @@ function PetViewModal({ pet, onClose }: { pet: Pet; onClose: () => void }) {
                                   <Play size={16} />
                                 </a>
                                 <a
-                                  href={`${process.env.NEXT_PUBLIC_UPLOAD_BASE_URL}/download/${pet?.insurancePdfPet}`}
+                                  href={`${process.env.NEXT_PUBLIC_UPLOAD_BASE_URL}/download/${pet?.insurancePdf}`}
                                   className="flex items-center gap-1 bg-green-600 text-white px-3 py-2 rounded-lg hover:bg-green-700 transition-colors"
                                 >
                                   <Download size={16} />
@@ -622,8 +622,8 @@ function PetViewModal({ pet, onClose }: { pet: Pet; onClose: () => void }) {
                     )}
 
                     {/* No files message */}
-                    {!pet?.certificatePdfPet &&
-                      !pet?.insurancePdfPet &&
+                    {!pet?.certificatePdf &&
+                      !pet?.insurancePdf &&
                       (pet?.galleryPhoto?.length ?? 0) === 0 &&
                       (pet?.galleryVideo?.length ?? 0) === 0 && (
                         <div className="text-center py-12">
@@ -1045,4 +1045,3 @@ export default function PetList() {
     </>
   );
 }
-

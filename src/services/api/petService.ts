@@ -170,6 +170,7 @@ export const updatePet = async (
   isAdmin: boolean
 ): Promise<Pet> => {
   try {
+    console.log("data recivbed at update fnc: ", petData);
     const response = await api.put<{ statusCode: number; result: Pet }>(
       isAdmin ? `/pet/company/${dataPetId}` : `/pet/${dataPetId}`,
       petData

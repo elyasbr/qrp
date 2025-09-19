@@ -785,7 +785,7 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
         // console.log("STEP 35: Updating pet");
         const isAdmin = role === "admin";
         const finalData = cleanData(submitData);
-        console.log("sendign thsi data:", finalData);
+        console.log("sendign this data:", finalData);
         await updatePet(pet.petId || "", finalData as unknown as Pet, isAdmin);
       } else {
         // console.log("STEP 36: Creating pet");
