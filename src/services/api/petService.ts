@@ -14,7 +14,7 @@ export interface Pet {
 
   // Pet info
   namePet: string;
-  typePet: string;
+  typePet: "DOG" | "CAT" | "PARROT" | "HORSE" | "UNKNOWN";
   breedName?: string;
   blood: string;
   sex: "MEN" | "WOMEN" | "UNKNOWN";

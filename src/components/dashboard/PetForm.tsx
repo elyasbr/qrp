@@ -860,6 +860,12 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
                           ? "سگ"
                           : pet.typePet === "CAT"
                           ? "گربه"
+                          : pet.typePet === "PARROT"
+                          ? "طوطی"
+                          : pet.typePet === "HORSE"
+                          ? "اسب"
+                          : pet.typePet === "UNKNOWN"
+                          ? "نامشخص"
                           : pet.typePet}
                       </span>
                     </div>
@@ -1305,12 +1311,16 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
                       نوع پت <span className="text-red-500">*</span>
                     </label>
                     <select
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg     focus:border-transparent"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:border-transparent"
                       {...register("typePet", { required: true })}
                     >
                       <option value="DOG">سگ</option>
                       <option value="CAT">گربه</option>
+                      <option value="PARROT">طوطی</option>
+                      <option value="HORSE">اسب</option>
+                      <option value="UNKNOWN">نامشخص</option>
                     </select>
+
                     {errors.typePet && (
                       <p className="mt-1 text-sm text-red-500">
                         نوع پت اجباری است
@@ -2272,10 +2282,10 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
                   <textarea
                     rows={3}
                     readOnly={role === "user"}
-                    className={`w-full px-3 py-2 border border-gray-300 rounded-lg focus:border-transparent ${
+                    className={`w-full px-3 py-2 border border-gray-300 rounded-lg ${
                       role === "user"
-                        ? "opacity-85 cursor-not-allowed outline-none focus:outline-none"
-                        : ""
+                        ? "opacity-80 cursor-not-allowed outline-none focus:outline-none"
+                        : "focus:border-transparent"
                     }`}
                     {...register("nutritionalCounseling")}
                   />
