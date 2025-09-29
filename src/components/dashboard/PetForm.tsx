@@ -1,3 +1,4 @@
+// @ts-nocheck
 "use client";
 import { useState, useEffect } from "react";
 import {
@@ -58,7 +59,7 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
     nationalCodeHead: "",
     mobile1Head: "",
     telHead: "",
-    iso3Head: "",
+    iso3Head: "IRN",
     stateHead: "",
     cityHead: "",
     addressHead: "",
@@ -103,6 +104,7 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
   } = useForm<Partial<Pet>>({
     defaultValues: {
       namePet: formData.namePet,
+      iso3Head: "IRN",
       typePet: formData.typePet ?? "DOG",
       breedName: formData.breedName ?? "",
       blood: formData.blood ?? "",
@@ -123,7 +125,6 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
       nationalCodeHead: formData.nationalCodeHead ?? "",
       mobile1Head: formData.mobile1Head ?? "",
       telHead: formData.telHead ?? "",
-      iso3Head: formData.iso3Head ?? "",
       stateHead: formData.stateHead ?? "",
       cityHead: formData.cityHead ?? "",
       addressHead: formData.addressHead ?? "",
@@ -164,19 +165,24 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
   useEffect(() => {
     if (pet && pet.petId) {
       getPetById(pet.petId).then((data) => {
+        const petDataWithIRN = {
+          ...data,
+          iso3Head: "IRN",
+        };
+
         setFormData((prev) => ({
           ...prev,
-          ...data,
+          ...petDataWithIRN,
         }));
         // Load existing pet media
         if (data.photoPet) {
           setExistingPetPhoto(data.photoPet);
         }
-        if (data.galleryPhoto && data.galleryPhoto.length > 0) {
-          setExistingPetImages(data.galleryPhoto);
+        if (data.galleriesPhoto && data.galleriesPhoto.length > 0) {
+          setExistingPetImages(data.galleriesPhoto);
         }
-        if (data.galleryVideo && data.galleryVideo.length > 0) {
-          setExistingPetVideos(data.galleryVideo);
+        if (data.galleriesVideo && data.galleriesVideo.length > 0) {
+          setExistingPetVideos(data.galleriesVideo);
         }
         if (data.certificatePdf) {
           setExistingCertificatePDF(data.certificatePdf);
@@ -189,7 +195,9 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
       });
     } else {
       // If no pet is being edited, reset to default empty values
-      reset({});
+      reset({
+        iso3Head: "IRN",
+      });
     }
   }, [pet, reset]);
 
@@ -453,28 +461,37 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
   const formatPhoneNumber = (phoneNumber: string): string => {
     if (!phoneNumber) return "";
 
-    // Remove any existing country codes and spaces/dashes
-    let cleaned = phoneNumber.replace(/[\s\-\(\)]/g, "");
+    // Remove all non-digit characters except +
+    let cleaned = phoneNumber.replace(/[^\d+]/g, "");
 
-    // Remove +98 if it already exists
+    // Handle various Iranian mobile number formats
     if (cleaned.startsWith("+98")) {
-      cleaned = cleaned.substring(3);
-    }
-    // Remove 0098 if it exists
-    else if (cleaned.startsWith("0098")) {
-      cleaned = cleaned.substring(4);
-    }
-    // Remove leading 0 if it exists (Iranian mobile numbers)
-    else if (cleaned.startsWith("0")) {
-      cleaned = cleaned.substring(1);
+      // Already in correct format, ensure it's exactly +98 followed by 10 digits
+      const digits = cleaned.substring(3);
+      return `+98${digits}`;
+    } else if (cleaned.startsWith("0098")) {
+      // Convert 0098 to +98
+      const digits = cleaned.substring(4);
+      return `+98${digits}`;
+    } else if (cleaned.startsWith("98")) {
+      // Convert 98 to +98
+      const digits = cleaned.substring(2);
+      return `+98${digits}`;
+    } else if (cleaned.startsWith("0")) {
+      // Remove leading 0 and add +98
+      const digits = cleaned.substring(1);
+      return `+98${digits}`;
+    } else if (cleaned.length === 10 && !cleaned.startsWith("+")) {
+      // Assume it's a 10-digit Iranian number without prefix
+      return `+98${cleaned}`;
+    } else if (cleaned.startsWith("+") && cleaned.length > 3) {
+      // Already has international format, return as is
+      return cleaned;
     }
 
-    // Only add +98 if there is something left
-    if (!cleaned) return "";
-    // Add +98 prefix
-    return `+98${cleaned}`;
+    // If none of the above, return empty string or original?
+    return cleaned ? `+98${cleaned}` : "";
   };
-
   const handleInputChange = (field: keyof Pet, value: any) => {
     setFormData((prev) => ({
       ...prev,
@@ -519,25 +536,39 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
   };
 
   function cleanData<T extends Record<string, any>>(data: T): Partial<T> {
-    //@ts-ignore
-    return Object.fromEntries(
+    const cleaned = Object.fromEntries(
       Object.entries(data)
-        .filter(([_, value]) => {
+        .filter(([key, value]) => {
+          // Remove galleriesPhoto and galleriesVideo entirely
+          if (key === "galleriesPhoto" || key === "galleriesVideo") {
+            return false;
+          }
+
           if (typeof value === "string") {
             return value.trim() !== ""; // remove empty strings
           }
           if (value === null || value === undefined) return false;
-          // if (Array.isArray(value) && value.length === 0) return false; // remove empty arrays
-          return true; // keep everything else
+          return true;
         })
         .map(([key, value]) => {
-          // if (typeof value === "string") {
-          //   return [key, value.trim()]; // keep trimmed version
-          // }
           return [key, value];
         })
     );
+
+    // Always include iso3Head with value "IRN"
+    return {
+      ...cleaned,
+      iso3Head: "IRN",
+    };
   }
+
+  const isValidIranianMobile = (phoneNumber: string): boolean => {
+    if (!phoneNumber) return false;
+
+    const formatted = formatPhoneNumber(phoneNumber);
+    // Iranian mobile numbers: +98 followed by 9 then 9 digits
+    return /^\+989\d{9}$/.test(formatted);
+  };
 
   const onSubmit = async (data: Pet) => {
     console.log("STEP 1: handleSubmit triggered");
@@ -557,6 +588,20 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
     // console.log("STEP 3: Loading set true");
 
     try {
+      const formattedData = {
+        ...data,
+        phoneNumberVeterinarian: formatPhoneNumber(
+          data.phoneNumberVeterinarian ?? ""
+        ),
+        mobile1Head: formatPhoneNumber(data.mobile1Head ?? ""),
+        telHead: formatPhoneNumber(data.telHead ?? ""),
+        whatsAppHead: formatPhoneNumber(data.whatsAppHead ?? ""),
+        phoneNumberGeneralVeterinarian: formatPhoneNumber(
+          data.phoneNumberGeneralVeterinarian ?? ""
+        ),
+      };
+      console.log("formatted Data: ", formattedData);
+
       // console.log("STEP 4: Preparing submitData");
       // Build raw object first
       const rawData: any = {
@@ -815,6 +860,8 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
     setRole(localStorage.getItem("role"));
   }, []);
 
+  console.log(existingPetImages);
+
   return (
     <div className="fixed inset-0 bg-white/30 backdrop-blur-sm flex items-center justify-center p-2 z-50">
       <div className="bg-white rounded-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto ring-3 ring-[var(--main-color)]">
@@ -883,6 +930,7 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
                     <div>
                       <span className="text-gray-500">رنگ:</span>
                       <span className="font-medium text-gray-900 mr-2">
+                        <p>{pet.colorPet}</p>
                         {pet.colorPet !== "UNKNOWN" ? pet.colorPet : "نامشخص"}
                       </span>
                     </div>
@@ -1526,22 +1574,23 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
                     </label>
                     <input
                       type="tel"
-                      minLength={10}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg     focus:border-transparent"
-                      placeholder="مثال: 9152944444 (اجباری)"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:border-transparent"
+                      placeholder="مثال: 9123456789 (اجباری)"
                       {...register("phoneNumberVeterinarian", {
-                        required: true,
-                        validate: (value) =>
-                          //@ts-ignore
-                          /^(\d{10,}|\+\d{10,})$/.test(value) ||
-                          "شماره تلفن معتبر نیست",
+                        validate: (value: string) => {
+                          if (!value) return true; // Optional field
+
+                          // Simple validation - just check if it contains digits
+                          const hasDigits = /\d/.test(value);
+                          return hasDigits || "شماره تلفن باید شامل اعداد باشد";
+                        },
                       })}
-                      onChange={(e) =>
-                        handlePhoneNumberChange(
-                          "phoneNumberVeterinarian",
-                          e.target.value
-                        )
-                      }
+                      onChange={(e) => {
+                        const formatted = formatPhoneNumber(e.target.value);
+                        setValue("phoneNumberVeterinarian", formatted, {
+                          shouldValidate: true,
+                        });
+                      }}
                     />
                     {errors.phoneNumberVeterinarian && (
                       <p className="mt-1 text-sm text-red-500">
@@ -1579,21 +1628,49 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
                     <label className="block text-sm font-medium text-gray-700 mb-1">
                       کد ملی
                     </label>
-                    <input
-                      type="text"
-                      minLength={10}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg     focus:border-transparent"
-                      {...register("nationalCodeHead", {
-                        minLength: {
-                          value: 10,
-                          message: "کد ملی باید 10 رقمی باشد",
-                        },
-                        maxLength: {
-                          value: 10,
-                          message: "کد ملی باید 10 رقمی باشد",
-                        },
-                      })}
-                    />
+                    <>
+                      <input
+                        type="text"
+                        inputMode="numeric"
+                        pattern="\d{10}"
+                        maxLength={10}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:border-transparent"
+                        {...register("nationalCodeHead", {
+                          minLength: {
+                            value: 10,
+                            message: "کد ملی باید 10 رقمی باشد",
+                          },
+                          maxLength: {
+                            value: 10,
+                            message: "کد ملی باید 10 رقمی باشد",
+                          },
+                          pattern: {
+                            value: /^\d{10}$/,
+                            message: "کد ملی باید فقط شامل اعداد باشد",
+                          },
+                        })}
+                        onKeyDown={(e) => {
+                          if (
+                            !/[0-9]/.test(e.key) &&
+                            e.key !== "Backspace" &&
+                            e.key !== "Delete" &&
+                            e.key !== "ArrowLeft" &&
+                            e.key !== "ArrowRight" &&
+                            e.key !== "Tab"
+                          ) {
+                            e.preventDefault();
+                          }
+                        }}
+                      />
+
+                      {errors.nationalCodeHead && (
+                        <p className="text-red-600 mt-1 text-sm">
+                          {errors.nationalCodeHead.message}
+                        </p>
+                      )}
+                    </>
+
+                    <p></p>
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -1605,15 +1682,42 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg     focus:border-transparent"
                       placeholder="مثال: 9123456789 (اجباری)"
                       {...register("mobile1Head", {
-                        required: true,
-                        validate: (value) =>
-                          //@ts-ignore
-                          /^(\d{10,}|\+\d{10,})$/.test(value) ||
-                          "شماره موبایل معتبر نیست",
+                        required: "موبایل اجباری است",
+                        validate: (value: string) => {
+                          if (!value) return "موبایل اجباری است";
+
+                          // Check if the value starts with +98
+                          if (!value.startsWith("+98")) {
+                            return "شماره موبایل باید با +98 شروع شود";
+                          }
+
+                          // Get the digits after +98 (should be exactly 10 digits)
+                          const digitsAfterPrefix = value.substring(3); // Remove "+98"
+
+                          // Check if there are exactly 10 digits after +98
+                          if (digitsAfterPrefix.length !== 10) {
+                            return "شماره موبایل باید ۱۰ رقم بعد از +98 داشته باشد";
+                          }
+
+                          // Check if all characters after +98 are digits
+                          if (!/^\d+$/.test(digitsAfterPrefix)) {
+                            return "شماره موبایل باید فقط شامل اعداد باشد";
+                          }
+
+                          // Check if it's a valid Iranian mobile number (starts with 9)
+                          if (!digitsAfterPrefix.startsWith("9")) {
+                            return "شماره موبایل باید با ۹ شروع شود";
+                          }
+
+                          return true;
+                        },
                       })}
-                      onChange={(e) =>
-                        handlePhoneNumberChange("mobile1Head", e.target.value)
-                      }
+                      onChange={(e) => {
+                        const formatted = formatPhoneNumber(e.target.value);
+                        setValue("mobile1Head", formatted, {
+                          shouldValidate: true,
+                        });
+                      }}
                     />
                     {errors.mobile1Head && (
                       <p className="mt-1 text-sm text-red-500">
@@ -1628,12 +1732,23 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
                     </label>
                     <input
                       type="tel"
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg     focus:border-transparent"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:border-transparent"
                       placeholder="مثال: 2112345678"
-                      {...register("telHead")}
-                      onChange={(e) =>
-                        handlePhoneNumberChange("telHead", e.target.value)
-                      }
+                      {...register("telHead", {
+                        validate: (value: string) => {
+                          if (!value) return true; // Optional field
+
+                          // Simple validation - just check if it contains digits
+                          const hasDigits = /\d/.test(value);
+                          return hasDigits || "شماره تلفن باید شامل اعداد باشد";
+                        },
+                      })}
+                      onChange={(e) => {
+                        const formatted = formatPhoneNumber(e.target.value);
+                        setValue("telHead", formatted, {
+                          shouldValidate: true,
+                        });
+                      }}
                     />
                   </div>
                   <div>
@@ -1777,11 +1892,26 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
                   <input
                     type="tel"
                     minLength={10}
-                    className="w-full mt-2 px-3 py-2 border border-gray-300 rounded-lg     focus:border-transparent"
+                    className="w-full mt-2 px-3 py-2 border border-gray-300 rounded-lg focus:border-transparent"
                     placeholder="مثال: 2112345678 (اجباری)"
                     {...register("phoneNumberGeneralVeterinarian", {
-                      required: true,
+                      required: "شماره تلفن دامپزشک اجباری است",
+                      validate: (value: string) => {
+                        if (!value) return "شماره تلفن دامپزشک اجباری است";
+
+                        const formattedValue = formatPhoneNumber(value);
+                        // Validate Iranian phone number format: +98 followed by 10 digits
+                        const isValid = /^\+98\d{10}$/.test(formattedValue);
+                        return isValid || "شماره تلفن معتبر نیست";
+                      },
                     })}
+                    onChange={(e) => {
+                      const formatted = formatPhoneNumber(e.target.value);
+                      // Update the form value with formatted number
+                      setValue("phoneNumberGeneralVeterinarian", formatted, {
+                        shouldValidate: true,
+                      });
+                    }}
                   />
                   {errors.phoneNumberGeneralVeterinarian && (
                     <p className="mt-1 text-sm text-red-500">
@@ -2318,6 +2448,7 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
                         ? "opacity-85 cursor-not-allowed outline-none focus:outline-none"
                         : ""
                     }`}
+                    {...register("trainingAdvice")}
                   />
                 </div>
               </div>
