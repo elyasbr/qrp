@@ -789,6 +789,7 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
         await updatePet(pet.petId || "", finalData as unknown as Pet, isAdmin);
       } else {
         // console.log("STEP 36: Creating pet");
+        const finalData = cleanData(submitData);
         await createPet(finalData as unknown as Pet);
       }
 
