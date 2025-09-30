@@ -1,3 +1,5 @@
+//@ts-nocheck
+
 "use client";
 import { useState, useEffect, useRef } from "react";
 import {
@@ -502,7 +504,7 @@ function PetViewModal({ pet, onClose }: { pet: Pet; onClose: () => void }) {
                     )}
 
                     {/* Gallery Photos Section */}
-                    {(pet?.galleryPhoto?.length ?? 0) > 0 && (
+                    {(pet?.galleriesPhoto?.length ?? 0) > 0 && (
                       <div className="space-y-3">
                         <h4 className="font-semibold text-gray-800 mb-3 flex items-center gap-2">
                           <ImageIcon
@@ -511,11 +513,11 @@ function PetViewModal({ pet, onClose }: { pet: Pet; onClose: () => void }) {
                           />
                           گالری عکس‌ها
                           <span className="bg-gray-100 text-gray-600 text-xs px-2 py-1 rounded-full">
-                            {pet?.galleryPhoto?.length}
+                            {pet?.galleriesPhoto?.length}
                           </span>
                         </h4>
                         <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                          {pet?.galleryPhoto?.map((photo, index) => (
+                          {pet?.galleriesPhoto?.map((photo, index) => (
                             <div
                               key={index}
                               className="group relative bg-white border border-gray-200 rounded-xl overflow-hidden hover:shadow-lg transition-all duration-200"
@@ -569,7 +571,7 @@ function PetViewModal({ pet, onClose }: { pet: Pet; onClose: () => void }) {
                     )}
 
                     {/* Gallery Videos Section */}
-                    {(pet?.galleryVideo?.length ?? 0) > 0 && (
+                    {(pet?.galleriesVideo?.length ?? 0) > 0 && (
                       <div className="space-y-3">
                         <h4 className="font-semibold text-gray-800 mb-3 flex items-center gap-2">
                           <Video
@@ -578,11 +580,11 @@ function PetViewModal({ pet, onClose }: { pet: Pet; onClose: () => void }) {
                           />
                           گالری ویدیوها
                           <span className="bg-gray-100 text-gray-600 text-xs px-2 py-1 rounded-full">
-                            {pet?.galleryVideo?.length}
+                            {pet?.galleriesVideo?.length}
                           </span>
                         </h4>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                          {pet?.galleryVideo?.map((video, index) => (
+                          {pet?.galleriesVideo?.map((video, index) => (
                             <div
                               key={index}
                               className="group relative bg-white border border-gray-200 rounded-xl overflow-hidden hover:shadow-lg transition-all duration-200"
@@ -624,8 +626,8 @@ function PetViewModal({ pet, onClose }: { pet: Pet; onClose: () => void }) {
                     {/* No files message */}
                     {!pet?.certificatePdf &&
                       !pet?.insurancePdf &&
-                      (pet?.galleryPhoto?.length ?? 0) === 0 &&
-                      (pet?.galleryVideo?.length ?? 0) === 0 && (
+                      (pet?.galleriesPhoto?.length ?? 0) <= 0 &&
+                      (pet?.galleriesVideo?.length ?? 0) <= 0 && (
                         <div className="text-center py-12">
                           <div className="p-4 bg-gray-50 rounded-full w-16 h-16 mx-auto mb-4 flex items-center justify-center">
                             <FileText size={32} className="text-gray-300" />
@@ -671,12 +673,25 @@ export default function PetList() {
   const [petToDelete, setPetToDelete] = useState<Pet | null>(null);
   const [qrModalOpen, setQrModalOpen] = useState(false);
   const [selectedPetForQR, setSelectedPetForQR] = useState<Pet | null>(null);
+  const [isAdmin, setIsAdmin] = useState(false);
 
   const { showError, showSuccess, snackbar, hideSnackbar } = useSnackbar();
 
   // Load pets on component mount
   useEffect(() => {
     loadPets();
+  }, []);
+
+  //check if user is admin on render
+
+  useEffect(() => {
+    //@ts-ignore
+    const role = localStorage.getItem("Iranradrole");
+    if (role === "user") setIsAdmin(false);
+    if (role === "admin") setIsAdmin(true);
+
+    //TODO SHOULD BE REMOVED LATE
+    setIsAdmin(false);
   }, []);
 
   const loadPets = async () => {
@@ -789,19 +804,21 @@ export default function PetList() {
           <div className="flex flex-col lg:flex-row gap-4 items-center justify-between">
             {/* Search */}
             <div className="hidden lg:flex flex-1 max-w-md">
-              <div className="relative">
-                <Search
-                  className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
-                  size={20}
-                />
-                <input
-                  type="text"
-                  placeholder="جستجو در پت..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--main-color)] focus:border-transparent"
-                />
-              </div>
+              {isAdmin && (
+                <div className="relative">
+                  <Search
+                    className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
+                    size={20}
+                  />
+                  <input
+                    type="text"
+                    placeholder="جستجو در پت..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--main-color)] focus:border-transparent"
+                  />
+                </div>
+              )}
             </div>
 
             {/* Add Button */}

@@ -857,7 +857,7 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
 
   useEffect(() => {
     //@ts-ignore
-    setRole(localStorage.getItem("role"));
+    setRole(localStorage.getItem("Iranradrole"));
   }, []);
 
   console.log(existingPetImages);

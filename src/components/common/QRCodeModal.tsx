@@ -11,7 +11,13 @@ interface QRCodeModalProps {
   insuranceNumber?: string;
 }
 
-export default function QRCodeModal({ isOpen, onClose, petId, petName, insuranceNumber }: QRCodeModalProps) {
+export default function QRCodeModal({
+  isOpen,
+  onClose,
+  petId,
+  petName,
+  insuranceNumber,
+}: QRCodeModalProps) {
   const [qrCodeDataUrl, setQrCodeDataUrl] = useState<string>("");
   const [isGenerating, setIsGenerating] = useState(false);
   const [copied, setCopied] = useState(false);
@@ -24,21 +30,21 @@ export default function QRCodeModal({ isOpen, onClose, petId, petName, insurance
 
   const generateQRCode = async () => {
     if (!petId) return;
-    
+
     setIsGenerating(true);
     try {
       // Generate QR code with just the URL
-      const petUrl = `${window.location.origin}/pet/${petId}`;
-      
+      const petUrl = `https://${window.location.host}/pet/${petId}`;
+
       const qrCodeDataUrl = await QRCode.toDataURL(petUrl, {
         width: 300,
         margin: 2,
         color: {
           dark: "#000000",
-          light: "#FFFFFF"
-        }
+          light: "#FFFFFF",
+        },
       });
-      
+
       setQrCodeDataUrl(qrCodeDataUrl);
     } catch (error) {
       console.error("Error generating QR code:", error);
@@ -49,7 +55,7 @@ export default function QRCodeModal({ isOpen, onClose, petId, petName, insurance
 
   const downloadQRCode = () => {
     if (!qrCodeDataUrl) return;
-    
+
     const link = document.createElement("a");
     link.download = `qr-code-${petName}-${petId}.png`;
     link.href = qrCodeDataUrl;
@@ -60,21 +66,23 @@ export default function QRCodeModal({ isOpen, onClose, petId, petName, insurance
 
   const shareQRCode = async () => {
     if (!qrCodeDataUrl) return;
-    
+
     try {
       // Convert data URL to blob
       const response = await fetch(qrCodeDataUrl);
       const blob = await response.blob();
-      
+
       if (navigator.share) {
-        const shareText = insuranceNumber 
+        const shareText = insuranceNumber
           ? `Scan this QR code to view ${petName}'s information\nشماره بیمه: ${insuranceNumber}`
           : `Scan this QR code to view ${petName}'s information`;
-        
+
         await navigator.share({
           title: `QR Code for ${petName}`,
           text: shareText,
-          files: [new File([blob], `qr-code-${petName}.png`, { type: 'image/png' })]
+          files: [
+            new File([blob], `qr-code-${petName}.png`, { type: "image/png" }),
+          ],
         });
       } else {
         // Fallback: copy to clipboard or download
@@ -87,8 +95,8 @@ export default function QRCodeModal({ isOpen, onClose, petId, petName, insurance
   };
 
   const copyUrl = async () => {
-    const petUrl = `${window.location.origin}/pet/${petId}`;
-    const copyText = insuranceNumber 
+    const petUrl = `https://${window.location.host}/pet/${petId}`;
+    const copyText = insuranceNumber
       ? `${petUrl}\nشماره بیمه: ${insuranceNumber}`
       : petUrl;
     try {
@@ -112,11 +120,13 @@ export default function QRCodeModal({ isOpen, onClose, petId, petName, insurance
             </div>
           </div>
         )}
-        
+
         {/* Header */}
         <div className="flex items-center justify-between mb-4 sm:mb-6">
           <div>
-            <h2 className="text-lg sm:text-xl font-bold text-gray-900">QR Code</h2>
+            <h2 className="text-lg sm:text-xl font-bold text-gray-900">
+              QR Code
+            </h2>
             <p className="text-xs sm:text-sm text-gray-600">برای {petName}</p>
           </div>
           <button
@@ -132,7 +142,9 @@ export default function QRCodeModal({ isOpen, onClose, petId, petName, insurance
           {isGenerating ? (
             <div className="flex flex-col items-center gap-3">
               <div className="animate-spin rounded-full h-10 w-10 sm:h-12 sm:w-12 border-b-2 border-[var(--main-color)]"></div>
-              <p className="text-sm sm:text-base text-gray-600 text-center">در حال تولید QR Code...</p>
+              <p className="text-sm sm:text-base text-gray-600 text-center">
+                در حال تولید QR Code...
+              </p>
             </div>
           ) : qrCodeDataUrl ? (
             <div className="text-center w-full">
@@ -147,7 +159,7 @@ export default function QRCodeModal({ isOpen, onClose, petId, petName, insurance
                 این QR Code را اسکن کنید تا اطلاعات {petName} را مشاهده کنید
               </p>
               <p className="text-xs text-gray-500 font-mono bg-gray-100 p-2 rounded mx-2 break-all">
-                {`${window.location.origin}/pet/${petId}`}
+                {`https://${window.location.host}/pet/${petId}`}
               </p>
               <p className="text-xs text-gray-500 mt-2">
                 شماره بیمه: {insuranceNumber || "تعیین نشده"}
